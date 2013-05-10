@@ -1,46 +1,81 @@
 package com.il.appshortcut;
 
 import android.app.ActionBar;
+import android.app.ActionBar.Tab;
 import android.app.Dialog;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 
+import com.il.appshortcut.adapters.GridPagerAdapter;
 import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.fragments.ApplicationListFragment;
 import com.il.appshortcut.fragments.FilterApplications;
 import com.il.appshortcut.views.ApplicationItem;
 
-public class ManageAppListActivity extends FragmentActivity
-		implements
+public class ManageAppListActivity extends FragmentActivity implements
 		ApplicationListFragment.ApplicationListListener,
-		FilterApplications.FilterDialogListener{
+		FilterApplications.FilterDialogListener,
+		ActionBar.TabListener{
 
 	public final String ACTIVITY_MANAGE_PATTERNS = "ActivityManagePatterns";
 	ApplicationListFragment appGridFragment;
+
+	GridPagerAdapter mGridAdapter;
+	ViewPager mViewPager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_manage_patterns);
+
 		if (findViewById(R.id.fragment_container) != null) {
 			if (savedInstanceState != null) {
 				return;
 			}
 
+			mGridAdapter = new GridPagerAdapter(getSupportFragmentManager());
+
 			final ActionBar actionBar = getActionBar();
-			actionBar.setDisplayHomeAsUpEnabled(true);
+			actionBar.setHomeButtonEnabled(true);
+			// Specify that we will be displaying tabs in the action bar.
+			actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+			mViewPager = (ViewPager) findViewById(R.id.pager);
+			mViewPager.setAdapter(mGridAdapter);
+			mViewPager
+					.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+						@Override
+						public void onPageSelected(int position) {
+							actionBar.setSelectedNavigationItem(position);
+						}
+					});
 
 			appGridFragment = new ApplicationListFragment();
 			appGridFragment.setArguments(getIntent().getExtras());
 			getSupportFragmentManager().beginTransaction()
 					.add(R.id.fragment_container, appGridFragment).commit();
+
+			// For each of the sections in the app, add a tab to the action bar.
+			for (int i = 0; i < mGridAdapter.getCount(); i++) {
+				// Create a tab with text corresponding to the page title
+				// defined by the adapter.
+				// Also specify this Activity object, which implements the
+				// TabListener interface, as the
+				// listener for when this tab is selected.
+				actionBar.addTab(actionBar.newTab()
+						.setText(mGridAdapter.getPageTitle(i))
+						.setTabListener(this));
+			}
+
 		}
 
 	}
@@ -48,19 +83,19 @@ public class ManageAppListActivity extends FragmentActivity
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			case android.R.id.home:
-				Intent upIntent = new Intent(this, MainActivity.class);
-				if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
-					TaskStackBuilder.create(this).addNextIntent(upIntent)
-							.startActivities();
-					finish();
-				} else {
-					NavUtils.navigateUpTo(this, upIntent);
-				}
-			break; 
-			case R.id.action_search:
-				FilterApplications fa = new FilterApplications();
-				fa.show(getSupportFragmentManager(), "Filter Applications");
+		case android.R.id.home:
+			Intent upIntent = new Intent(this, MainActivity.class);
+			if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
+				TaskStackBuilder.create(this).addNextIntent(upIntent)
+						.startActivities();
+				finish();
+			} else {
+				NavUtils.navigateUpTo(this, upIntent);
+			}
+			break;
+		case R.id.action_search:
+			FilterApplications fa = new FilterApplications();
+			fa.show(getSupportFragmentManager(), "Filter Applications");
 			break;
 		}
 		return super.onOptionsItemSelected(item);
@@ -72,50 +107,70 @@ public class ManageAppListActivity extends FragmentActivity
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.il.appshortcut.fragments.ApplicationListFragment.ApplicationListListener#onApplicationSelected(com.il.appshortcut.views.ApplicationItem)
-	 * This is when the user select an applicatoin from the list
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.il.appshortcut.fragments.ApplicationListFragment.ApplicationListListener
+	 * #onApplicationSelected(com.il.appshortcut.views.ApplicationItem) This is
+	 * when the user select an applicatoin from the list
 	 */
 	@Override
 	public void onApplicationSelected(ApplicationItem _appSelected) {
 		AppShortcutApplication appState = (AppShortcutApplication) getApplicationContext();
 		appState.setAppSelected(_appSelected);
-		Intent intent = new Intent(ManageAppListActivity.this, ManageApplicationActivity.class);
+		Intent intent = new Intent(ManageAppListActivity.this,
+				ManageApplicationActivity.class);
 		startActivity(intent);
 	}
 
 	@Override
 	public void onDialogPositiveClick(DialogFragment dialog) {
-		FilterApplications filterDialog = (FilterApplications) dialog; 
+		FilterApplications filterDialog = (FilterApplications) dialog;
 		int filterType = filterDialog.filterCheckbox;
 		Dialog d = filterDialog.getDialog();
 		EditText et = (EditText) d.findViewById(R.id.search_criteria);
 		String appName = et.getText().toString();
-		
+
 		appGridFragment.setFilterValues(appName, filterType);
 		appGridFragment.refresList();
 	}
-	
 
 	@Override
 	public void onDialogNegativeClick(DialogFragment dialog) {
 		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onTabReselected(Tab tab, FragmentTransaction ft) {
+		// TODO Auto-generated method stub
 		
 	}
 
-//	@Override
-//	public void onBackPressed() {
-//		super.onBackPressed();
-//		if (fragmentLoaded == 1) {
-//			fragmentLoaded = 0;
-//			appSelected = null;
-//			appGridFragment.refresAppList();
-//		} else if (fragmentLoaded == 2) {
-//			fragmentLoaded = 1;
-//			// TODO pending
-//		}
-//	}
+	@Override
+	public void onTabSelected(Tab tab, FragmentTransaction ft) {
+		// TODO Auto-generated method stub
+		
+	}
 
-	
+	@Override
+	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	// @Override
+	// public void onBackPressed() {
+	// super.onBackPressed();
+	// if (fragmentLoaded == 1) {
+	// fragmentLoaded = 0;
+	// appSelected = null;
+	// appGridFragment.refresAppList();
+	// } else if (fragmentLoaded == 2) {
+	// fragmentLoaded = 1;
+	// // TODO pending
+	// }
+	// }
 
 }

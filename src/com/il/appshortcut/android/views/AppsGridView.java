@@ -1,18 +1,14 @@
 package com.il.appshortcut.android.views;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.view.View;
 import android.widget.GridView;
 
-import com.il.appshortcut.events.AdapterView;
-import com.il.appshortcut.events.DragSource;
 
-public class AppsGridView extends GridView implements AdapterView.OnItemClickListener {
+public class AppsGridView extends GridView {
 
 	private Bitmap mTexture;
     private Paint mPaint;
@@ -35,12 +31,6 @@ public class AppsGridView extends GridView implements AdapterView.OnItemClickLis
         return !mTexture.hasAlpha();
     }
 
-    @Override
-    protected void onFinishInflate() {
-//        setOnItemClickListener(this);
-    }
-	
-    
     @Override
     public void draw(Canvas canvas) {
         final Bitmap texture = mTexture;
@@ -67,10 +57,5 @@ public class AppsGridView extends GridView implements AdapterView.OnItemClickLis
         super.draw(canvas);
     }
     
-    @Override
-    public void onItemClick(AdapterView parent, View v, int position, long id) {
-//        ApplicationInfo app = (ApplicationInfo) parent.getItemAtPosition(position);
-//        mLauncher.startActivitySafely(app.intent);
-    }
 
 }
