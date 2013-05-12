@@ -1,10 +1,22 @@
 package com.il.appshortcut;
 
+import static com.il.appshortcut.helpers.ActionHelper.isAssignedByApplication;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Dialog;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -14,6 +26,7 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.il.appshortcut.adapters.GridPagerAdapter;
 import com.il.appshortcut.config.AppShortcutApplication;
@@ -22,64 +35,114 @@ import com.il.appshortcut.fragments.FilterApplications;
 import com.il.appshortcut.views.ApplicationItem;
 
 public class ManageAppListActivity extends FragmentActivity implements
+		FilterApplications.FilterDialogListener, 
 		ApplicationListFragment.ApplicationListListener,
-		FilterApplications.FilterDialogListener,
 		ActionBar.TabListener{
 
-	public final String ACTIVITY_MANAGE_PATTERNS = "ActivityManagePatterns";
-	ApplicationListFragment appGridFragment;
-
-	GridPagerAdapter mGridAdapter;
+	public ActionBar actionBar;
+	GridPagerAdapter mGridPagerAdapter;
 	ViewPager mViewPager;
-
+	
+	private String filterAppName;
+	private int filterType;
+	private ArrayList<ApplicationItem> applicationItems;
+	private List<ApplicationItem> listApplications;
+	
+	public void init() {
+		filterAppName = "";
+		filterType = 0;
+		listApplications = new ArrayList<ApplicationItem>();
+		applicationItems = new ArrayList<ApplicationItem>();
+		
+	}
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_manage_patterns);
-
-		if (findViewById(R.id.fragment_container) != null) {
-			if (savedInstanceState != null) {
-				return;
-			}
-
-			mGridAdapter = new GridPagerAdapter(getSupportFragmentManager());
-
-			final ActionBar actionBar = getActionBar();
-			actionBar.setHomeButtonEnabled(true);
-			// Specify that we will be displaying tabs in the action bar.
-			actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
-			mViewPager = (ViewPager) findViewById(R.id.pager);
-			mViewPager.setAdapter(mGridAdapter);
-			mViewPager
-					.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-						@Override
-						public void onPageSelected(int position) {
-							actionBar.setSelectedNavigationItem(position);
-						}
-					});
-
-			appGridFragment = new ApplicationListFragment();
-			appGridFragment.setArguments(getIntent().getExtras());
-			getSupportFragmentManager().beginTransaction()
-					.add(R.id.fragment_container, appGridFragment).commit();
-
-			// For each of the sections in the app, add a tab to the action bar.
-			for (int i = 0; i < mGridAdapter.getCount(); i++) {
-				// Create a tab with text corresponding to the page title
-				// defined by the adapter.
-				// Also specify this Activity object, which implements the
-				// TabListener interface, as the
-				// listener for when this tab is selected.
-				actionBar.addTab(actionBar.newTab()
-						.setText(mGridAdapter.getPageTitle(i))
-						.setTabListener(this));
-			}
-
+		
+		actionBar = getActionBar();
+		actionBar.setHomeButtonEnabled(true);
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		
+		init();
+		new LoadApplication().execute();
+		
+		mGridPagerAdapter = new GridPagerAdapter(getSupportFragmentManager());
+		mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager.setAdapter(mGridPagerAdapter);
+        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                actionBar.setSelectedNavigationItem(position);
+            }
+        });
+        
+	}
+	
+	public void refrestTabs() {
+		actionBar.removeAllTabs();
+		for (int i = 0; i < mGridPagerAdapter.getCount(); i++) {
+			actionBar.addTab(actionBar.newTab()
+					.setText(mGridPagerAdapter.getPageTitle(i))
+					.setTabListener(this));
 		}
-
+	}
+	
+	public void refresList() {
+		List<ApplicationItem> tmpList = filterList(listApplications);
+		applicationItems.clear();
+		if (!tmpList.isEmpty()) {
+			int tmp = 1;
+			if ((tmpList.size() > ApplicationListFragment.GRID_SIZE) 
+					&& tmpList.size() % ApplicationListFragment.GRID_SIZE == 1){
+				tmp = 0;
+			}
+			int pages = tmpList.size() / ApplicationListFragment.GRID_SIZE + tmp;
+			mGridPagerAdapter.setmViews(pages);
+			Toast.makeText(getApplicationContext(), "-->" + pages, Toast.LENGTH_SHORT).show();
+			applicationItems.addAll(tmpList);
+			
+			AppShortcutApplication appState = ((AppShortcutApplication)getApplicationContext());
+			appState.setCurrentListApplications(applicationItems);
+			
+			mGridPagerAdapter.notifyDataSetChanged();
+			
+			refrestTabs();
+		}
+		
+		
 	}
 
+	public List<ApplicationItem> filterList(List<ApplicationItem> list) {
+		boolean someNameSearch = (filterAppName != null && !(filterAppName
+				.equalsIgnoreCase("")));
+		List<ApplicationItem> returnList = new ArrayList<ApplicationItem>();
+		if (someNameSearch || (filterType > 0) && list != null) {
+			for (ApplicationItem item : list) {
+
+				boolean type = (filterType == 0)
+						|| (filterType == 1 && item.isAssigned())
+						|| (filterType == 2 && !item.isAssigned());
+
+				boolean name = (filterAppName != null
+						&& !filterAppName.equalsIgnoreCase("") && item
+						.getApplicationName().toLowerCase()
+						.contains(filterAppName.toLowerCase()));
+
+				boolean add = name && type;
+
+				if (add) {
+					returnList.add(item);
+				}
+			}
+		} else {
+			returnList = listApplications;
+		}
+		return returnList;
+	}
+
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -127,50 +190,95 @@ public class ManageAppListActivity extends FragmentActivity implements
 	@Override
 	public void onDialogPositiveClick(DialogFragment dialog) {
 		FilterApplications filterDialog = (FilterApplications) dialog;
-		int filterType = filterDialog.filterCheckbox;
+		filterType = filterDialog.filterCheckbox;
 		Dialog d = filterDialog.getDialog();
 		EditText et = (EditText) d.findViewById(R.id.search_criteria);
-		String appName = et.getText().toString();
-
-		appGridFragment.setFilterValues(appName, filterType);
-		appGridFragment.refresList();
+		filterAppName = et.getText().toString();
+		refresList();
 	}
 
 	@Override
 	public void onDialogNegativeClick(DialogFragment dialog) {
 		// TODO Auto-generated method stub
-
 	}
 
+
+	@Override
+    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+        mViewPager.setCurrentItem(tab.getPosition());
+    }
+	
 	@Override
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
-		// TODO Auto-generated method stub
-		
 	}
-
-	@Override
-	public void onTabSelected(Tab tab, FragmentTransaction ft) {
-		// TODO Auto-generated method stub
-		
-	}
-
+	
 	@Override
 	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-		// TODO Auto-generated method stub
-		
 	}
 
-	// @Override
-	// public void onBackPressed() {
-	// super.onBackPressed();
-	// if (fragmentLoaded == 1) {
-	// fragmentLoaded = 0;
-	// appSelected = null;
-	// appGridFragment.refresAppList();
-	// } else if (fragmentLoaded == 2) {
-	// fragmentLoaded = 1;
-	// // TODO pending
-	// }
-	// }
+    /**
+	 * @author cesaregb progress dialog loads application list
+	 */
+	private ProgressDialog progressDialog;
+
+	public class LoadApplication extends AsyncTask<String, Integer, String> {
+		@Override
+		protected void onPreExecute() {
+			progressDialog = new ProgressDialog(ManageAppListActivity.this);
+			progressDialog.setMessage("Loading Applicationss...");
+			progressDialog.setIndeterminate(false);
+			progressDialog.setMax(100);
+			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			progressDialog.setCancelable(true);
+			progressDialog.show();
+		}
+
+		@Override
+		protected String doInBackground(String... params) {
+
+			PackageManager pm = getPackageManager();
+			List<ApplicationInfo> apps = pm.getInstalledApplications(0);
+			int i = 0;
+			for (ApplicationInfo app : apps) {
+				boolean addItem = false;
+				i++;
+				publishProgress((int) ((i / (float) apps.size()) * 100));
+
+				if ((app.flags & ApplicationInfo.FLAG_SYSTEM) == 1) {
+					// system applicatoins
+				} else {
+					addItem = true;
+				}
+
+				if (addItem) {
+					ApplicationItem item = new ApplicationItem(
+							(String) pm.getApplicationLabel(app));
+					item.setApplicationInfo(app);
+
+					SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
+									String.valueOf(R.string.idPrefFile),
+									Context.MODE_PRIVATE);
+					Resources r = getResources();
+					boolean assigned = isAssignedByApplication(item,
+							sharedPref, r);
+					item.setAssigned(assigned);
+
+					listApplications.add(item);
+				}
+			}
+
+			return null;
+		}
+
+		protected void onProgressUpdate(Integer... progress) {
+			progressDialog.setProgress(progress[0]);
+		}
+
+		protected void onPostExecute(String params) {
+			refresList();
+			progressDialog.dismiss();
+		}
+	}
+
 
 }

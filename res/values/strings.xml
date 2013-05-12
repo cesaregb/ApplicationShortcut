@@ -30,4 +30,7 @@
         <item>Assigned</item>
         <item>Not Assigned</item>
     </string-array>
+    
+    
+   <string name="dummy_section_text">Section %1d is just a dummy section.</string>
 </resources>

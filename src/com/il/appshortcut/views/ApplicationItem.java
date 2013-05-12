@@ -5,7 +5,7 @@ import android.content.pm.ApplicationInfo;
 public class ApplicationItem {
 	
 	private String applicationName;
-	private boolean assigned; 
+	private boolean assigned = false;; 
 	private String patter;
 	private ApplicationInfo applicationInfo;
 	private ApplicationActionItem applicationActionItem;

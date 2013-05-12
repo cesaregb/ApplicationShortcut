@@ -41,22 +41,21 @@ public final class R {
         public static final int ic_launcher=0x7f020004;
     }
     public static final class id {
-        public static final int action_search=0x7f0a0011;
-        public static final int action_settings=0x7f0a0010;
+        public static final int action_search=0x7f0a0010;
+        public static final int action_settings=0x7f0a000f;
         public static final int app_name=0x7f0a0008;
         public static final int applicatoin_action_name=0x7f0a0005;
         public static final int assignPattern=0x7f0a000d;
         public static final int editText1=0x7f0a0000;
-        public static final int fragment_container=0x7f0a0004;
         public static final int fragment_container_application=0x7f0a0003;
-        public static final int gridview=0x7f0a000f;
+        public static final int gridview=0x7f0a000e;
         public static final int icon_app_selected=0x7f0a0007;
         public static final int icon_image=0x7f0a000c;
         public static final int list_possible_actions=0x7f0a000a;
         public static final int list_selected_actions=0x7f0a0009;
         public static final int luncher_widget=0x7f0a0001;
         public static final int manage=0x7f0a0002;
-        public static final int pager=0x7f0a000e;
+        public static final int pager=0x7f0a0004;
         public static final int row=0x7f0a000b;
         public static final int search_criteria=0x7f0a0006;
     }
@@ -70,6 +69,8 @@ public final class R {
         public static final int comp_app_list_item=0x7f030006;
         public static final int comp_app_select_pattern=0x7f030007;
         public static final int comp_grid_view=0x7f030008;
+        public static final int comp_pager_view=0x7f030009;
+        public static final int fragment_section_dummy=0x7f03000a;
     }
     public static final class menu {
         public static final int grid_view=0x7f090000;
@@ -88,6 +89,7 @@ public final class R {
         public static final int confirm=0x7f060006;
         public static final int desc_backround=0x7f06000b;
         public static final int desc_temporal=0x7f06000c;
+        public static final int dummy_section_text=0x7f06000f;
         public static final int filter=0x7f060003;
         /**  app settings 
          */
