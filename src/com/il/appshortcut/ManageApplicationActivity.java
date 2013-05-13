@@ -2,12 +2,16 @@ package com.il.appshortcut;
 
 import android.app.ActionBar;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NavUtils;
+import android.support.v4.app.TaskStackBuilder;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -43,6 +47,25 @@ public class ManageApplicationActivity extends FragmentActivity
 			getSupportFragmentManager().beginTransaction().add(R.id.fragment_container_application, newFragment).commit();
 		}
 	}
+	
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			Intent upIntent = new Intent(this, ManageAppListActivity.class);
+			if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
+				TaskStackBuilder.create(this).addNextIntent(upIntent)
+						.startActivities();
+				finish();
+			} else {
+				NavUtils.navigateUpTo(this, upIntent);
+			}
+			break;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+	
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

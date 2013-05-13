@@ -30,7 +30,6 @@ public class MainActivity extends Activity implements
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-
 	
 	public void openManagePatterns(View view){
 		Intent intent = new Intent(MainActivity.this, ManageAppListActivity.class);

@@ -3,14 +3,18 @@ package com.il.appshortcut.adapters;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.il.appshortcut.fragments.ApplicationListFragment;
 
-public class GridPagerAdapter extends FragmentPagerAdapter {
+//public class GridPagerAdapter extends FragmentPagerAdapter {
+public class GridPagerAdapter extends FragmentStatePagerAdapter {
+
 	@Override
-	public void notifyDataSetChanged() {
-		super.notifyDataSetChanged();
+	public int getItemPosition(Object object) {
+		// TODO Auto-generated method stub
+		return FragmentStatePagerAdapter.POSITION_NONE;
+//		return super.getItemPosition(object);
 	}
 
 	private int mViews = 0;
@@ -34,7 +38,6 @@ public class GridPagerAdapter extends FragmentPagerAdapter {
 		args.putInt(ApplicationListFragment.ARG_SECTION_NUMBER, i);
 		fragment.setArguments(args);
 		return fragment;
-		
 	}
 
 	@Override
@@ -46,8 +49,6 @@ public class GridPagerAdapter extends FragmentPagerAdapter {
 	public CharSequence getPageTitle(int position) {
 		return "Section " + (position + 1);
 	}
-
-	
 	
 //	public static class ArrayListFragment extends ListFragment {
 //        int mNum;

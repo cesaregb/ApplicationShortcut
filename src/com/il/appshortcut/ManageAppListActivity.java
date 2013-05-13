@@ -1,8 +1,8 @@
 package com.il.appshortcut;
 
-import static com.il.appshortcut.helpers.ActionHelper.isAssignedByApplication;
-
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import android.app.ActionBar;
@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -33,6 +34,8 @@ import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.fragments.ApplicationListFragment;
 import com.il.appshortcut.fragments.FilterApplications;
 import com.il.appshortcut.views.ApplicationItem;
+
+import static com.il.appshortcut.helpers.ActionHelper.isAssignedByApplication;
 
 public class ManageAppListActivity extends FragmentActivity implements
 		FilterApplications.FilterDialogListener, 
@@ -62,8 +65,9 @@ public class ManageAppListActivity extends FragmentActivity implements
 		setContentView(R.layout.activity_manage_patterns);
 		
 		actionBar = getActionBar();
-		actionBar.setHomeButtonEnabled(true);
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+		actionBar.setDisplayHomeAsUpEnabled(true);
+		actionBar.setDisplayShowTitleEnabled(false);
+//		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		
 		init();
 		new LoadApplication().execute();
@@ -71,12 +75,12 @@ public class ManageAppListActivity extends FragmentActivity implements
 		mGridPagerAdapter = new GridPagerAdapter(getSupportFragmentManager());
 		mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mGridPagerAdapter);
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                actionBar.setSelectedNavigationItem(position);
-            }
-        });
+//        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+//            @Override
+//            public void onPageSelected(int position) {
+//                actionBar.setSelectedNavigationItem(position);
+//            }
+//        });
         
 	}
 	
@@ -92,26 +96,24 @@ public class ManageAppListActivity extends FragmentActivity implements
 	public void refresList() {
 		List<ApplicationItem> tmpList = filterList(listApplications);
 		applicationItems.clear();
-		if (!tmpList.isEmpty()) {
-			int tmp = 1;
-			if ((tmpList.size() > ApplicationListFragment.GRID_SIZE) 
-					&& tmpList.size() % ApplicationListFragment.GRID_SIZE == 1){
-				tmp = 0;
-			}
-			int pages = tmpList.size() / ApplicationListFragment.GRID_SIZE + tmp;
-			mGridPagerAdapter.setmViews(pages);
-			Toast.makeText(getApplicationContext(), "-->" + pages, Toast.LENGTH_SHORT).show();
-			applicationItems.addAll(tmpList);
-			
-			AppShortcutApplication appState = ((AppShortcutApplication)getApplicationContext());
-			appState.setCurrentListApplications(applicationItems);
-			
-			mGridPagerAdapter.notifyDataSetChanged();
-			
-			refrestTabs();
+		int tmp = 1;
+		if ((tmpList.size() > ApplicationListFragment.GRID_SIZE) 
+				&& tmpList.size() % ApplicationListFragment.GRID_SIZE == 1){
+			tmp = 0;
 		}
+		int pages = tmpList.size() / ApplicationListFragment.GRID_SIZE + tmp;
+		mGridPagerAdapter.setmViews(pages);
+		applicationItems.addAll(tmpList);
 		
+		AppShortcutApplication appState = ((AppShortcutApplication)getApplicationContext());
+		appState.setCurrentListApplications(applicationItems);
 		
+		mGridPagerAdapter.notifyDataSetChanged();
+		
+//		refrestTabs();
+		if (tmpList.isEmpty()) {
+			Toast.makeText(getApplicationContext(), "No application found.", Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	public List<ApplicationItem> filterList(List<ApplicationItem> list) {
@@ -236,36 +238,64 @@ public class ManageAppListActivity extends FragmentActivity implements
 		@Override
 		protected String doInBackground(String... params) {
 
-			PackageManager pm = getPackageManager();
-			List<ApplicationInfo> apps = pm.getInstalledApplications(0);
-			int i = 0;
-			for (ApplicationInfo app : apps) {
-				boolean addItem = false;
-				i++;
-				publishProgress((int) ((i / (float) apps.size()) * 100));
+//			PackageManager pm = getPackageManager();
+//			List<ApplicationInfo> apps = pm.getInstalledApplications(0);
+//			int i = 0;
+//			for (ApplicationInfo app : apps) {
+//				boolean addItem = false;
+//				i++;
+//				publishProgress((int) ((i / (float) apps.size()) * 100));
+//
+//				if ((app.flags & ApplicationInfo.FLAG_SYSTEM) != 1) {
+//					addItem = true;
+//				}
+//
+//				if (addItem) {
+//					ApplicationItem item = new ApplicationItem(
+//							(String) pm.getApplicationLabel(app));
+//					item.setApplicationInfo(app);
+//
+//					SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
+//									String.valueOf(R.string.idPrefFile),
+//									Context.MODE_PRIVATE);
+//					Resources r = getResources();
+//					boolean assigned = isAssignedByApplication(item,
+//							sharedPref, r);
+//					item.setAssigned(assigned);
+//
+//					listApplications.add(item);
+//				}
+//			}
+			
+			ArrayList<ApplicationInfo> applist = new ArrayList<ApplicationInfo>();
+			PackageManager manager = getPackageManager();
+			Intent localIntent = new Intent("android.intent.action.MAIN", null);
+			localIntent.addCategory("android.intent.category.LAUNCHER");
+			List<ResolveInfo> resolveInfos = manager.queryIntentActivities(
+			localIntent, 0);
+			Collections.sort(resolveInfos, new ResolveInfo.DisplayNameComparator(
+			manager));//It is used to sort the list in alphabetic order
 
-				if ((app.flags & ApplicationInfo.FLAG_SYSTEM) == 1) {
-					// system applicatoins
-				} else {
-					addItem = true;
-				}
+			for (ResolveInfo info : resolveInfos) {
+				ApplicationInfo applicationInfo = info.activityInfo.applicationInfo;
+				applist.add(applicationInfo);
 
-				if (addItem) {
-					ApplicationItem item = new ApplicationItem(
-							(String) pm.getApplicationLabel(app));
-					item.setApplicationInfo(app);
+				ApplicationItem item = new ApplicationItem(
+						(String) manager.getApplicationLabel(applicationInfo));
+				item.setApplicationInfo(applicationInfo);
 
-					SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
-									String.valueOf(R.string.idPrefFile),
-									Context.MODE_PRIVATE);
-					Resources r = getResources();
-					boolean assigned = isAssignedByApplication(item,
-							sharedPref, r);
-					item.setAssigned(assigned);
+				SharedPreferences sharedPref = getApplicationContext()
+						.getSharedPreferences(
+								String.valueOf(R.string.idPrefFile),
+								Context.MODE_PRIVATE);
+				Resources r = getResources();
+				boolean assigned = isAssignedByApplication(item, sharedPref, r);
+				item.setAssigned(assigned);
 
-					listApplications.add(item);
-				}
+				listApplications.add(item);
+
 			}
+			
 
 			return null;
 		}
@@ -276,9 +306,16 @@ public class ManageAppListActivity extends FragmentActivity implements
 
 		protected void onPostExecute(String params) {
 			refresList();
+			Collections.sort(listApplications, new AppComparable());
 			progressDialog.dismiss();
 		}
 	}
-
+	
+	public class AppComparable implements Comparator<ApplicationItem>{
+	    @Override
+	    public int compare(ApplicationItem o1, ApplicationItem o2) {
+	        return (o1.getApplicationName().compareToIgnoreCase(o2.getApplicationName())) ;
+	    }
+	}
 
 }
