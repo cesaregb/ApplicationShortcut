@@ -14,13 +14,23 @@ public final class R {
     public static final class attr {
     }
     public static final class color {
+        public static final int appwidget_error_color=0x7f04000b;
         public static final int background_color=0x7f040000;
+        public static final int bubble_dark_background=0x7f040009;
+        public static final int delete_color_filter=0x7f04000a;
+        public static final int gesture_color=0x7f04000d;
+        public static final int grid_dark_background=0x7f040008;
         public static final int marker_color=0x7f040001;
         public static final int notepad_lines=0x7f040004;
         public static final int notepad_margin=0x7f040005;
         public static final int notepad_paper=0x7f040003;
         public static final int notepad_text=0x7f040006;
+        public static final int snag_callout_color=0x7f04000c;
         public static final int text_color=0x7f040002;
+        public static final int uncertain_gesture_color=0x7f04000e;
+        /**      From android 
+         */
+        public static final int window_background=0x7f040007;
     }
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 

@@ -4,8 +4,6 @@ import java.util.List;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,7 +39,10 @@ public class ApplicationListItemAdapter extends ArrayAdapter<ApplicationItem> {
 		LinearLayout view;
 		ApplicationItem item;
 		item = getItem(position);
+		
 		String applicationName = item.getApplicationName();
+		
+		
 		if (convertView == null) {
 			view = new LinearLayout(getContext());
 			String inflater = Context.LAYOUT_INFLATER_SERVICE;
@@ -51,17 +52,24 @@ public class ApplicationListItemAdapter extends ArrayAdapter<ApplicationItem> {
 		} else {
 			view = (LinearLayout) convertView;
 		}
+		final ApplicationInfo info = item.getApplicationInfo();
+		if (info != null) {
+			Drawable icon = info.loadIcon(getContext().getPackageManager());
+			item.setIcon(Utilities.createIconThumbnail(icon, getContext()));
+		}
+
 		ApplicationListItemView applicationView = (ApplicationListItemView) view
 				.findViewById(R.id.row);
 		applicationView.setText(applicationName);
 
 		ImageView iconImage = (ImageView) view.findViewById(R.id.icon_image);
 
-		ApplicationInfo appInfo = item.getApplicationInfo();
-		Drawable icon = appInfo.loadIcon(getContext().getPackageManager());
-		Bitmap bmpIcon = ((BitmapDrawable) icon).getBitmap();
+//		ApplicationInfo appInfo = item.getApplicationInfo();
+//		Drawable icon = appInfo.loadIcon(getContext().getPackageManager());
+//		Bitmap bmpIcon = ((BitmapDrawable) icon).getBitmap();
+//		iconImage.setImageBitmap(bmpIcon);
 
-		iconImage.setImageBitmap(bmpIcon);
+		iconImage.setImageDrawable(item.getIcon());
 		return view;
 	}
 

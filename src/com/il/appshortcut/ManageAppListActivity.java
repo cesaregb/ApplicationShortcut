@@ -1,8 +1,9 @@
 package com.il.appshortcut;
 
+import static com.il.appshortcut.helpers.ActionHelper.isAssignedByApplication;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import android.app.ActionBar;
@@ -33,9 +34,8 @@ import com.il.appshortcut.adapters.GridPagerAdapter;
 import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.fragments.ApplicationListFragment;
 import com.il.appshortcut.fragments.FilterApplications;
+import com.il.appshortcut.views.AllAppsList;
 import com.il.appshortcut.views.ApplicationItem;
-
-import static com.il.appshortcut.helpers.ActionHelper.isAssignedByApplication;
 
 public class ManageAppListActivity extends FragmentActivity implements
 		FilterApplications.FilterDialogListener, 
@@ -221,6 +221,7 @@ public class ManageAppListActivity extends FragmentActivity implements
     /**
 	 * @author cesaregb progress dialog loads application list
 	 */
+	
 	private ProgressDialog progressDialog;
 
 	public class LoadApplication extends AsyncTask<String, Integer, String> {
@@ -230,56 +231,30 @@ public class ManageAppListActivity extends FragmentActivity implements
 			progressDialog.setMessage("Loading Applicationss...");
 			progressDialog.setIndeterminate(false);
 			progressDialog.setMax(100);
-			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 			progressDialog.setCancelable(true);
 			progressDialog.show();
 		}
 
 		@Override
 		protected String doInBackground(String... params) {
-
-//			PackageManager pm = getPackageManager();
-//			List<ApplicationInfo> apps = pm.getInstalledApplications(0);
-//			int i = 0;
-//			for (ApplicationInfo app : apps) {
-//				boolean addItem = false;
-//				i++;
-//				publishProgress((int) ((i / (float) apps.size()) * 100));
-//
-//				if ((app.flags & ApplicationInfo.FLAG_SYSTEM) != 1) {
-//					addItem = true;
-//				}
-//
-//				if (addItem) {
-//					ApplicationItem item = new ApplicationItem(
-//							(String) pm.getApplicationLabel(app));
-//					item.setApplicationInfo(app);
-//
-//					SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
-//									String.valueOf(R.string.idPrefFile),
-//									Context.MODE_PRIVATE);
-//					Resources r = getResources();
-//					boolean assigned = isAssignedByApplication(item,
-//							sharedPref, r);
-//					item.setAssigned(assigned);
-//
-//					listApplications.add(item);
-//				}
-//			}
+			AllAppsList allApp = new AllAppsList();
 			
 			ArrayList<ApplicationInfo> applist = new ArrayList<ApplicationInfo>();
 			PackageManager manager = getPackageManager();
-			Intent localIntent = new Intent("android.intent.action.MAIN", null);
-			localIntent.addCategory("android.intent.category.LAUNCHER");
-			List<ResolveInfo> resolveInfos = manager.queryIntentActivities(
-			localIntent, 0);
-			Collections.sort(resolveInfos, new ResolveInfo.DisplayNameComparator(
-			manager));//It is used to sort the list in alphabetic order
-
+			
+			Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+			mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+			
+			List<ResolveInfo> resolveInfos = manager.queryIntentActivities(mainIntent, 0);
+			
+			Collections.sort(resolveInfos,
+					new ResolveInfo.DisplayNameComparator(manager));
+			int i = 0;
 			for (ResolveInfo info : resolveInfos) {
+				publishProgress((int) ((i / (float) resolveInfos.size()) * 100));
 				ApplicationInfo applicationInfo = info.activityInfo.applicationInfo;
 				applist.add(applicationInfo);
-
 				ApplicationItem item = new ApplicationItem(
 						(String) manager.getApplicationLabel(applicationInfo));
 				item.setApplicationInfo(applicationInfo);
@@ -291,11 +266,11 @@ public class ManageAppListActivity extends FragmentActivity implements
 				Resources r = getResources();
 				boolean assigned = isAssignedByApplication(item, sharedPref, r);
 				item.setAssigned(assigned);
-
-				listApplications.add(item);
-
+				item.componentName = info.activityInfo.applicationInfo.packageName;
+				allApp.add(item);
 			}
 			
+			listApplications.addAll(allApp.data);
 
 			return null;
 		}
@@ -306,16 +281,8 @@ public class ManageAppListActivity extends FragmentActivity implements
 
 		protected void onPostExecute(String params) {
 			refresList();
-			Collections.sort(listApplications, new AppComparable());
 			progressDialog.dismiss();
 		}
 	}
 	
-	public class AppComparable implements Comparator<ApplicationItem>{
-	    @Override
-	    public int compare(ApplicationItem o1, ApplicationItem o2) {
-	        return (o1.getApplicationName().compareToIgnoreCase(o2.getApplicationName())) ;
-	    }
-	}
-
 }
