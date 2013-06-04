@@ -15,7 +15,7 @@ import android.widget.GridView;
 import com.il.appshortcut.R;
 import com.il.appshortcut.adapters.ApplicationListItemAdapter;
 import com.il.appshortcut.config.AppShortcutApplication;
-import com.il.appshortcut.views.ApplicationItem;
+import com.il.appshortcut.views.ApplicationVo;
 
 
 public class ApplicationListFragment extends Fragment {
@@ -30,14 +30,14 @@ public class ApplicationListFragment extends Fragment {
 	ApplicationListListener mCallback;
 	 // The container Activity must implement this interface so the frag can deliver messages
     public interface ApplicationListListener {
-        public void onApplicationSelected(ApplicationItem appSelected);
+        public void onApplicationSelected(ApplicationVo appSelected);
     }
 	
 	GridView gridView;
 	int position;
 	public static final String ARG_SECTION_NUMBER = "section_number";
     
-    private ArrayList<ApplicationItem> applicationItems;
+    private ArrayList<ApplicationVo> applicationItems;
 	private ApplicationListItemAdapter aa;
 
 	@Override
@@ -66,7 +66,7 @@ public class ApplicationListFragment extends Fragment {
         View view = inflater.inflate(R.layout.comp_grid_view, container, false); 
         gridView = (GridView) view.findViewById(R.id.gridview);
 
-        applicationItems = new ArrayList<ApplicationItem>();
+        applicationItems = new ArrayList<ApplicationVo>();
 		int resID = R.layout.comp_app_list_item;
 		aa = new ApplicationListItemAdapter(view.getContext(), resID, applicationItems);
         gridView.setAdapter(aa);
@@ -84,11 +84,11 @@ public class ApplicationListFragment extends Fragment {
 	public void refresList(){
 		applicationItems.clear();
 		AppShortcutApplication appState = ((AppShortcutApplication)getActivity().getApplicationContext());
-		List<ApplicationItem> l = appState.getCurrentListApplications();
+		List<ApplicationVo> l = appState.getCurrentListApplications();
 		if (l != null){
 			int arrPos = ((position>0)?position:1 - 1) * GRID_SIZE;
 			int listSize = l.size();
-			List<ApplicationItem> subSet = new ArrayList<ApplicationItem>();
+			List<ApplicationVo> subSet = new ArrayList<ApplicationVo>();
 			if ((listSize/GRID_SIZE) > position){
 				subSet = l.subList(arrPos, (arrPos + GRID_SIZE) );
 			}else{

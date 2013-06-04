@@ -14,13 +14,13 @@ import android.widget.LinearLayout;
 
 import com.il.appshortcut.R;
 import com.il.appshortcut.android.views.ApplicationListItemView;
-import com.il.appshortcut.views.ApplicationItem;
+import com.il.appshortcut.views.ApplicationVo;
 
 /**
  * @author Cesaregb this adapter is for the application list (grid)
  */
 
-public class ApplicationListItemAdapter extends ArrayAdapter<ApplicationItem> {
+public class ApplicationListItemAdapter extends ArrayAdapter<ApplicationVo> {
 	int resource;
 
 	public ApplicationListItemAdapter(Context context, int textViewResourceId) {
@@ -29,7 +29,7 @@ public class ApplicationListItemAdapter extends ArrayAdapter<ApplicationItem> {
 	}
 
 	public ApplicationListItemAdapter(Context context, int textViewResourceId,
-			List<ApplicationItem> items) {
+			List<ApplicationVo> items) {
 		super(context, textViewResourceId, items);
 		this.resource = textViewResourceId;
 	}
@@ -37,12 +37,9 @@ public class ApplicationListItemAdapter extends ArrayAdapter<ApplicationItem> {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		LinearLayout view;
-		ApplicationItem item;
+		ApplicationVo item;
 		item = getItem(position);
-		
-		String applicationName = item.getApplicationName();
-		
-		
+		String applicationName = item.getName();
 		if (convertView == null) {
 			view = new LinearLayout(getContext());
 			String inflater = Context.LAYOUT_INFLATER_SERVICE;
@@ -63,13 +60,8 @@ public class ApplicationListItemAdapter extends ArrayAdapter<ApplicationItem> {
 		applicationView.setText(applicationName);
 
 		ImageView iconImage = (ImageView) view.findViewById(R.id.icon_image);
-
-//		ApplicationInfo appInfo = item.getApplicationInfo();
-//		Drawable icon = appInfo.loadIcon(getContext().getPackageManager());
-//		Bitmap bmpIcon = ((BitmapDrawable) icon).getBitmap();
-//		iconImage.setImageBitmap(bmpIcon);
-
 		iconImage.setImageDrawable(item.getIcon());
+
 		return view;
 	}
 

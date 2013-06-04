@@ -35,55 +35,60 @@ import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.fragments.ApplicationListFragment;
 import com.il.appshortcut.fragments.FilterApplications;
 import com.il.appshortcut.views.AllAppsList;
-import com.il.appshortcut.views.ApplicationItem;
+import com.il.appshortcut.views.ApplicationVo;
 
 public class ManageAppListActivity extends FragmentActivity implements
-		FilterApplications.FilterDialogListener, 
-		ApplicationListFragment.ApplicationListListener,
-		ActionBar.TabListener{
+		FilterApplications.FilterDialogListener,
+		ApplicationListFragment.ApplicationListListener, ActionBar.TabListener {
 
 	public ActionBar actionBar;
 	GridPagerAdapter mGridPagerAdapter;
 	ViewPager mViewPager;
-	
+	boolean isOrderSelected = false;
+
 	private String filterAppName;
 	private int filterType;
-	private ArrayList<ApplicationItem> applicationItems;
-	private List<ApplicationItem> listApplications;
-	
+	private ArrayList<ApplicationVo> applicationItems;
+	private List<ApplicationVo> listApplications;
+
+	boolean removeFilter = false;
+
 	public void init() {
 		filterAppName = "";
 		filterType = 0;
-		listApplications = new ArrayList<ApplicationItem>();
-		applicationItems = new ArrayList<ApplicationItem>();
-		
+		listApplications = new ArrayList<ApplicationVo>();
+		applicationItems = new ArrayList<ApplicationVo>();
+
 	}
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_manage_patterns);
-		
+
 		actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(false);
-//		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		
+
 		init();
 		new LoadApplication().execute();
-		
+
 		mGridPagerAdapter = new GridPagerAdapter(getSupportFragmentManager());
 		mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mGridPagerAdapter);
-//        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-//            @Override
-//            public void onPageSelected(int position) {
-//                actionBar.setSelectedNavigationItem(position);
-//            }
-//        });
-        
+		mViewPager.setAdapter(mGridPagerAdapter);
+		if (isOrderSelected) {
+			actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+			mViewPager
+					.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+						@Override
+						public void onPageSelected(int position) {
+							actionBar.setSelectedNavigationItem(position);
+						}
+					});
+		}
+
 	}
-	
+
 	public void refrestTabs() {
 		actionBar.removeAllTabs();
 		for (int i = 0; i < mGridPagerAdapter.getCount(); i++) {
@@ -92,36 +97,38 @@ public class ManageAppListActivity extends FragmentActivity implements
 					.setTabListener(this));
 		}
 	}
-	
+
 	public void refresList() {
-		List<ApplicationItem> tmpList = filterList(listApplications);
+		List<ApplicationVo> tmpList = filterList(listApplications);
 		applicationItems.clear();
 		int tmp = 1;
-		if ((tmpList.size() > ApplicationListFragment.GRID_SIZE) 
-				&& tmpList.size() % ApplicationListFragment.GRID_SIZE == 1){
+		if ((tmpList.size() > ApplicationListFragment.GRID_SIZE)
+				&& tmpList.size() % ApplicationListFragment.GRID_SIZE == 1) {
 			tmp = 0;
 		}
 		int pages = tmpList.size() / ApplicationListFragment.GRID_SIZE + tmp;
 		mGridPagerAdapter.setmViews(pages);
 		applicationItems.addAll(tmpList);
-		
-		AppShortcutApplication appState = ((AppShortcutApplication)getApplicationContext());
+
+		AppShortcutApplication appState = ((AppShortcutApplication) getApplicationContext());
 		appState.setCurrentListApplications(applicationItems);
-		
+
 		mGridPagerAdapter.notifyDataSetChanged();
-		
-//		refrestTabs();
+		if (isOrderSelected) {
+			refrestTabs();
+		}
 		if (tmpList.isEmpty()) {
-			Toast.makeText(getApplicationContext(), "No application found.", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), "No application found.",
+					Toast.LENGTH_SHORT).show();
 		}
 	}
 
-	public List<ApplicationItem> filterList(List<ApplicationItem> list) {
+	public List<ApplicationVo> filterList(List<ApplicationVo> list) {
 		boolean someNameSearch = (filterAppName != null && !(filterAppName
 				.equalsIgnoreCase("")));
-		List<ApplicationItem> returnList = new ArrayList<ApplicationItem>();
+		List<ApplicationVo> returnList = new ArrayList<ApplicationVo>();
 		if (someNameSearch || (filterType > 0) && list != null) {
-			for (ApplicationItem item : list) {
+			for (ApplicationVo item : list) {
 
 				boolean type = (filterType == 0)
 						|| (filterType == 1 && item.isAssigned())
@@ -129,10 +136,10 @@ public class ManageAppListActivity extends FragmentActivity implements
 
 				boolean name = (filterAppName != null
 						&& !filterAppName.equalsIgnoreCase("") && item
-						.getApplicationName().toLowerCase()
+						.getName().toLowerCase()
 						.contains(filterAppName.toLowerCase()));
 
-				boolean add = name && type;
+				boolean add = (someNameSearch)?name && type:type;
 
 				if (add) {
 					returnList.add(item);
@@ -144,7 +151,6 @@ public class ManageAppListActivity extends FragmentActivity implements
 		return returnList;
 	}
 
-	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -162,6 +168,13 @@ public class ManageAppListActivity extends FragmentActivity implements
 			FilterApplications fa = new FilterApplications();
 			fa.show(getSupportFragmentManager(), "Filter Applications");
 			break;
+		case R.id.action_filter_delete:
+			filterAppName = "";
+			filterType = 0;
+			refresList();
+			removeFilter = false;
+			invalidateOptionsMenu();
+			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -169,6 +182,10 @@ public class ManageAppListActivity extends FragmentActivity implements
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.manage_patterns, menu);
+		MenuItem acRemoveFilter = menu.findItem(R.id.action_filter_delete);
+		MenuItem acSearch = menu.findItem(R.id.action_search);
+		acRemoveFilter.setVisible(removeFilter);
+		acSearch.setVisible(!removeFilter);
 		return true;
 	}
 
@@ -181,7 +198,7 @@ public class ManageAppListActivity extends FragmentActivity implements
 	 * when the user select an applicatoin from the list
 	 */
 	@Override
-	public void onApplicationSelected(ApplicationItem _appSelected) {
+	public void onApplicationSelected(ApplicationVo _appSelected) {
 		AppShortcutApplication appState = (AppShortcutApplication) getApplicationContext();
 		appState.setAppSelected(_appSelected);
 		Intent intent = new Intent(ManageAppListActivity.this,
@@ -197,6 +214,8 @@ public class ManageAppListActivity extends FragmentActivity implements
 		EditText et = (EditText) d.findViewById(R.id.search_criteria);
 		filterAppName = et.getText().toString();
 		refresList();
+		removeFilter = true;
+		invalidateOptionsMenu();
 	}
 
 	@Override
@@ -204,24 +223,24 @@ public class ManageAppListActivity extends FragmentActivity implements
 		// TODO Auto-generated method stub
 	}
 
-
 	@Override
-    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-        mViewPager.setCurrentItem(tab.getPosition());
-    }
-	
+	public void onTabSelected(ActionBar.Tab tab,
+			FragmentTransaction fragmentTransaction) {
+		mViewPager.setCurrentItem(tab.getPosition());
+	}
+
 	@Override
 	public void onTabReselected(Tab tab, FragmentTransaction ft) {
 	}
-	
+
 	@Override
 	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 	}
+	
 
-    /**
+	/**
 	 * @author cesaregb progress dialog loads application list
 	 */
-	
 	private ProgressDialog progressDialog;
 
 	public class LoadApplication extends AsyncTask<String, Integer, String> {
@@ -239,15 +258,16 @@ public class ManageAppListActivity extends FragmentActivity implements
 		@Override
 		protected String doInBackground(String... params) {
 			AllAppsList allApp = new AllAppsList();
-			
+
 			ArrayList<ApplicationInfo> applist = new ArrayList<ApplicationInfo>();
 			PackageManager manager = getPackageManager();
-			
+
 			Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
 			mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-			
-			List<ResolveInfo> resolveInfos = manager.queryIntentActivities(mainIntent, 0);
-			
+
+			List<ResolveInfo> resolveInfos = manager.queryIntentActivities(
+					mainIntent, 0);
+
 			Collections.sort(resolveInfos,
 					new ResolveInfo.DisplayNameComparator(manager));
 			int i = 0;
@@ -255,7 +275,7 @@ public class ManageAppListActivity extends FragmentActivity implements
 				publishProgress((int) ((i / (float) resolveInfos.size()) * 100));
 				ApplicationInfo applicationInfo = info.activityInfo.applicationInfo;
 				applist.add(applicationInfo);
-				ApplicationItem item = new ApplicationItem(
+				ApplicationVo item = new ApplicationVo(
 						(String) manager.getApplicationLabel(applicationInfo));
 				item.setApplicationInfo(applicationInfo);
 
@@ -264,14 +284,12 @@ public class ManageAppListActivity extends FragmentActivity implements
 								String.valueOf(R.string.idPrefFile),
 								Context.MODE_PRIVATE);
 				Resources r = getResources();
-				boolean assigned = isAssignedByApplication(item, sharedPref, r);
+				boolean assigned = isAssignedByApplication(item, sharedPref, r, item.getActions());
 				item.setAssigned(assigned);
-				item.componentName = info.activityInfo.applicationInfo.packageName;
+				item.setApplicationPackage(info.activityInfo.applicationInfo.packageName);
 				allApp.add(item);
 			}
-			
 			listApplications.addAll(allApp.data);
-
 			return null;
 		}
 
@@ -284,5 +302,5 @@ public class ManageAppListActivity extends FragmentActivity implements
 			progressDialog.dismiss();
 		}
 	}
-	
+
 }

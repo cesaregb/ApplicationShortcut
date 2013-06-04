@@ -5,11 +5,11 @@ import java.util.ArrayList;
 public class AllAppsList {
 	public static final int DEFAULT_APPLICATIONS_NUMBER = 42;
 
-	public ArrayList<ApplicationItem> data = new ArrayList<ApplicationItem>(
+	public ArrayList<ApplicationVo> data = new ArrayList<ApplicationVo>(
 			DEFAULT_APPLICATIONS_NUMBER);
 
-	public void add(ApplicationItem info) {
-		if (findActivity(data, info.componentName)) {
+	public void add(ApplicationVo info) {
+		if (findActivity(data, info.getApplicationPackage())) {
 			return;
 		}
 		data.add(info);
@@ -23,16 +23,16 @@ public class AllAppsList {
 		return data.size();
 	}
 
-	public ApplicationItem get(int index) {
+	public ApplicationVo get(int index) {
 		return data.get(index);
 	}
 
-	private static boolean findActivity(ArrayList<ApplicationItem> apps,
+	private static boolean findActivity(ArrayList<ApplicationVo> apps,
 			String component) {
 		final int N = apps.size();
 		for (int i = 0; i < N; i++) {
-			final ApplicationItem info = apps.get(i);
-			if (info.componentName.equalsIgnoreCase(component)) {
+			final ApplicationVo info = apps.get(i);
+			if (info.getApplicationPackage().equalsIgnoreCase(component)) {
 				return true;
 			}
 		}

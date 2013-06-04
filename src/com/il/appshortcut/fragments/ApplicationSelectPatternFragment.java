@@ -15,12 +15,12 @@ import android.widget.TextView;
 
 import com.il.appshortcut.R;
 import com.il.appshortcut.config.AppShortcutApplication;
-import com.il.appshortcut.views.ApplicationItem;
+import com.il.appshortcut.views.ApplicationVo;
 
 public class ApplicationSelectPatternFragment extends Fragment {
 	ApplicationSelectPatternFragmentListener mCallback;
 	public final static String ARG_POSITION = "application";
-	private ApplicationItem mCurrentApplication = null;
+	private ApplicationVo mCurrentApplication = null;
 
 	public interface ApplicationSelectPatternFragmentListener {
 		public void onSomething(String something);
@@ -43,7 +43,7 @@ public class ApplicationSelectPatternFragment extends Fragment {
 			Bundle savedInstanceState) {
 		//get the selected application..
 		AppShortcutApplication appState = (AppShortcutApplication)getActivity().getApplicationContext();
-		mCurrentApplication = (ApplicationItem) appState.getAppSelected();
+		mCurrentApplication = (ApplicationVo) appState.getAppSelected();
 		
 		return inflater.inflate(R.layout.comp_app_select_pattern, container, false);
 	}
@@ -54,11 +54,11 @@ public class ApplicationSelectPatternFragment extends Fragment {
 		updateApplicationView(mCurrentApplication);
 	}
 
-	public void updateApplicationView(ApplicationItem application) {
+	public void updateApplicationView(ApplicationVo application) {
 		mCurrentApplication = application;
 		
 		TextView article = (TextView) getActivity().findViewById(R.id.app_name);
-		article.setText(application.getApplicationName());
+		article.setText(application.getName());
 		ImageView image = (ImageView) getActivity().findViewById(
 				R.id.icon_app_selected);
 		ApplicationInfo appInfo = application.getApplicationInfo();

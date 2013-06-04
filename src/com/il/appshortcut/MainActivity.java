@@ -23,6 +23,9 @@ public class MainActivity extends Activity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		luncherWidget = (LuncherPatternView) findViewById(R.id.luncher_widget);
+		
+		Resources r = getResources(); 
+		com.il.appshortcut.helpers.ActionHelper.assignIdPrefFile(r);
 	}
 
 	@Override
@@ -42,9 +45,8 @@ public class MainActivity extends Activity implements
 		SharedPreferences sharedPref = getApplicationContext()
 				.getSharedPreferences(String.valueOf(R.string.idPrefFile),
 						Context.MODE_PRIVATE);
-		Resources r = getResources(); 
 		try {
-			Intent i = com.il.appshortcut.helpers.ActionHelper.getIntent(currentSelection, sharedPref, r, getPackageManager());
+			Intent i = com.il.appshortcut.helpers.ActionHelper.getIntent(currentSelection, sharedPref, getPackageManager());
 			if (i != null){
 				startActivity(i);
 			}else{ Toast.makeText(getApplicationContext(), "Exception.. so bad right? ", Toast.LENGTH_SHORT).show(); }

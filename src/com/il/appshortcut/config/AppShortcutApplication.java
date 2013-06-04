@@ -4,28 +4,28 @@ import java.util.List;
 
 import android.app.Application;
 
-import com.il.appshortcut.views.ApplicationItem;
+import com.il.appshortcut.views.ApplicationVo;
 
 public class AppShortcutApplication extends Application{
 	
-	private ApplicationItem appSelected;
+	private ApplicationVo appSelected;
 	
-	private List<ApplicationItem> currentListApplications;
+	private List<ApplicationVo> currentListApplications;
 
-	public ApplicationItem getAppSelected() {
+	public ApplicationVo getAppSelected() {
 		return appSelected;
 	}
 
-	public void setAppSelected(ApplicationItem appSelected) {
+	public void setAppSelected(ApplicationVo appSelected) {
 		this.appSelected = appSelected;
 	}
 
-	public List<ApplicationItem> getCurrentListApplications() {
+	public List<ApplicationVo> getCurrentListApplications() {
 		return currentListApplications;
 	}
 
 	public void setCurrentListApplications(
-			List<ApplicationItem> currentListApplications) {
+			List<ApplicationVo> currentListApplications) {
 		this.currentListApplications = currentListApplications;
 	} 
 

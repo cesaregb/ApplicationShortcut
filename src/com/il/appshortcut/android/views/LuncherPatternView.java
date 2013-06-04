@@ -13,7 +13,6 @@ import android.media.AudioManager;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -28,7 +27,15 @@ public class LuncherPatternView extends View {
 	}
 	
 	private String currentSelection;
-	Handler lunchAppTimer;
+	Handler lunchAppTimer = new Handler();
+	
+	private Runnable runnable = new Runnable()  {
+		@Override
+	    public void run() {
+	    	onItemPressedListener.fireApplication(currentSelection);
+        	currentSelection = "";
+	    }
+	};
 	
 	final int MIN_WIDTH = 200;
 	final int MIN_HEIGHT = 200;
@@ -187,9 +194,7 @@ public class LuncherPatternView extends View {
 	protected void onDraw(Canvas canvas) {
 		canvas.drawRect(2, 2, getWidth() - 2, getHeight() - 2, background);
 		canvas.save();
-		
 		drawDots(canvas);
-		
 	}
 	
 	private void drawDots(Canvas canvas){
@@ -255,8 +260,6 @@ public class LuncherPatternView extends View {
 		int action = event.getAction();
 		if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_MOVE) {
 			if (checkGrid(x, y)){
-				
-				
 				onItemPressed(cellProps.getLastPressed());
 			}
 			
@@ -287,11 +290,9 @@ public class LuncherPatternView extends View {
 		return onTouchEvent(event);
 	}
 	
-	@SuppressWarnings("fallthrough")
 	public void onItemPressed(int itemPressed) {
 		
 		currentSelection += String.valueOf(itemPressed);
-		Log.d("--", currentSelection);
 		com.il.appshortcut.helpers.UserInputHelpers.pressEffect(
 				(Vibrator) getContext().getSystemService(
 						Context.VIBRATOR_SERVICE),
@@ -300,17 +301,11 @@ public class LuncherPatternView extends View {
 
 		onItemPressedListener.registerSelection(currentSelection);
 		
-		lunchAppTimer = new Handler();
-		lunchAppTimer.postDelayed(new Runnable() {
-	        @Override
-	        public void run() {
-	        	onItemPressedListener.fireApplication(currentSelection);
-	        	currentSelection = "";
-	        }
-	    }, 2000);
+		lunchAppTimer.removeCallbacks(runnable);
+		lunchAppTimer.postDelayed(runnable, 2000);
 		
-
 		this.invalidate();
 	}
+	
 
 }

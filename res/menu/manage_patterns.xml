@@ -8,9 +8,14 @@
     
     <item
         android:id="@+id/action_search"
-        android:icon="@drawable/find"
+        android:icon="@drawable/action_search"
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
         android:title="@string/search"/>
+    
+    <item android:id="@+id/action_filter_delete"
+          android:icon="@drawable/content_discard"
+          android:title="@string/cancel"
+          android:showAsAction="ifRoom" />
 
 </menu>

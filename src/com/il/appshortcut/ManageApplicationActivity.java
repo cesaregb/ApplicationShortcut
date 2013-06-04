@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
@@ -19,8 +18,9 @@ import com.il.appshortcut.android.views.LuncherPatternView;
 import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.fragments.ApplicationInfoFragment;
 import com.il.appshortcut.fragments.ApplicationSelectPatternFragment;
-import com.il.appshortcut.views.ApplicationActionItem;
-import com.il.appshortcut.views.ApplicationItem;
+import com.il.appshortcut.helpers.ActionHelper;
+import com.il.appshortcut.views.ActionVo;
+import com.il.appshortcut.views.ApplicationVo;
 
 public class ManageApplicationActivity extends FragmentActivity
 		implements
@@ -85,14 +85,14 @@ public class ManageApplicationActivity extends FragmentActivity
 	 * message, etc...] list
 	 */
 	@Override
-	public void onApplicationActionItem(ApplicationActionItem item) {
+	public void onApplicationActionItem(ActionVo item) {
 		AppShortcutApplication appState = ((AppShortcutApplication)getApplicationContext());
-		ApplicationItem appSelected = appState.getAppSelected();
-		if (item.getAction() == null) {
-			item.setAction(appSelected.getApplicationInfo().packageName);
+		ApplicationVo appSelected = appState.getAppSelected();
+		if (item.getApplicationPackage() == null) {
+			item.setApplicationPackage(appSelected.getApplicationInfo().packageName);
 		}
-		
-		appSelected.setApplicationActionItem(item);
+		appSelected.setCurrentAction(item);
+//		appSelected.getActions().addAction(item);
 		appState.setAppSelected(appSelected);
 		
 		
@@ -102,7 +102,7 @@ public class ManageApplicationActivity extends FragmentActivity
 		transaction.replace(R.id.fragment_container_application, newFragment)
 				.addToBackStack(null).commit();
 
-		Toast.makeText(this, "Action S: " + item.getAction(),
+		Toast.makeText(this, "Action S: " + item.getApplicationPackage(),
 				Toast.LENGTH_SHORT).show();
 	}
 
@@ -116,9 +116,9 @@ public class ManageApplicationActivity extends FragmentActivity
 	 * from the action [open, new message, etc...] list
 	 */
 	@Override
-	public void onApplicationActionItemSelected(ApplicationActionItem item) {
+	public void onApplicationActionItemSelected(ActionVo item) {
 		Toast.makeText(this,
-				"onApplicationActionItemSelected : " + item.getAction(),
+				"onApplicationActionItemSelected : " + item.getApplicationPackage(),
 				Toast.LENGTH_SHORT).show();
 	}
 
@@ -142,7 +142,7 @@ public class ManageApplicationActivity extends FragmentActivity
 	 *            information for a pattern...
 	 */
 	public void assignPattern(View view) {
-		ApplicationItem appSelected = ((AppShortcutApplication)getApplicationContext()).getAppSelected();
+		ApplicationVo appSelected = ((AppShortcutApplication)getApplicationContext()).getAppSelected();
 		
 		if (appSelected != null) {
 			Context context = getApplicationContext();
@@ -150,18 +150,17 @@ public class ManageApplicationActivity extends FragmentActivity
 					String.valueOf(R.string.idPrefFile), Context.MODE_PRIVATE);
 			SharedPreferences.Editor editor = sharedPref.edit();
 
-			Resources r = getResources();
-			String idPrefFile = r.getString(R.string.idPrefFile);
-
-			String actionId = idPrefFile + "-" + appSelected.getApplicationName()
-					+ "-" + appSelected.getApplicationActionItem().getAction();
-			String appId = idPrefFile + "-" + appSelected.getApplicationName();
-			String appIdPatt = idPrefFile + "-" + selectedPattern;
-
+			String actionName = "";
+			if (appSelected.getCurrentAction() != null){
+				actionName = appSelected.getCurrentAction().getName();
+			}
+			String actionId = ActionHelper.getActionId( appSelected.getName(), actionName);
+			String appId = ActionHelper.getAppId( appSelected.getName() );
+			String appIdPatt = ActionHelper.getPatternId(selectedPattern);
+ 
 			editor.putString(actionId, selectedPattern); // search by application  + action 
 			editor.putString(appId, selectedPattern); // search by application 
-			editor.putString(appIdPatt, appSelected.getApplicationName() + "-"
-					+ appSelected.getApplicationActionItem().getAction()); //search by pattern
+			editor.putString(appIdPatt, appSelected.getName() + "-" + actionName); //search by pattern
 
 			Toast.makeText(getApplicationContext(),
 					"Pattern: " + appIdPatt + " saved", Toast.LENGTH_SHORT)

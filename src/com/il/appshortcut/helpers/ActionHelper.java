@@ -9,38 +9,49 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 
 import com.il.appshortcut.R;
-import com.il.appshortcut.actions.ICommonActions;
-import com.il.appshortcut.actions.imp.CommonActions;
-import com.il.appshortcut.actions.imp.FacebookActions;
-import com.il.appshortcut.views.ApplicationActionItem;
-import com.il.appshortcut.views.ApplicationItem;
+import com.il.appshortcut.actions.CommonActions;
+import com.il.appshortcut.actions.FacebookActions;
+import com.il.appshortcut.views.ActionVo;
+import com.il.appshortcut.views.ApplicationVo;
 
 public class ActionHelper {
 	
 	public static final String FACEBOOK_APP_NAME = "facebook";
-
+	public static final String SEPARATOR = "-";
+	
+	public static String idPrefFile; 
+	
+	public static void assignIdPrefFile(Resources r){
+		idPrefFile = r.getString(R.string.idPrefFile);
+	}
+	
 	public static Intent getIntent(String pattern,
-			SharedPreferences sharedPref, Resources r, PackageManager pm)
+			SharedPreferences sharedPref, PackageManager pm)
 			throws Exception {
 		Intent resultIntent = null;
-		String idPrefFile = r.getString(R.string.idPrefFile);
+		
 		String id = idPrefFile + "-" + pattern;
 		String tmp = sharedPref.getString(id, null);
 		if (tmp != null) {
 			String[] split = tmp.split("-");
 			
 			String appName = split[0]; 
-			String appPackage = split[1]; 
-			String action = split[2]; 
+			String appPackage = split[1];
+			String action = "";
+			if (split.length > 2){
+				action = split[2]; 
+			}
 			
-			ICommonActions actions = null;
+			CommonActions actions = null;
 			if (appName.equalsIgnoreCase(FACEBOOK_APP_NAME)) {
+				
 				if (action.equalsIgnoreCase(FacebookActions.ACTION_OPEN)) {
 					actions = new CommonActions(appPackage, pm);
 					resultIntent = actions.getOpenApplicationIntent();
 				} else if (action
 						.equalsIgnoreCase(FacebookActions.ACTION_NEW_MESSAGE)) {
 					actions = new FacebookActions();
+//					((FacebookActions) actions).getNewPostIntent():
 				} else {
 					actions = new CommonActions(appPackage, pm);
 					resultIntent = actions.getOpenApplicationIntent();
@@ -54,12 +65,12 @@ public class ActionHelper {
 		
 	}
 	
-	public static List<ApplicationActionItem> getApplicationSelectedActions(List<ApplicationActionItem> list, ApplicationItem appSelected, SharedPreferences sharedPref, Resources r) throws Exception{
+	public static List<ActionVo> getApplicationSelectedActions(List<ActionVo> list, ApplicationVo appSelected, SharedPreferences sharedPref, Resources r) throws Exception{
 		String idPrefFile = r.getString(R.string.idPrefFile);
-		List<ApplicationActionItem> result = new ArrayList<ApplicationActionItem>();
+		List<ActionVo> result = new ArrayList<ActionVo>();
 		int i = 0;
-		for (ApplicationActionItem item : list){
-			String appId = idPrefFile + "-" + appSelected.getApplicationName() + "-" + item.getAction();
+		for (ActionVo item : list){
+			String appId = idPrefFile + "-" + appSelected.getName() + "-" + item.getApplicationPackage();
 			String tmp = sharedPref.getString(appId, null);
 			if (tmp != null){
 				result.add(item);
@@ -70,28 +81,38 @@ public class ActionHelper {
 		return result;
 	}
 
-	public static List<ApplicationActionItem> getApplicationPossibledActions(
-			ApplicationItem appSelected) throws Exception {
-		List<ApplicationActionItem> result = null;
+	public static List<ActionVo> getApplicationPossibledActions(
+			ApplicationVo appSelected) throws Exception {
+		List<ActionVo> result = null;
 		if (ActionHelper.FACEBOOK_APP_NAME
 				.trim()
 				.toLowerCase()
 				.equalsIgnoreCase(
-						appSelected.getApplicationName().trim().toLowerCase())) {
-			result = FacebookActions.getActions();
+						appSelected.getName().trim().toLowerCase())) {
+			result = new FacebookActions().getActions();
 		}
 		if (result == null) {
-			result = CommonActions.getActions();
+			result = new CommonActions().getActions();
 		}
 		return result;
 	}
 	
 	
-	public static boolean isAssignedByApplication(ApplicationItem app, SharedPreferences sharedPref, Resources r){
-		String idPrefFile = r.getString(R.string.idPrefFile);
-		String appId = idPrefFile + "-" + app.getApplicationName();
+	public static boolean isAssignedByApplication(ApplicationVo app, SharedPreferences sharedPref, Resources r, CommonActions actions){
+		String appId = getAppId( app.getName() );
 		String pattern = sharedPref.getString(appId, null);
 		return (pattern != null);
+	}
+	
+	
+	public static String getActionId(String appInfo, String actionInfo){
+		return idPrefFile + SEPARATOR + appInfo + SEPARATOR + actionInfo;
+	}
+	public static String getAppId(String appInfo){
+		return idPrefFile + SEPARATOR + appInfo;
+	}
+	public static String getPatternId(String pattern){
+		return idPrefFile + SEPARATOR + pattern;
 	}
 	
 	

@@ -26,8 +26,8 @@ import com.il.appshortcut.R;
 import com.il.appshortcut.adapters.ApplicationActionItemAdapter;
 import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.helpers.ActionHelper;
-import com.il.appshortcut.views.ApplicationActionItem;
-import com.il.appshortcut.views.ApplicationItem;
+import com.il.appshortcut.views.ActionVo;
+import com.il.appshortcut.views.ApplicationVo;
 
 /**
  * @author Cesaregb
@@ -39,16 +39,16 @@ public class ApplicationInfoFragment extends Fragment {
 	ApplicationInfoListener mCallback;
 
 	public final static String ARG_POSITION = "position";
-	private ApplicationItem mCurrentApplication = null;
+	private ApplicationVo mCurrentApplication = null;
 
-	private ArrayList<ApplicationActionItem> applicationActionItems;
-	private ArrayList<ApplicationActionItem> applicationActionItemsSelected;
+	private ArrayList<ActionVo> applicationActionItems;
+	private ArrayList<ActionVo> applicationActionItemsSelected;
 	private ApplicationActionItemAdapter aa;
 	private ApplicationActionItemAdapter aaSelected;
 
 	public interface ApplicationInfoListener{
-		public void onApplicationActionItem(ApplicationActionItem item);
-		public void onApplicationActionItemSelected(ApplicationActionItem item);
+		public void onApplicationActionItem(ActionVo item);
+		public void onApplicationActionItemSelected(ActionVo item);
 
 	}
 
@@ -71,7 +71,7 @@ public class ApplicationInfoFragment extends Fragment {
 			Bundle savedInstanceState) {
 		//get the selected application..
 		AppShortcutApplication appState = (AppShortcutApplication)getActivity().getApplicationContext();
-		mCurrentApplication = (ApplicationItem) appState.getAppSelected();
+		mCurrentApplication = (ApplicationVo) appState.getAppSelected();
 		
 		return inflater.inflate(R.layout.comp_app_info, container, false);
 	}
@@ -87,13 +87,13 @@ public class ApplicationInfoFragment extends Fragment {
 	 * here is configured application actions (open, new message, etc...) 
 	 * @param application
 	 */
-	public void updateApplicationView(ApplicationItem application) {
+	public void updateApplicationView(ApplicationVo application) {
 		SharedPreferences sharedPref = getActivity().getApplicationContext()
 				.getSharedPreferences(String.valueOf(R.string.idPrefFile),
 						Context.MODE_PRIVATE);
 		
-		List<ApplicationActionItem> allActions = null; 
-		List<ApplicationActionItem> selectedActions = null; 
+		List<ActionVo> allActions = null; 
+		List<ActionVo> selectedActions = null; 
 		Resources r = null;
 		try{
 			r = getActivity().getResources();
@@ -103,7 +103,7 @@ public class ApplicationInfoFragment extends Fragment {
 		
 		
 		TextView article = (TextView) getActivity().findViewById(R.id.app_name);
-		article.setText(application.getApplicationName());
+		article.setText(application.getName());
 		ImageView image = (ImageView) getActivity().findViewById(R.id.icon_app_selected);
 		ApplicationInfo appInfo = application.getApplicationInfo();
 		Drawable icon = appInfo.loadIcon(getActivity().getApplicationContext().getPackageManager());
@@ -111,7 +111,7 @@ public class ApplicationInfoFragment extends Fragment {
 		image.setImageBitmap(bmpIcon);
 
 		listView = (ListView)getActivity().findViewById(R.id.list_selected_actions);
-		applicationActionItems = new ArrayList<ApplicationActionItem>();
+		applicationActionItems = new ArrayList<ActionVo>();
 		int resID = R.layout.comp_app_action_item;
 		aa = new ApplicationActionItemAdapter(getActivity(), resID, applicationActionItems);
 		listView.setAdapter(aa);
@@ -119,38 +119,38 @@ public class ApplicationInfoFragment extends Fragment {
 		OnItemClickListener listener = new android.widget.AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
-				ApplicationActionItem appItem = (ApplicationActionItem) listView.getItemAtPosition(position);
+				ActionVo appItem = (ActionVo) listView.getItemAtPosition(position);
 				mCallback.onApplicationActionItem(appItem);
 			}
 		};
 		listView.setOnItemClickListener(listener);
-		for (ApplicationActionItem item : allActions){
+		for (ActionVo item : allActions){
 			addApplicatoinActionItem(item, 0);
 		}
 		
 		listViewSelected = (ListView)getActivity().findViewById(R.id.list_possible_actions);
-		applicationActionItemsSelected = new ArrayList<ApplicationActionItem>();
+		applicationActionItemsSelected = new ArrayList<ActionVo>();
 		resID = R.layout.comp_app_action_item;
 		aaSelected = new ApplicationActionItemAdapter(getActivity(), resID, applicationActionItemsSelected);
 		listViewSelected.setAdapter(aaSelected);
 		OnItemClickListener listenerSelected = new android.widget.AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
-				ApplicationActionItem appItem = (ApplicationActionItem) listViewSelected.getItemAtPosition(position);
+				ActionVo appItem = (ActionVo) listViewSelected.getItemAtPosition(position);
 				mCallback.onApplicationActionItemSelected(appItem);
 			}
 		};
 		listViewSelected.setOnItemClickListener(listenerSelected);
-		for (ApplicationActionItem item : selectedActions){
+		for (ActionVo item : selectedActions){
 			addApplicatoinActionItem(item, 1);
 		}
 	}
 
-	public ApplicationItem getmCurrentApplication() {
+	public ApplicationVo getmCurrentApplication() {
 		return mCurrentApplication;
 	}
 
-	public void setmCurrentApplication(ApplicationItem mCurrentApplication) {
+	public void setmCurrentApplication(ApplicationVo mCurrentApplication) {
 		this.mCurrentApplication = mCurrentApplication;
 	}
 
@@ -159,11 +159,11 @@ public class ApplicationInfoFragment extends Fragment {
 	 * @param item
 	 * @param type
 	 */
-	public void addApplicatoinActionItem(ApplicationActionItem item, int type){
+	public void addApplicatoinActionItem(ActionVo item, int type){
 		if (item == null){
-			item = new ApplicationActionItem();
+			item = new ActionVo();
 			item.setName("...Error...");
-			item.setAction(mCurrentApplication.getApplicationInfo().packageName);
+			item.setApplicationPackage(mCurrentApplication.getApplicationInfo().packageName);
 		}
 		if (type == 0){
 			applicationActionItems.add(0, item);
