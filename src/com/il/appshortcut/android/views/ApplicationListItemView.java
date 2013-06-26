@@ -76,8 +76,7 @@ public class ApplicationListItemView extends View {
 		canvas.drawBitmap(backgroundImage, 5, TOP_MARGIN, bgPaint);
 		super.onDraw(canvas);
 		canvas.restore();
-		
-		canvas.drawText("Aqui: " + this.text, 5, RECT_SIZE - 50, appText);
+		canvas.drawText(this.text, 5, RECT_SIZE - 50, appText);
 	}
 
 	public String getText() {

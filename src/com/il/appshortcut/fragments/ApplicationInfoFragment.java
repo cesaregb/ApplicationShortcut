@@ -7,7 +7,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -69,7 +68,6 @@ public class ApplicationInfoFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, 
 			Bundle savedInstanceState) {
-		//get the selected application..
 		AppShortcutApplication appState = (AppShortcutApplication)getActivity().getApplicationContext();
 		mCurrentApplication = (ApplicationVo) appState.getAppSelected();
 		
@@ -88,19 +86,25 @@ public class ApplicationInfoFragment extends Fragment {
 	 * @param application
 	 */
 	public void updateApplicationView(ApplicationVo application) {
+		
 		SharedPreferences sharedPref = getActivity().getApplicationContext()
 				.getSharedPreferences(String.valueOf(R.string.idPrefFile),
 						Context.MODE_PRIVATE);
 		
-		List<ActionVo> allActions = null; 
-		List<ActionVo> selectedActions = null; 
-		Resources r = null;
-		try{
-			r = getActivity().getResources();
-			allActions = ActionHelper.getApplicationPossibledActions(mCurrentApplication);
-			selectedActions = ActionHelper.getApplicationSelectedActions(allActions, mCurrentApplication, sharedPref, r);
-		}catch(Exception e){ }
+		List<ActionVo> notSelectedActions = new ArrayList<ActionVo>(); 
+		List<ActionVo> selectedActions = new ArrayList<ActionVo>(); 
 		
+		if (application.getActions() != null
+				&& application.getActions().getActions() != null ){
+			for (ActionVo a : application.getActions().getActions()){
+				if (ActionHelper.isAssignedByAction(application, a, sharedPref)){
+					selectedActions.add(a);
+				}else{
+					notSelectedActions.add(a);
+				}
+			}
+			
+		}
 		
 		TextView article = (TextView) getActivity().findViewById(R.id.app_name);
 		article.setText(application.getName());
@@ -124,7 +128,7 @@ public class ApplicationInfoFragment extends Fragment {
 			}
 		};
 		listView.setOnItemClickListener(listener);
-		for (ActionVo item : allActions){
+		for (ActionVo item : notSelectedActions){
 			addApplicatoinActionItem(item, 0);
 		}
 		
@@ -163,7 +167,7 @@ public class ApplicationInfoFragment extends Fragment {
 		if (item == null){
 			item = new ActionVo();
 			item.setName("...Error...");
-			item.setApplicationPackage(mCurrentApplication.getApplicationInfo().packageName);
+			item.setActionPackage(mCurrentApplication.getApplicationInfo().packageName);
 		}
 		if (type == 0){
 			applicationActionItems.add(0, item);

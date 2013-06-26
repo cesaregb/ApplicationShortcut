@@ -88,8 +88,8 @@ public class ManageApplicationActivity extends FragmentActivity
 	public void onApplicationActionItem(ActionVo item) {
 		AppShortcutApplication appState = ((AppShortcutApplication)getApplicationContext());
 		ApplicationVo appSelected = appState.getAppSelected();
-		if (item.getApplicationPackage() == null) {
-			item.setApplicationPackage(appSelected.getApplicationInfo().packageName);
+		if (item.getActionPackage() == null) {
+			item.setActionPackage(appSelected.getApplicationPackage());
 		}
 		appSelected.setCurrentAction(item);
 //		appSelected.getActions().addAction(item);
@@ -102,7 +102,7 @@ public class ManageApplicationActivity extends FragmentActivity
 		transaction.replace(R.id.fragment_container_application, newFragment)
 				.addToBackStack(null).commit();
 
-		Toast.makeText(this, "Action S: " + item.getApplicationPackage(),
+		Toast.makeText(this, "Action S: " + item.getActionPackage(),
 				Toast.LENGTH_SHORT).show();
 	}
 
@@ -118,7 +118,7 @@ public class ManageApplicationActivity extends FragmentActivity
 	@Override
 	public void onApplicationActionItemSelected(ActionVo item) {
 		Toast.makeText(this,
-				"onApplicationActionItemSelected : " + item.getApplicationPackage(),
+				"onApplicationActionItemSelected : " + item.getActionPackage(),
 				Toast.LENGTH_SHORT).show();
 	}
 
@@ -150,17 +150,18 @@ public class ManageApplicationActivity extends FragmentActivity
 					String.valueOf(R.string.idPrefFile), Context.MODE_PRIVATE);
 			SharedPreferences.Editor editor = sharedPref.edit();
 
-			String actionName = "";
+			String actionPackage = "";
 			if (appSelected.getCurrentAction() != null){
-				actionName = appSelected.getCurrentAction().getName();
+				actionPackage = appSelected.getCurrentAction().getActionPackage();
 			}
-			String actionId = ActionHelper.getActionId( appSelected.getName(), actionName);
-			String appId = ActionHelper.getAppId( appSelected.getName() );
+			String appInfo = ActionHelper.getApplicationInfo(appSelected.getComponentName());
+			String actionId = ActionHelper.getActionId(appInfo, actionPackage);
+			String appId = ActionHelper.getAppId(appInfo);
 			String appIdPatt = ActionHelper.getPatternId(selectedPattern);
  
 			editor.putString(actionId, selectedPattern); // search by application  + action 
 			editor.putString(appId, selectedPattern); // search by application 
-			editor.putString(appIdPatt, appSelected.getName() + "-" + actionName); //search by pattern
+			editor.putString(appIdPatt, appInfo + ActionHelper.SEPARATOR + actionPackage); //search by pattern
 
 			Toast.makeText(getApplicationContext(),
 					"Pattern: " + appIdPatt + " saved", Toast.LENGTH_SHORT)

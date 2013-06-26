@@ -10,6 +10,14 @@ import android.content.pm.PackageManager;
 import com.il.appshortcut.views.ActionVo;
 
 public class CommonActions {
+
+//com.joelapenna.foursquared foursquare
+//com.twitter.android twitter
+//com.google.android.youtube
+//com.google.android.apps.maps
+//com.google.android.gm - gmail
+//com.instagram.android
+	
 	public static final String ACTION_OPEN = "open";
 	protected List<ActionVo> actions; 
 	private String appPackage; 
@@ -22,9 +30,9 @@ public class CommonActions {
 	public CommonActions(){
 		actions = new ArrayList<ActionVo>();
 		ActionVo action = new ActionVo();
-		action.setName("Open");
+		action.setName(ACTION_OPEN);
 		action.setAssigned(false);
-		action.setApplicationPackage("");
+		action.setActionPackage("");
 		action.setDescription("Open the application");
 		action.setPatter("");
 		actions.add(action);
@@ -63,7 +71,18 @@ public class CommonActions {
 		intent = new Intent(Intent.ACTION_MAIN);
 		intent.addCategory(Intent.CATEGORY_LAUNCHER);
 		intent.setComponent(new ComponentName(appPackage, mainActivity));
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+                Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+		return intent;
+	}
+	
+	public Intent getOpenApplicationIntent(String className) throws Exception {
+		Intent intent = null;
+		intent = new Intent(Intent.ACTION_MAIN);
+		intent.addCategory(Intent.CATEGORY_LAUNCHER);
+		intent.setComponent(new ComponentName(appPackage, className));
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+				Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 		return intent;
 	}
 

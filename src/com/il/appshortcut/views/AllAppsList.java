@@ -2,6 +2,8 @@ package com.il.appshortcut.views;
 
 import java.util.ArrayList;
 
+import android.content.ComponentName;
+
 public class AllAppsList {
 	public static final int DEFAULT_APPLICATIONS_NUMBER = 42;
 
@@ -9,7 +11,7 @@ public class AllAppsList {
 			DEFAULT_APPLICATIONS_NUMBER);
 
 	public void add(ApplicationVo info) {
-		if (findActivity(data, info.getApplicationPackage())) {
+		if (findActivity(data, info.getComponentName())) {
 			return;
 		}
 		data.add(info);
@@ -28,11 +30,11 @@ public class AllAppsList {
 	}
 
 	private static boolean findActivity(ArrayList<ApplicationVo> apps,
-			String component) {
+			ComponentName component) {
 		final int N = apps.size();
 		for (int i = 0; i < N; i++) {
 			final ApplicationVo info = apps.get(i);
-			if (info.getApplicationPackage().equalsIgnoreCase(component)) {
+			if (info.getComponentName().equals(component)) {
 				return true;
 			}
 		}

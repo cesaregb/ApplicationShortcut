@@ -9,28 +9,28 @@ package com.il.appshortcut;
 
 public final class R {
     public static final class array {
-        public static final int filter_options_string_array=0x7f070000;
+        public static final int filter_options_string_array=0x7f080000;
     }
     public static final class attr {
     }
     public static final class color {
-        public static final int appwidget_error_color=0x7f04000b;
-        public static final int background_color=0x7f040000;
-        public static final int bubble_dark_background=0x7f040009;
-        public static final int delete_color_filter=0x7f04000a;
-        public static final int gesture_color=0x7f04000d;
-        public static final int grid_dark_background=0x7f040008;
-        public static final int marker_color=0x7f040001;
-        public static final int notepad_lines=0x7f040004;
-        public static final int notepad_margin=0x7f040005;
-        public static final int notepad_paper=0x7f040003;
-        public static final int notepad_text=0x7f040006;
-        public static final int snag_callout_color=0x7f04000c;
-        public static final int text_color=0x7f040002;
-        public static final int uncertain_gesture_color=0x7f04000e;
+        public static final int appwidget_error_color=0x7f05000b;
+        public static final int background_color=0x7f050000;
+        public static final int bubble_dark_background=0x7f050009;
+        public static final int delete_color_filter=0x7f05000a;
+        public static final int gesture_color=0x7f05000d;
+        public static final int grid_dark_background=0x7f050008;
+        public static final int marker_color=0x7f050001;
+        public static final int notepad_lines=0x7f050004;
+        public static final int notepad_margin=0x7f050005;
+        public static final int notepad_paper=0x7f050003;
+        public static final int notepad_text=0x7f050006;
+        public static final int snag_callout_color=0x7f05000c;
+        public static final int text_color=0x7f050002;
+        public static final int uncertain_gesture_color=0x7f05000e;
         /**      From android 
          */
-        public static final int window_background=0x7f040007;
+        public static final int window_background=0x7f050007;
     }
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 
@@ -39,9 +39,10 @@ public final class R {
          screen margins) for sw720dp devices (e.g. 10" tablets) in landscape here.
     
          */
-        public static final int activity_horizontal_margin=0x7f050000;
-        public static final int activity_vertical_margin=0x7f050001;
-        public static final int notepad_margin=0x7f050002;
+        public static final int activity_horizontal_margin=0x7f060000;
+        public static final int activity_vertical_margin=0x7f060001;
+        public static final int notepad_margin=0x7f060002;
+        public static final int widget_margin=0x7f060003;
     }
     public static final class drawable {
         public static final int action_search=0x7f020000;
@@ -52,24 +53,33 @@ public final class R {
         public static final int ic_launcher=0x7f020005;
     }
     public static final class id {
-        public static final int action_filter_delete=0x7f0a0011;
-        public static final int action_search=0x7f0a0010;
-        public static final int action_settings=0x7f0a000f;
-        public static final int app_name=0x7f0a0008;
-        public static final int applicatoin_action_name=0x7f0a0005;
-        public static final int assignPattern=0x7f0a000d;
-        public static final int editText1=0x7f0a0000;
-        public static final int fragment_container_application=0x7f0a0003;
-        public static final int gridview=0x7f0a000e;
-        public static final int icon_app_selected=0x7f0a0007;
-        public static final int icon_image=0x7f0a000c;
-        public static final int list_possible_actions=0x7f0a000a;
-        public static final int list_selected_actions=0x7f0a0009;
-        public static final int luncher_widget=0x7f0a0001;
-        public static final int manage=0x7f0a0002;
-        public static final int pager=0x7f0a0004;
-        public static final int row=0x7f0a000b;
-        public static final int search_criteria=0x7f0a0006;
+        public static final int action_clear=0x7f0b0018;
+        public static final int action_filter_delete=0x7f0b001a;
+        public static final int action_search=0x7f0b0019;
+        public static final int action_settings=0x7f0b0017;
+        public static final int app_name=0x7f0b0008;
+        public static final int applicatoin_action_name=0x7f0b0005;
+        public static final int assignPattern=0x7f0b000d;
+        public static final int clearSelection=0x7f0b0016;
+        public static final int contentContainer=0x7f0b000f;
+        public static final int editText1=0x7f0b0000;
+        public static final int fragment_container_application=0x7f0b0003;
+        public static final int gridview=0x7f0b000e;
+        public static final int icon_app_selected=0x7f0b0007;
+        public static final int icon_image=0x7f0b000c;
+        public static final int list_possible_actions=0x7f0b000a;
+        public static final int list_selected_actions=0x7f0b0009;
+        public static final int luncher_widget=0x7f0b0001;
+        public static final int manage=0x7f0b0002;
+        public static final int pager=0x7f0b0004;
+        public static final int row=0x7f0b000b;
+        public static final int search_criteria=0x7f0b0006;
+        public static final int selected_patter_widget=0x7f0b0010;
+        public static final int tableRow1=0x7f0b0012;
+        public static final int widget_down_button=0x7f0b0015;
+        public static final int widget_left_button=0x7f0b0013;
+        public static final int widget_right_button=0x7f0b0014;
+        public static final int widget_up_button=0x7f0b0011;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
@@ -83,38 +93,40 @@ public final class R {
         public static final int comp_grid_view=0x7f030008;
         public static final int comp_pager_view=0x7f030009;
         public static final int fragment_section_dummy=0x7f03000a;
+        public static final int widget_app_shortcut_launcher=0x7f03000b;
     }
     public static final class menu {
-        public static final int grid_view=0x7f090000;
-        public static final int main=0x7f090001;
-        public static final int manage_application=0x7f090002;
-        public static final int manage_patterns=0x7f090003;
+        public static final int grid_view=0x7f0a0000;
+        public static final int main=0x7f0a0001;
+        public static final int manage_application=0x7f0a0002;
+        public static final int manage_patterns=0x7f0a0003;
     }
     public static final class string {
+        public static final int action_clear=0x7f070003;
         /**  	common used   
          */
-        public static final int action_settings=0x7f060002;
-        public static final int app_name=0x7f060001;
-        public static final int apply=0x7f060007;
-        public static final int assigned=0x7f06000d;
-        public static final int cancel=0x7f060005;
-        public static final int confirm=0x7f060006;
-        public static final int desc_backround=0x7f06000b;
-        public static final int desc_temporal=0x7f06000c;
-        public static final int dummy_section_text=0x7f06000f;
-        public static final int filter=0x7f060003;
+        public static final int action_settings=0x7f070002;
+        public static final int app_name=0x7f070001;
+        public static final int apply=0x7f070008;
+        public static final int assigned=0x7f07000e;
+        public static final int cancel=0x7f070006;
+        public static final int confirm=0x7f070007;
+        public static final int desc_backround=0x7f07000c;
+        public static final int desc_temporal=0x7f07000d;
+        public static final int dummy_section_text=0x7f070010;
+        public static final int filter=0x7f070004;
         /**  app settings 
          */
-        public static final int idPrefFile=0x7f060000;
+        public static final int idPrefFile=0x7f070000;
         /**  specific 
          */
-        public static final int managePatterns=0x7f06000a;
-        public static final int not_assigned=0x7f06000e;
-        public static final int search=0x7f060004;
-        public static final int title_activity_manage_application=0x7f060009;
+        public static final int managePatterns=0x7f07000b;
+        public static final int not_assigned=0x7f07000f;
+        public static final int search=0x7f070005;
+        public static final int title_activity_manage_application=0x7f07000a;
         /**  activities captions 
          */
-        public static final int title_activity_manage_patterns=0x7f060008;
+        public static final int title_activity_manage_patterns=0x7f070009;
     }
     public static final class style {
         /** 
@@ -138,11 +150,14 @@ public final class R {
     
  API 14 theme customizations can go here. 
          */
-        public static final int AppBaseTheme=0x7f080000;
+        public static final int AppBaseTheme=0x7f090000;
         /**  Application theme. 
  All customizations that are NOT specific to a particular API-level can go here. 
          */
-        public static final int AppTheme=0x7f080001;
-        public static final int button=0x7f080002;
+        public static final int AppTheme=0x7f090001;
+        public static final int button=0x7f090002;
+    }
+    public static final class xml {
+        public static final int widget_appshortcut_launcher=0x7f040000;
     }
 }

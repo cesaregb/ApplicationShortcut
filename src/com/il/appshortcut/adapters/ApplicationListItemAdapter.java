@@ -3,8 +3,6 @@ package com.il.appshortcut.adapters;
 import java.util.List;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,10 +47,8 @@ public class ApplicationListItemAdapter extends ArrayAdapter<ApplicationVo> {
 		} else {
 			view = (LinearLayout) convertView;
 		}
-		final ApplicationInfo info = item.getApplicationInfo();
-		if (info != null) {
-			Drawable icon = info.loadIcon(getContext().getPackageManager());
-			item.setIcon(Utilities.createIconThumbnail(icon, getContext()));
+		if (item.getIcon() != null) {
+			item.setIcon(Utilities.createIconThumbnail(item.getIcon(), getContext()));
 		}
 
 		ApplicationListItemView applicationView = (ApplicationListItemView) view

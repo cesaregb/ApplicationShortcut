@@ -3,6 +3,7 @@ package com.il.appshortcut.helpers;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -16,8 +17,9 @@ import com.il.appshortcut.views.ApplicationVo;
 
 public class ActionHelper {
 	
-	public static final String FACEBOOK_APP_NAME = "facebook";
+	
 	public static final String SEPARATOR = "-";
+	public static final String SEPARATOR_2 = ":";
 	
 	public static String idPrefFile; 
 	
@@ -33,32 +35,27 @@ public class ActionHelper {
 		String id = idPrefFile + "-" + pattern;
 		String tmp = sharedPref.getString(id, null);
 		if (tmp != null) {
-			String[] split = tmp.split("-");
+			String[] split = tmp.split(SEPARATOR);
 			
-			String appName = split[0]; 
-			String appPackage = split[1];
-			String action = "";
-			if (split.length > 2){
-				action = split[2]; 
-			}
+			String appPackageParts = split[0]; 
+			String[] appInfoParts = appPackageParts.split(SEPARATOR_2);
+			String appPackage = appInfoParts[0];
+			String appClassName = appInfoParts[1];
+			String actionPackage = split[1];
 			
 			CommonActions actions = null;
-			if (appName.equalsIgnoreCase(FACEBOOK_APP_NAME)) {
-				
-				if (action.equalsIgnoreCase(FacebookActions.ACTION_OPEN)) {
-					actions = new CommonActions(appPackage, pm);
-					resultIntent = actions.getOpenApplicationIntent();
-				} else if (action
+			if (appPackage.equalsIgnoreCase(FacebookActions.FACEBOOK_PACKAGE)) {
+				if (actionPackage
 						.equalsIgnoreCase(FacebookActions.ACTION_NEW_MESSAGE)) {
 					actions = new FacebookActions();
-//					((FacebookActions) actions).getNewPostIntent():
+					resultIntent = ((FacebookActions) actions).getNewMessageIntent();
 				} else {
-					actions = new CommonActions(appPackage, pm);
+					actions = new CommonActions(actionPackage, pm);
 					resultIntent = actions.getOpenApplicationIntent();
 				}
 			}else{
-				actions = new CommonActions(appPackage, pm);
-				resultIntent = actions.getOpenApplicationIntent();
+				actions = new CommonActions(actionPackage, pm);
+				resultIntent = actions.getOpenApplicationIntent(appClassName);
 			}
 		}
 		return resultIntent;
@@ -70,7 +67,7 @@ public class ActionHelper {
 		List<ActionVo> result = new ArrayList<ActionVo>();
 		int i = 0;
 		for (ActionVo item : list){
-			String appId = idPrefFile + "-" + appSelected.getName() + "-" + item.getApplicationPackage();
+			String appId = idPrefFile + "-" + appSelected.getName() + "-" + item.getActionPackage();
 			String tmp = sharedPref.getString(appId, null);
 			if (tmp != null){
 				result.add(item);
@@ -81,29 +78,27 @@ public class ActionHelper {
 		return result;
 	}
 
-	public static List<ActionVo> getApplicationPossibledActions(
-			ApplicationVo appSelected) throws Exception {
-		List<ActionVo> result = null;
-		if (ActionHelper.FACEBOOK_APP_NAME
-				.trim()
-				.toLowerCase()
-				.equalsIgnoreCase(
-						appSelected.getName().trim().toLowerCase())) {
-			result = new FacebookActions().getActions();
-		}
-		if (result == null) {
-			result = new CommonActions().getActions();
-		}
-		return result;
-	}
-	
-	
-	public static boolean isAssignedByApplication(ApplicationVo app, SharedPreferences sharedPref, Resources r, CommonActions actions){
-		String appId = getAppId( app.getName() );
+	public static boolean isAssignedByApplication(ApplicationVo app, SharedPreferences sharedPref){
+		String appId = getAppId(getApplicationInfo(app.getComponentName()) );
 		String pattern = sharedPref.getString(appId, null);
 		return (pattern != null);
 	}
 	
+	public static boolean isAssignedByAction(ApplicationVo app, ActionVo action, SharedPreferences sharedPref){
+		String actionId = getActionId( getApplicationInfo(app.getComponentName()), action.getActionPackage() );
+		String pattern = sharedPref.getString(actionId, null);
+		return (pattern != null);
+	}
+	
+	
+	/**
+	 * @param appInfo
+	 * @param actionInfo
+	 * @return String containing appPakcaget + ":" + appClassName 
+	 */
+	public static String getApplicationInfo(ComponentName coponentName){
+		return coponentName.getPackageName() + SEPARATOR_2 + coponentName.getClassName();
+	}
 	
 	public static String getActionId(String appInfo, String actionInfo){
 		return idPrefFile + SEPARATOR + appInfo + SEPARATOR + actionInfo;

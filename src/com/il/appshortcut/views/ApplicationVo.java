@@ -1,19 +1,23 @@
 package com.il.appshortcut.views;
 
+import android.content.ComponentName;
 import android.content.pm.ApplicationInfo;
 import android.graphics.drawable.Drawable;
 
 import com.il.appshortcut.actions.CommonActions;
 
-public class ApplicationVo{
+public class ApplicationVo {
 	
 	private String name;
 	private String applicationPackage;
 	private boolean assigned = false;
 	private String patter;
+	
 	private ApplicationInfo applicationInfo;
 	private Drawable icon;
 	private CommonActions actions;
+	private ComponentName componentName;
+	//selected action, this is for manage application helper 
 	private ActionVo currentAction;
 	
 	public ApplicationVo(String applicationName){
@@ -60,12 +64,6 @@ public class ApplicationVo{
 	public void setApplicationPackage(String applicationPackage) {
 		this.applicationPackage = applicationPackage;
 	}
-	public CommonActions getActions() {
-		return actions;
-	}
-	public void setActions(CommonActions actions) {
-		this.actions = actions;
-	}
 
 
 	@Override
@@ -77,5 +75,17 @@ public class ApplicationVo{
 	}
 	public void setCurrentAction(ActionVo currentAction) {
 		this.currentAction = currentAction;
+	}
+	public CommonActions getActions() {
+		return actions;
+	}
+	public void setActions(CommonActions actions) {
+		this.actions = actions;
+	}
+	public ComponentName getComponentName() {
+		return componentName;
+	}
+	public void setComponentName(ComponentName componentName) {
+		this.componentName = componentName;
 	}
 }

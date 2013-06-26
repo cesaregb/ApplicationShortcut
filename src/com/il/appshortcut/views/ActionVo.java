@@ -2,11 +2,10 @@ package com.il.appshortcut.views;
 
 
 public class ActionVo {
-	
 	private String name;
 	private String patter;
 	private String description;
-	private String applicationPackage;
+	private String actionPackage;
 	private boolean assigned = false;
 	
 	public String getPatter() {
@@ -33,11 +32,11 @@ public class ActionVo {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public String getApplicationPackage() {
-		return applicationPackage;
+	public String getActionPackage() {
+		return actionPackage;
 	}
-	public void setApplicationPackage(String applicationPackage) {
-		this.applicationPackage = applicationPackage;
+	public void setActionPackage(String actionPackage) {
+		this.actionPackage = actionPackage;
 	}
 	
 }

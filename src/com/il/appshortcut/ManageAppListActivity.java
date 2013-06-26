@@ -11,13 +11,13 @@ import android.app.ActionBar.Tab;
 import android.app.Dialog;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -25,11 +25,13 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.il.appshortcut.actions.ActionsFactory;
 import com.il.appshortcut.adapters.GridPagerAdapter;
 import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.fragments.ApplicationListFragment;
@@ -129,7 +131,6 @@ public class ManageAppListActivity extends FragmentActivity implements
 		List<ApplicationVo> returnList = new ArrayList<ApplicationVo>();
 		if (someNameSearch || (filterType > 0) && list != null) {
 			for (ApplicationVo item : list) {
-
 				boolean type = (filterType == 0)
 						|| (filterType == 1 && item.isAssigned())
 						|| (filterType == 2 && !item.isAssigned());
@@ -143,6 +144,8 @@ public class ManageAppListActivity extends FragmentActivity implements
 
 				if (add) {
 					returnList.add(item);
+				}else{
+					Log.d("Missing", item.getApplicationPackage());
 				}
 			}
 		} else {
@@ -257,37 +260,41 @@ public class ManageAppListActivity extends FragmentActivity implements
 
 		@Override
 		protected String doInBackground(String... params) {
-			AllAppsList allApp = new AllAppsList();
-
-			ArrayList<ApplicationInfo> applist = new ArrayList<ApplicationInfo>();
-			PackageManager manager = getPackageManager();
-
-			Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+			AllAppsList allApp = new AllAppsList(); // Application list helper 
+			List<ResolveInfo> applicationList = null; // android object list... 
+			
+			//generate the intent to get the application list 
+			final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
 			mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+			
+			PackageManager manager = getPackageManager();
+			applicationList = manager.queryIntentActivities(mainIntent, 0);
 
-			List<ResolveInfo> resolveInfos = manager.queryIntentActivities(
-					mainIntent, 0);
-
-			Collections.sort(resolveInfos,
-					new ResolveInfo.DisplayNameComparator(manager));
-			int i = 0;
-			for (ResolveInfo info : resolveInfos) {
-				publishProgress((int) ((i / (float) resolveInfos.size()) * 100));
-				ApplicationInfo applicationInfo = info.activityInfo.applicationInfo;
-				applist.add(applicationInfo);
-				ApplicationVo item = new ApplicationVo(
-						(String) manager.getApplicationLabel(applicationInfo));
-				item.setApplicationInfo(applicationInfo);
-
-				SharedPreferences sharedPref = getApplicationContext()
-						.getSharedPreferences(
-								String.valueOf(R.string.idPrefFile),
-								Context.MODE_PRIVATE);
-				Resources r = getResources();
-				boolean assigned = isAssignedByApplication(item, sharedPref, r, item.getActions());
-				item.setAssigned(assigned);
-				item.setApplicationPackage(info.activityInfo.applicationInfo.packageName);
-				allApp.add(item);
+			//sort the list 
+			Collections.sort(applicationList, new ResolveInfo.DisplayNameComparator(manager));
+			
+			//user in calculating percentage. 
+			if (applicationList.size() > 0 ){
+				for (ResolveInfo info : applicationList) {
+					ApplicationInfo applicationInfo = info.activityInfo.applicationInfo;
+					ApplicationVo item = new ApplicationVo(info.loadLabel(manager).toString());
+					item.setIcon(info.loadIcon(manager));
+					item.setComponentName(new ComponentName(info.activityInfo.packageName, info.activityInfo.name));
+					item.setApplicationInfo(applicationInfo);
+					item.setApplicationPackage(applicationInfo.packageName);
+					
+					SharedPreferences sharedPref = getApplicationContext()
+							.getSharedPreferences(
+									String.valueOf(R.string.idPrefFile),
+									Context.MODE_PRIVATE);
+					
+					item.setAssigned(isAssignedByApplication(item, sharedPref));
+					item.setActions(ActionsFactory.create(item));
+					if ( item.getApplicationPackage().equalsIgnoreCase("com.google.android.gallery3d")){
+						Log.d("ONE", info.activityInfo.name + " ** " + applicationInfo.packageName + " ** " + (String) manager.getApplicationLabel(applicationInfo));
+					}
+					allApp.add(item);
+				}
 			}
 			listApplications.addAll(allApp.data);
 			return null;

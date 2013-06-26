@@ -27,6 +27,6 @@ public class AppShortcutApplication extends Application{
 	public void setCurrentListApplications(
 			List<ApplicationVo> currentListApplications) {
 		this.currentListApplications = currentListApplications;
-	} 
+	}
 
 }

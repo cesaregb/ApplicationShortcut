@@ -12,7 +12,6 @@ public class GridPagerAdapter extends FragmentStatePagerAdapter {
 
 	@Override
 	public int getItemPosition(Object object) {
-		// TODO Auto-generated method stub
 		return FragmentStatePagerAdapter.POSITION_NONE;
 //		return super.getItemPosition(object);
 	}
