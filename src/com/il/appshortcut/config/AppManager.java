@@ -1,9 +1,14 @@
 package com.il.appshortcut.config;
 
 public class AppManager {
+	public static String LOG_WIDGET = "LOG_WIDGET";
+	public static String LOG_EXCEPTIONS = "LOG_EXCEPTIONS";
+	
 	private static AppManager _instance;
 	public static String CLEAR_STRING = "";
-
+	public static String ID_PRE_FFILE = "com.il.appshortcut";
+	
+	
 	private String currentSelection;
 	
 	private AppManager() { }

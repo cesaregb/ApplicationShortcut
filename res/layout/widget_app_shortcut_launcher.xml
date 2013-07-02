@@ -17,7 +17,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:maxLines="5"
-            android:text="initial text"
+            android:text="Initial Text"
             android:textColor="#fcfcfc"
             android:textSize="13sp"
             android:textStyle="normal" />
@@ -30,9 +30,8 @@
 
         <Button
             android:id="@+id/widget_up_button"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="20dip"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:text="UP" />
     </LinearLayout>
 
@@ -44,16 +43,14 @@
 
         <Button
             android:id="@+id/widget_left_button"
-            android:layout_width="100dp"
-            android:layout_height="match_parent"
-            android:padding="20dip"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:text="Left" />
 
         <Button
             android:id="@+id/widget_right_button"
-            android:layout_width="100dp"
-            android:layout_height="match_parent"
-            android:padding="20dip"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:text="Rigt" />
     </LinearLayout>
 
@@ -65,17 +62,21 @@
 
         <Button
             android:id="@+id/widget_down_button"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="20dip"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:text="Down" />
     </LinearLayout>
+	
+     <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
 
-    <Button
-        android:id="@+id/clearSelection"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="20dip"
-        android:text="Clear" />
-
+         <Button
+        	android:id="@+id/clearSelection"
+	        android:layout_width="50dp"
+	        android:layout_height="50dp"
+	        android:text="Clear" />
+    </LinearLayout>
+    
 </LinearLayout>

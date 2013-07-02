@@ -5,22 +5,17 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="11"
+        android:minSdkVersion="17"
         android:targetSdkVersion="17" />
 
     <uses-permission android:name="android.permission.VIBRATE" />
-	<uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.RECORD_VIDEO" />
     <uses-permission android:name="android.permission.INTERNET" />
-	
+
     <application
+        android:name="com.il.appshortcut.config.AppShortcutApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:name=".config.AppShortcutApplication"
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.il.appshortcut.MainActivity"
@@ -31,30 +26,28 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.il.appshortcut.ManageAppListActivity" 
-            android:label="@string/app_name"
-             >
+            android:name="com.il.appshortcut.ManageAppListActivity"
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.permission.CAMERA" />
             </intent-filter>
         </activity>
         <activity
             android:name="com.il.appshortcut.ManageApplicationActivity"
-            android:label="@string/app_name"
-            >
+            android:label="@string/app_name" >
             <action android:name="android.permission.CAMERA" />
         </activity>
-        
+
         <receiver android:name="com.il.appshortcut.widgets.AppShortcutLauncherWidgetProvider" >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
+
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_appshortcut_launcher" />
         </receiver>
-        <receiver
-            android:name="com.il.appshortcut.widgets.AppShortcutLauncherWidgetReceiver" >
+        <receiver android:name="com.il.appshortcut.widgets.AppShortcutLauncherWidgetReceiver" >
             <intent-filter>
                 <action android:name="com.il.appshortcut.intent.action.LEFT" />
             </intent-filter>
@@ -70,11 +63,17 @@
             <intent-filter>
                 <action android:name="com.il.appshortcut.intent.action.CLEAR" />
             </intent-filter>
+
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_appshortcut_launcher" />
         </receiver>
 
+        <activity
+            android:clearTaskOnLaunch="true"
+            android:name="com.il.appshortcut.ProxyActivity"
+            android:label="@string/title_activity_proxy" >
+        </activity>
     </application>
 
 </manifest>

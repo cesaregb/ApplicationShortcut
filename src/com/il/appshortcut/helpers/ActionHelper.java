@@ -9,32 +9,26 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 
-import com.il.appshortcut.R;
 import com.il.appshortcut.actions.CommonActions;
 import com.il.appshortcut.actions.FacebookActions;
+import com.il.appshortcut.config.AppManager;
 import com.il.appshortcut.views.ActionVo;
 import com.il.appshortcut.views.ApplicationVo;
 
 public class ActionHelper {
-	
-	
 	public static final String SEPARATOR = "-";
 	public static final String SEPARATOR_2 = ":";
 	
-	public static String idPrefFile; 
 	
-	public static void assignIdPrefFile(Resources r){
-		idPrefFile = r.getString(R.string.idPrefFile);
-	}
-	
-	public static Intent getIntent(String pattern,
+	public static Intent getPatternIntent(String pattern,
 			SharedPreferences sharedPref, PackageManager pm)
 			throws Exception {
 		Intent resultIntent = null;
 		
-		String id = idPrefFile + "-" + pattern;
+		String id = AppManager.ID_PRE_FFILE + "-" + pattern;
 		String tmp = sharedPref.getString(id, null);
 		if (tmp != null) {
+			
 			String[] split = tmp.split(SEPARATOR);
 			
 			String appPackageParts = split[0]; 
@@ -42,6 +36,7 @@ public class ActionHelper {
 			String appPackage = appInfoParts[0];
 			String appClassName = appInfoParts[1];
 			String actionPackage = split[1];
+			
 			
 			CommonActions actions = null;
 			if (appPackage.equalsIgnoreCase(FacebookActions.FACEBOOK_PACKAGE)) {
@@ -62,12 +57,19 @@ public class ActionHelper {
 		
 	}
 	
+	public static boolean isPatternAssigned(String pattern,
+			SharedPreferences sharedPref)
+					throws Exception {
+		String id = AppManager.ID_PRE_FFILE + "-" + pattern;
+		String tmp = sharedPref.getString(id, null);
+		return (tmp != null);
+	}
+	
 	public static List<ActionVo> getApplicationSelectedActions(List<ActionVo> list, ApplicationVo appSelected, SharedPreferences sharedPref, Resources r) throws Exception{
-		String idPrefFile = r.getString(R.string.idPrefFile);
 		List<ActionVo> result = new ArrayList<ActionVo>();
 		int i = 0;
 		for (ActionVo item : list){
-			String appId = idPrefFile + "-" + appSelected.getName() + "-" + item.getActionPackage();
+			String appId = AppManager.ID_PRE_FFILE + "-" + appSelected.getName() + "-" + item.getActionPackage();
 			String tmp = sharedPref.getString(appId, null);
 			if (tmp != null){
 				result.add(item);
@@ -101,13 +103,13 @@ public class ActionHelper {
 	}
 	
 	public static String getActionId(String appInfo, String actionInfo){
-		return idPrefFile + SEPARATOR + appInfo + SEPARATOR + actionInfo;
+		return AppManager.ID_PRE_FFILE + SEPARATOR + appInfo + SEPARATOR + actionInfo;
 	}
 	public static String getAppId(String appInfo){
-		return idPrefFile + SEPARATOR + appInfo;
+		return AppManager.ID_PRE_FFILE + SEPARATOR + appInfo;
 	}
 	public static String getPatternId(String pattern){
-		return idPrefFile + SEPARATOR + pattern;
+		return AppManager.ID_PRE_FFILE + SEPARATOR + pattern;
 	}
 	
 	

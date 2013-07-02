@@ -33,6 +33,7 @@ import android.widget.Toast;
 
 import com.il.appshortcut.actions.ActionsFactory;
 import com.il.appshortcut.adapters.GridPagerAdapter;
+import com.il.appshortcut.config.AppManager;
 import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.fragments.ApplicationListFragment;
 import com.il.appshortcut.fragments.FilterApplications;
@@ -285,7 +286,7 @@ public class ManageAppListActivity extends FragmentActivity implements
 					
 					SharedPreferences sharedPref = getApplicationContext()
 							.getSharedPreferences(
-									String.valueOf(R.string.idPrefFile),
+									AppManager.ID_PRE_FFILE,
 									Context.MODE_PRIVATE);
 					
 					item.setAssigned(isAssignedByApplication(item, sharedPref));

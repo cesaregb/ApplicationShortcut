@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import com.il.appshortcut.R;
 import com.il.appshortcut.adapters.ApplicationActionItemAdapter;
+import com.il.appshortcut.config.AppManager;
 import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.helpers.ActionHelper;
 import com.il.appshortcut.views.ActionVo;
@@ -88,7 +89,7 @@ public class ApplicationInfoFragment extends Fragment {
 	public void updateApplicationView(ApplicationVo application) {
 		
 		SharedPreferences sharedPref = getActivity().getApplicationContext()
-				.getSharedPreferences(String.valueOf(R.string.idPrefFile),
+				.getSharedPreferences(AppManager.ID_PRE_FFILE,
 						Context.MODE_PRIVATE);
 		
 		List<ActionVo> notSelectedActions = new ArrayList<ActionVo>(); 

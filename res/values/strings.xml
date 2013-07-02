@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<!-- app settings -->
-    <string name="idPrefFile">com.il.appshortcut</string>
+
+    <!-- app settings -->
     <string name="app_name">AppShortcut</string>
-    
-<!-- 	common used   -->
+
+    <!-- common used -->
     <string name="action_settings">Settings</string>
     <string name="action_clear">Clear</string>
     <string name="filter">Filter</string>
@@ -13,25 +13,25 @@
     <string name="confirm">Confirm</string>
     <string name="apply">Apply</string>
 
-<!-- activities captions -->
+    <!-- activities captions -->
     <string name="title_activity_manage_patterns">ManagePatternsActivity</string>
     <string name="title_activity_manage_application">ManageApplicationActivity</string>
 
-<!-- specific -->
+    <!-- specific -->
     <string name="managePatterns">Manage Patterns</string>
     <string name="desc_backround">Background image</string>
     <string name="desc_temporal">Background image</string>
-    
     <string name="assigned">Assigned</string>
     <string name="not_assigned">Not Assigned</string>
-    
-	
+
     <string-array name="filter_options_string_array">
         <item>All</item>
         <item>Assigned</item>
         <item>Not Assigned</item>
     </string-array>
-    
-    
-   <string name="dummy_section_text">Section %1d is just a dummy section.</string>
+
+    <string name="dummy_section_text">Section %1d is just a dummy section.</string>
+    <string name="title_activity_proxy">ProxyActivity</string>
+    <string name="hello_world">Hello world!</string>
+
 </resources>

@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
@@ -14,6 +13,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.il.appshortcut.android.views.LuncherPatternView;
+import com.il.appshortcut.config.AppManager;
 
 
 public class MainActivity extends Activity implements
@@ -26,9 +26,6 @@ public class MainActivity extends Activity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		luncherWidget = (LuncherPatternView) findViewById(R.id.luncher_widget);
-		
-		Resources r = getResources(); 
-		com.il.appshortcut.helpers.ActionHelper.assignIdPrefFile(r);
 	}
 
 	
@@ -47,7 +44,7 @@ public class MainActivity extends Activity implements
 			break;
 		case R.id.action_clear:
 			SharedPreferences sharedPref = getApplicationContext()
-			.getSharedPreferences(String.valueOf(R.string.idPrefFile),
+			.getSharedPreferences(AppManager.ID_PRE_FFILE,
 					Context.MODE_PRIVATE);
 			sharedPref.edit().clear().commit();
 			Toast.makeText(getApplicationContext(), "The patters had been deleted", Toast.LENGTH_SHORT).show();
@@ -72,10 +69,10 @@ public class MainActivity extends Activity implements
 	public void fireApplication(String currentSelection) {
 
 		SharedPreferences sharedPref = getApplicationContext()
-				.getSharedPreferences(String.valueOf(R.string.idPrefFile),
+				.getSharedPreferences(AppManager.ID_PRE_FFILE,
 						Context.MODE_PRIVATE);
 		try {
-			Intent i = com.il.appshortcut.helpers.ActionHelper.getIntent(currentSelection, sharedPref, getPackageManager());
+			Intent i = com.il.appshortcut.helpers.ActionHelper.getPatternIntent(currentSelection, sharedPref, getPackageManager());
 			if (i != null){
 				startActivity(i);
 			}else{ Toast.makeText(getApplicationContext(), "Exception.. so bad right? ", Toast.LENGTH_SHORT).show(); }

@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.il.appshortcut.android.views.LuncherPatternView;
+import com.il.appshortcut.config.AppManager;
 import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.fragments.ApplicationInfoFragment;
 import com.il.appshortcut.fragments.ApplicationSelectPatternFragment;
@@ -147,7 +148,7 @@ public class ManageApplicationActivity extends FragmentActivity
 		if (appSelected != null) {
 			Context context = getApplicationContext();
 			SharedPreferences sharedPref = context.getSharedPreferences(
-					String.valueOf(R.string.idPrefFile), Context.MODE_PRIVATE);
+					AppManager.ID_PRE_FFILE, Context.MODE_PRIVATE);
 			SharedPreferences.Editor editor = sharedPref.edit();
 
 			String actionPackage = "";
