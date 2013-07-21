@@ -60,8 +60,21 @@ public class MainActivity extends Activity implements
 		return true;
 	}
 	
+	/**
+	 * @param view
+	 * this fires the Manage Applications  
+	 */
 	public void openManagePatterns(View view){
 		Intent intent = new Intent(MainActivity.this, ManageAppListActivity.class);
+		startActivity(intent);
+	}
+	
+	/**
+	 * @param view
+	 * this fires the Manage Activities  
+	 */
+	public void openManageActivities(View view){
+		Intent intent = new Intent(MainActivity.this, ManageAcivitiesListActivity.class);
 		startActivity(intent);
 	}
 

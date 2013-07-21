@@ -3,7 +3,7 @@ package com.il.appshortcut.actions;
 import android.content.Intent;
 import android.net.Uri;
 
-import com.il.appshortcut.views.ActionVo;
+import com.il.appshortcut.views.ApplicationActionVo;
 
 public class FacebookActions extends CommonActions {
 	public static final String FACEBOOK_APP_NAME = "facebook";
@@ -11,7 +11,7 @@ public class FacebookActions extends CommonActions {
 	public static final String ACTION_NEW_MESSAGE = "com.il.appshortcut.actions.facebook.newMessage"; //replace for package 
 	
 	public FacebookActions(){
-		ActionVo action = new ActionVo();
+		ApplicationActionVo action = new ApplicationActionVo();
 		action.setName("New Message");
 		action.setAssigned(false);
 		action.setActionPackage(ACTION_NEW_MESSAGE);

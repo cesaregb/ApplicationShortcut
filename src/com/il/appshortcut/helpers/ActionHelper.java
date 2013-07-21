@@ -12,31 +12,39 @@ import android.content.res.Resources;
 import com.il.appshortcut.actions.CommonActions;
 import com.il.appshortcut.actions.FacebookActions;
 import com.il.appshortcut.config.AppManager;
-import com.il.appshortcut.views.ActionVo;
+import com.il.appshortcut.views.ApplicationActionVo;
 import com.il.appshortcut.views.ApplicationVo;
 
 public class ActionHelper {
+//	final PackageManager pm = getApplicationContext().getPackageManager();
+//	ApplicationInfo ai;
+//	try {
+//	    ai = pm.getApplicationInfo( this.getPackageName(), 0);
+//	} catch (final NameNotFoundException e) {
+//	    ai = null;
+//	}
+//	final String applicationName = (String) (ai != null ? pm.getApplicationLabel(ai) : "(unknown)");
+	
 	public static final String SEPARATOR = "-";
 	public static final String SEPARATOR_2 = ":";
-	
 	
 	public static Intent getPatternIntent(String pattern,
 			SharedPreferences sharedPref, PackageManager pm)
 			throws Exception {
 		Intent resultIntent = null;
 		
-		String id = AppManager.ID_PRE_FFILE + "-" + pattern;
+		String id = AppManager.ID_PRE_FFILE + SEPARATOR + pattern;
 		String tmp = sharedPref.getString(id, null);
 		if (tmp != null) {
 			
 			String[] split = tmp.split(SEPARATOR);
 			
 			String appPackageParts = split[0]; 
+			String actionPackage = split[1];
+			
 			String[] appInfoParts = appPackageParts.split(SEPARATOR_2);
 			String appPackage = appInfoParts[0];
 			String appClassName = appInfoParts[1];
-			String actionPackage = split[1];
-			
 			
 			CommonActions actions = null;
 			if (appPackage.equalsIgnoreCase(FacebookActions.FACEBOOK_PACKAGE)) {
@@ -60,16 +68,33 @@ public class ActionHelper {
 	public static boolean isPatternAssigned(String pattern,
 			SharedPreferences sharedPref)
 					throws Exception {
-		String id = AppManager.ID_PRE_FFILE + "-" + pattern;
+		String id = AppManager.ID_PRE_FFILE + SEPARATOR + pattern;
 		String tmp = sharedPref.getString(id, null);
 		return (tmp != null);
 	}
 	
-	public static List<ActionVo> getApplicationSelectedActions(List<ActionVo> list, ApplicationVo appSelected, SharedPreferences sharedPref, Resources r) throws Exception{
-		List<ActionVo> result = new ArrayList<ActionVo>();
+	public static String getApplicationNameByPattern(String pattern,
+			SharedPreferences sharedPref)
+					throws Exception {
+		String result = null;
+		String id = AppManager.ID_PRE_FFILE + SEPARATOR + pattern;
+		String tmp = sharedPref.getString(id, null);
+		if (tmp != null){
+			String[] appInfoArray = tmp.split(SEPARATOR);
+			if (appInfoArray.length == 3){
+				result = appInfoArray[2];
+			}else{
+				result = appInfoArray[0];
+			}
+		}
+		return result;
+	}
+	
+	public static List<ApplicationActionVo> getApplicationSelectedActions(List<ApplicationActionVo> list, ApplicationVo appSelected, SharedPreferences sharedPref, Resources r) throws Exception{
+		List<ApplicationActionVo> result = new ArrayList<ApplicationActionVo>();
 		int i = 0;
-		for (ActionVo item : list){
-			String appId = AppManager.ID_PRE_FFILE + "-" + appSelected.getName() + "-" + item.getActionPackage();
+		for (ApplicationActionVo item : list){
+			String appId = AppManager.ID_PRE_FFILE + SEPARATOR + appSelected.getName() + SEPARATOR + item.getActionPackage();
 			String tmp = sharedPref.getString(appId, null);
 			if (tmp != null){
 				result.add(item);
@@ -86,10 +111,10 @@ public class ActionHelper {
 		return (pattern != null);
 	}
 	
-	public static boolean isAssignedByAction(ApplicationVo app, ActionVo action, SharedPreferences sharedPref){
+	public static String isAssignedByAction(ApplicationVo app, ApplicationActionVo action, SharedPreferences sharedPref){
 		String actionId = getActionId( getApplicationInfo(app.getComponentName()), action.getActionPackage() );
 		String pattern = sharedPref.getString(actionId, null);
-		return (pattern != null);
+		return pattern;
 	}
 	
 	

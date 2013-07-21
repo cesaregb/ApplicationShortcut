@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,10 +18,12 @@ import android.widget.Toast;
 import com.il.appshortcut.android.views.LuncherPatternView;
 import com.il.appshortcut.config.AppManager;
 import com.il.appshortcut.config.AppShortcutApplication;
+import com.il.appshortcut.dao.IAppshortcutDAO;
+import com.il.appshortcut.dao.impl.AppshortcutDAO;
 import com.il.appshortcut.fragments.ApplicationInfoFragment;
 import com.il.appshortcut.fragments.ApplicationSelectPatternFragment;
 import com.il.appshortcut.helpers.ActionHelper;
-import com.il.appshortcut.views.ActionVo;
+import com.il.appshortcut.views.ApplicationActionVo;
 import com.il.appshortcut.views.ApplicationVo;
 
 public class ManageApplicationActivity extends FragmentActivity
@@ -30,6 +33,7 @@ public class ManageApplicationActivity extends FragmentActivity
 		LuncherPatternView.LuncherPatternListener {
 	
 	private String selectedPattern = "";
+	private int numberOfActionByApplication = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +52,6 @@ public class ManageApplicationActivity extends FragmentActivity
 			getSupportFragmentManager().beginTransaction().add(R.id.fragment_container_application, newFragment).commit();
 		}
 	}
-	
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -74,19 +77,9 @@ public class ManageApplicationActivity extends FragmentActivity
 		getMenuInflater().inflate(R.menu.manage_application, menu);
 		return true;
 	}
-	
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.il.appshortcut.fragments.ApplicationInfoFragment.ApplicationInfoListener
-	 * #onApplicationActionItem(com.il.appshortcut.views.ApplicationActionItem)
-	 * NEW This is called when the user select a list from the action [open, new
-	 * message, etc...] list
-	 */
 	@Override
-	public void onApplicationActionItem(ActionVo item) {
+	public void onApplicationActionItem(ApplicationActionVo item) {
 		AppShortcutApplication appState = ((AppShortcutApplication)getApplicationContext());
 		ApplicationVo appSelected = appState.getAppSelected();
 		if (item.getActionPackage() == null) {
@@ -107,20 +100,47 @@ public class ManageApplicationActivity extends FragmentActivity
 				Toast.LENGTH_SHORT).show();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.il.appshortcut.fragments.ApplicationInfoFragment.ApplicationInfoListener
-	 * #onApplicationActionItemSelected(com.il.appshortcut.views.
-	 * ApplicationActionItem) EDIT This is called when the user select a list
-	 * from the action [open, new message, etc...] list
-	 */
 	@Override
-	public void onApplicationActionItemSelected(ActionVo item) {
-		Toast.makeText(this,
-				"onApplicationActionItemSelected : " + item.getActionPackage(),
-				Toast.LENGTH_SHORT).show();
+	public void onApplicationActionItemSelected(ApplicationActionVo item) {
+		Log.d(AppManager.LOG_APPLICATION_INFO_FRAGMENT, "pattern: " + item.getPatter());
+		ApplicationVo appSelected = ((AppShortcutApplication)getApplicationContext()).getAppSelected();
+		if (item.getActionPackage() == null) {
+			item.setActionPackage(appSelected.getApplicationPackage());
+		}
+		appSelected.setCurrentAction(item);
+		if (appSelected != null 
+				&& item != null) {
+			
+			SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
+					AppManager.ID_PRE_FFILE, Context.MODE_PRIVATE);
+			SharedPreferences.Editor editor = sharedPref.edit();
+
+				
+			String actionPackage = "";
+			if (appSelected.getCurrentAction() != null){
+				actionPackage = appSelected.getCurrentAction().getActionPackage();
+			}
+			String appInfo = ActionHelper.getApplicationInfo(appSelected.getComponentName());
+			String actionId = ActionHelper.getActionId(appInfo, actionPackage);
+			String appId = ActionHelper.getAppId(appInfo);
+			String appIdPatt = ActionHelper.getPatternId(selectedPattern);
+
+			editor.remove(actionId);
+			editor.remove(appIdPatt);
+			if (numberOfActionByApplication-- == 0)
+				editor.remove(appId);
+			
+			editor.commit();
+			
+			
+			ApplicationInfoFragment fragment = (ApplicationInfoFragment)
+	                getSupportFragmentManager().findFragmentById(R.id.fragment_container_application);
+
+	        if (fragment != null) {
+	        	fragment.updateApplicationView(appSelected);
+	        }
+			
+		}
 	}
 
 	@Override
@@ -146,31 +166,44 @@ public class ManageApplicationActivity extends FragmentActivity
 		ApplicationVo appSelected = ((AppShortcutApplication)getApplicationContext()).getAppSelected();
 		
 		if (appSelected != null) {
-			Context context = getApplicationContext();
-			SharedPreferences sharedPref = context.getSharedPreferences(
-					AppManager.ID_PRE_FFILE, Context.MODE_PRIVATE);
-			SharedPreferences.Editor editor = sharedPref.edit();
-
-			String actionPackage = "";
-			if (appSelected.getCurrentAction() != null){
-				actionPackage = appSelected.getCurrentAction().getActionPackage();
+			
+			IAppshortcutDAO dao = new AppshortcutDAO();
+			try{
+				dao.savePattern(selectedPattern, getApplicationContext());
+			}catch(Exception e){
+				Toast.makeText(getApplicationContext(), "Error Saving Information", Toast.LENGTH_SHORT);
 			}
-			String appInfo = ActionHelper.getApplicationInfo(appSelected.getComponentName());
-			String actionId = ActionHelper.getActionId(appInfo, actionPackage);
-			String appId = ActionHelper.getAppId(appInfo);
-			String appIdPatt = ActionHelper.getPatternId(selectedPattern);
- 
-			editor.putString(actionId, selectedPattern); // search by application  + action 
-			editor.putString(appId, selectedPattern); // search by application 
-			editor.putString(appIdPatt, appInfo + ActionHelper.SEPARATOR + actionPackage); //search by pattern
-
-			Toast.makeText(getApplicationContext(),
-					"Pattern: " + appIdPatt + " saved", Toast.LENGTH_SHORT)
-					.show();
-			editor.commit();
+			
+//			Context context = getApplicationContext();
+//			SharedPreferences sharedPref = context.getSharedPreferences(
+//					AppManager.ID_PRE_FFILE, Context.MODE_PRIVATE);
+//			SharedPreferences.Editor editor = sharedPref.edit();
+//
+//			String actionPackage = "";
+//			if (appSelected.getCurrentAction() != null){
+//				actionPackage = appSelected.getCurrentAction().getActionPackage();
+//			}
+//			String appInfo = ActionHelper.getApplicationInfo(appSelected.getComponentName());
+//			String actionId = ActionHelper.getActionId(appInfo, actionPackage);
+//			String appId = ActionHelper.getAppId(appInfo);
+//			String appIdPatt = ActionHelper.getPatternId(selectedPattern);
+// 
+//			editor.putString(actionId, selectedPattern); // search by application  + action 
+//			editor.putString(appId, selectedPattern); // search by application 
+//			editor.putString(appIdPatt, appInfo + ActionHelper.SEPARATOR + actionPackage + ActionHelper.SEPARATOR + appSelected.getName()); //search by pattern
+//
+//			Toast.makeText(getApplicationContext(),
+//					"Pattern: " + appIdPatt + " saved", Toast.LENGTH_SHORT)
+//					.show();
+//			editor.commit();
 
 		}
 		onBackPressed();
+	}
+
+	@Override
+	public void updateNumberOfActionsByApplication(int number) {
+		this.numberOfActionByApplication = number;
 	}
 
 }

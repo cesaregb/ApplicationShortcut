@@ -26,7 +26,7 @@ import com.il.appshortcut.adapters.ApplicationActionItemAdapter;
 import com.il.appshortcut.config.AppManager;
 import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.helpers.ActionHelper;
-import com.il.appshortcut.views.ActionVo;
+import com.il.appshortcut.views.ApplicationActionVo;
 import com.il.appshortcut.views.ApplicationVo;
 
 /**
@@ -41,14 +41,15 @@ public class ApplicationInfoFragment extends Fragment {
 	public final static String ARG_POSITION = "position";
 	private ApplicationVo mCurrentApplication = null;
 
-	private ArrayList<ActionVo> applicationActionItems;
-	private ArrayList<ActionVo> applicationActionItemsSelected;
+	private ArrayList<ApplicationActionVo> applicationActionItems;
+	private ArrayList<ApplicationActionVo> applicationActionItemsSelected;
 	private ApplicationActionItemAdapter aa;
 	private ApplicationActionItemAdapter aaSelected;
 
 	public interface ApplicationInfoListener{
-		public void onApplicationActionItem(ActionVo item);
-		public void onApplicationActionItemSelected(ActionVo item);
+		public void onApplicationActionItem(ApplicationActionVo item);
+		public void onApplicationActionItemSelected(ApplicationActionVo item);
+		public void updateNumberOfActionsByApplication(int number);
 
 	}
 
@@ -82,8 +83,7 @@ public class ApplicationInfoFragment extends Fragment {
 	}
 
 	/**
-	 * init list
-	 * here is configured application actions (open, new message, etc...) 
+	 * init list here is configured application actions (open, new message, etc...) 
 	 * @param application
 	 */
 	public void updateApplicationView(ApplicationVo application) {
@@ -92,19 +92,25 @@ public class ApplicationInfoFragment extends Fragment {
 				.getSharedPreferences(AppManager.ID_PRE_FFILE,
 						Context.MODE_PRIVATE);
 		
-		List<ActionVo> notSelectedActions = new ArrayList<ActionVo>(); 
-		List<ActionVo> selectedActions = new ArrayList<ActionVo>(); 
-		
+		List<ApplicationActionVo> notSelectedActions = new ArrayList<ApplicationActionVo>(); 
+		List<ApplicationActionVo> selectedActions = new ArrayList<ApplicationActionVo>(); 
+		int countActionsByApplication = 0;
 		if (application.getActions() != null
 				&& application.getActions().getActions() != null ){
-			for (ActionVo a : application.getActions().getActions()){
-				if (ActionHelper.isAssignedByAction(application, a, sharedPref)){
+			for (ApplicationActionVo a : application.getActions().getActions()){
+				String pattern = ActionHelper.isAssignedByAction(application, a, sharedPref);
+				if (pattern != null && !pattern.equals("")){
+					countActionsByApplication++;
+					a.setPatter(pattern);
 					selectedActions.add(a);
 				}else{
 					notSelectedActions.add(a);
 				}
 			}
 			
+		}
+		if(countActionsByApplication > 0){
+			mCallback.updateNumberOfActionsByApplication(countActionsByApplication);
 		}
 		
 		TextView article = (TextView) getActivity().findViewById(R.id.app_name);
@@ -116,7 +122,7 @@ public class ApplicationInfoFragment extends Fragment {
 		image.setImageBitmap(bmpIcon);
 
 		listView = (ListView)getActivity().findViewById(R.id.list_selected_actions);
-		applicationActionItems = new ArrayList<ActionVo>();
+		applicationActionItems = new ArrayList<ApplicationActionVo>();
 		int resID = R.layout.comp_app_action_item;
 		aa = new ApplicationActionItemAdapter(getActivity(), resID, applicationActionItems);
 		listView.setAdapter(aa);
@@ -124,29 +130,29 @@ public class ApplicationInfoFragment extends Fragment {
 		OnItemClickListener listener = new android.widget.AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
-				ActionVo appItem = (ActionVo) listView.getItemAtPosition(position);
+				ApplicationActionVo appItem = (ApplicationActionVo) listView.getItemAtPosition(position);
 				mCallback.onApplicationActionItem(appItem);
 			}
 		};
 		listView.setOnItemClickListener(listener);
-		for (ActionVo item : notSelectedActions){
+		for (ApplicationActionVo item : notSelectedActions){
 			addApplicatoinActionItem(item, 0);
 		}
 		
 		listViewSelected = (ListView)getActivity().findViewById(R.id.list_possible_actions);
-		applicationActionItemsSelected = new ArrayList<ActionVo>();
+		applicationActionItemsSelected = new ArrayList<ApplicationActionVo>();
 		resID = R.layout.comp_app_action_item;
 		aaSelected = new ApplicationActionItemAdapter(getActivity(), resID, applicationActionItemsSelected);
 		listViewSelected.setAdapter(aaSelected);
 		OnItemClickListener listenerSelected = new android.widget.AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
-				ActionVo appItem = (ActionVo) listViewSelected.getItemAtPosition(position);
+				ApplicationActionVo appItem = (ApplicationActionVo) listViewSelected.getItemAtPosition(position);
 				mCallback.onApplicationActionItemSelected(appItem);
 			}
 		};
 		listViewSelected.setOnItemClickListener(listenerSelected);
-		for (ActionVo item : selectedActions){
+		for (ApplicationActionVo item : selectedActions){
 			addApplicatoinActionItem(item, 1);
 		}
 	}
@@ -164,9 +170,9 @@ public class ApplicationInfoFragment extends Fragment {
 	 * @param item
 	 * @param type
 	 */
-	public void addApplicatoinActionItem(ActionVo item, int type){
+	public void addApplicatoinActionItem(ApplicationActionVo item, int type){
 		if (item == null){
-			item = new ActionVo();
+			item = new ApplicationActionVo();
 			item.setName("...Error...");
 			item.setActionPackage(mCurrentApplication.getApplicationInfo().packageName);
 		}

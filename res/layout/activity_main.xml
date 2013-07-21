@@ -2,28 +2,36 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-    
-     <EditText
-         android:id="@+id/editText1"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:ems="10" >
-     </EditText>
+
+    <EditText
+        android:id="@+id/editText1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10" >
+    </EditText>
 
     <com.il.appshortcut.android.views.LuncherPatternView
         android:id="@+id/luncher_widget"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp" />
-    
-    <Button 
+
+    <Button
         android:id="@+id/manage"
+        style="@style/button"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/managePatterns"
         android:onClick="openManagePatterns"
-        style="@style/button">
-        
+        android:text="@string/managePatterns" >
+    </Button>
+
+    <Button
+        android:id="@+id/manage_activities"
+        style="@style/button"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:onClick="openManageActivities"
+        android:text="@string/manageActivities" >
     </Button>
 
 </LinearLayout>

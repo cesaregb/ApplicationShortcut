@@ -3,6 +3,10 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
     
+<!-- 
+	This component is used on the application list, this one contains the the multiple grids! 
+ -->
+    
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"

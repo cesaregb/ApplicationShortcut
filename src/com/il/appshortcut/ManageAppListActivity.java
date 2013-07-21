@@ -145,8 +145,6 @@ public class ManageAppListActivity extends FragmentActivity implements
 
 				if (add) {
 					returnList.add(item);
-				}else{
-					Log.d("Missing", item.getApplicationPackage());
 				}
 			}
 		} else {
@@ -193,14 +191,6 @@ public class ManageAppListActivity extends FragmentActivity implements
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.il.appshortcut.fragments.ApplicationListFragment.ApplicationListListener
-	 * #onApplicationSelected(com.il.appshortcut.views.ApplicationItem) This is
-	 * when the user select an applicatoin from the list
-	 */
 	@Override
 	public void onApplicationSelected(ApplicationVo _appSelected) {
 		AppShortcutApplication appState = (AppShortcutApplication) getApplicationContext();
@@ -223,9 +213,7 @@ public class ManageAppListActivity extends FragmentActivity implements
 	}
 
 	@Override
-	public void onDialogNegativeClick(DialogFragment dialog) {
-		// TODO Auto-generated method stub
-	}
+	public void onDialogNegativeClick(DialogFragment dialog) { }
 
 	@Override
 	public void onTabSelected(ActionBar.Tab tab,
@@ -234,12 +222,10 @@ public class ManageAppListActivity extends FragmentActivity implements
 	}
 
 	@Override
-	public void onTabReselected(Tab tab, FragmentTransaction ft) {
-	}
+	public void onTabReselected(Tab tab, FragmentTransaction ft) { }
 
 	@Override
-	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
-	}
+	public void onTabUnselected(Tab tab, FragmentTransaction ft) { }
 	
 
 	/**
@@ -251,7 +237,7 @@ public class ManageAppListActivity extends FragmentActivity implements
 		@Override
 		protected void onPreExecute() {
 			progressDialog = new ProgressDialog(ManageAppListActivity.this);
-			progressDialog.setMessage("Loading Applicationss...");
+			progressDialog.setMessage("Loading Applications...");
 			progressDialog.setIndeterminate(false);
 			progressDialog.setMax(100);
 			progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -291,9 +277,6 @@ public class ManageAppListActivity extends FragmentActivity implements
 					
 					item.setAssigned(isAssignedByApplication(item, sharedPref));
 					item.setActions(ActionsFactory.create(item));
-					if ( item.getApplicationPackage().equalsIgnoreCase("com.google.android.gallery3d")){
-						Log.d("ONE", info.activityInfo.name + " ** " + applicationInfo.packageName + " ** " + (String) manager.getApplicationLabel(applicationInfo));
-					}
 					allApp.add(item);
 				}
 			}

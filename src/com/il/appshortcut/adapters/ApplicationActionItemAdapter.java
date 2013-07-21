@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.il.appshortcut.R;
-import com.il.appshortcut.views.ActionVo;
+import com.il.appshortcut.views.ApplicationActionVo;
 
 /**
  * @author Cesaregb
@@ -19,7 +19,7 @@ import com.il.appshortcut.views.ActionVo;
  *
  */
 
-public class ApplicationActionItemAdapter extends ArrayAdapter<ActionVo>{
+public class ApplicationActionItemAdapter extends ArrayAdapter<ApplicationActionVo>{
 	int resource; 
 	
 	
@@ -28,7 +28,7 @@ public class ApplicationActionItemAdapter extends ArrayAdapter<ActionVo>{
 		this.resource = textViewResourceId;
 	}
 	
-	public ApplicationActionItemAdapter(Context context, int textViewResourceId, List<ActionVo> items) {
+	public ApplicationActionItemAdapter(Context context, int textViewResourceId, List<ApplicationActionVo> items) {
 		super(context, textViewResourceId, items);
 		this.resource = textViewResourceId;
 	}
@@ -36,7 +36,7 @@ public class ApplicationActionItemAdapter extends ArrayAdapter<ActionVo>{
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		LinearLayout applicationActionView;
-		ActionVo item = getItem(position);
+		ApplicationActionVo item = getItem(position);
 		String taskString = item.getName();
 		if (convertView == null) {
 			applicationActionView = new LinearLayout(getContext());

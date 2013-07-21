@@ -7,7 +7,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 
-import com.il.appshortcut.views.ActionVo;
+import com.il.appshortcut.views.ApplicationActionVo;
 
 public class CommonActions {
 
@@ -19,17 +19,19 @@ public class CommonActions {
 //com.instagram.android
 	
 	public static final String ACTION_OPEN = "open";
-	protected List<ActionVo> actions; 
+	
+	protected List<ApplicationActionVo> actions; 
+	
 	private String appPackage; 
 	private PackageManager pm;
 	
-	public List<ActionVo> getActions(){
+	public List<ApplicationActionVo> getActions(){
 		return actions;
 	}
 	
 	public CommonActions(){
-		actions = new ArrayList<ActionVo>();
-		ActionVo action = new ActionVo();
+		actions = new ArrayList<ApplicationActionVo>();
+		ApplicationActionVo action = new ApplicationActionVo();
 		action.setName(ACTION_OPEN);
 		action.setAssigned(false);
 		action.setActionPackage("");

@@ -1,11 +1,6 @@
 package com.il.appshortcut.widgets;
 
-import static com.il.appshortcut.helpers.ActionHelper.getPatternIntent;
-import static com.il.appshortcut.helpers.ActionHelper.isPatternAssigned;
-
-import java.util.Calendar;
-
-import android.app.AlarmManager;
+import static com.il.appshortcut.helpers.ActionHelper.getApplicationNameByPattern;
 import android.app.KeyguardManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -16,103 +11,75 @@ import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
-import com.il.appshortcut.ProxyActivity;
 import com.il.appshortcut.R;
 import com.il.appshortcut.config.AppManager;
+import com.il.appshortcut.views.ApplicationVo;
 
 public class AppShortcutLauncherWidgetReceiver extends BroadcastReceiver {
 	public static int clickCount = 0;
-	private PendingIntent service = null;
-	
+	private boolean isMatchFound = false;
+	private String currentSelection;
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
 
 		boolean updateWidget = false;
 		String currentAction = intent.getAction();
-		String currentSelection = null;
-
-		if (currentAction.equals(WidgetUtils.WIDGET_UP_ACTION)) {
-			currentSelection = WidgetUtils.updateSharedPref(context,
-					WidgetUtils.WIDGET_UP_VALUE);
-			updateWidget = true;
-		}
-		if (currentAction.equals(WidgetUtils.WIDGET_LEFT_ACTION)) {
-			currentSelection = WidgetUtils.updateSharedPref(context,
-					WidgetUtils.WIDGET_LEFT_VALUE);
-			updateWidget = true;
-		}
-		if (currentAction.equals(WidgetUtils.WIDGET_RIGHT_ACTION)) {
-			currentSelection = WidgetUtils.updateSharedPref(context,
-					WidgetUtils.WIDGET_RIGHT_VALUE);
-			updateWidget = true;
-		}
-		if (currentAction.equals(WidgetUtils.WIDGET_DOWN_ACTION)) {
-			currentSelection = WidgetUtils.updateSharedPref(context,
-					WidgetUtils.WIDGET_DOWN_VALUE);
-			updateWidget = true;
-		}
-		if (currentAction.equals(WidgetUtils.WIDGET_CLEAR_ACTION)) {
-			Log.d(AppManager.LOG_WIDGET, "Clear Selection");
-			WidgetUtils.clearSharedPref(context);
-			
-			final AlarmManager m = (AlarmManager) context
-					.getSystemService(Context.ALARM_SERVICE);
-
-			final Calendar TIME = Calendar.getInstance();
-			TIME.set(Calendar.MINUTE, 0);
-			TIME.set(Calendar.SECOND, 0);
-			TIME.set(Calendar.MILLISECOND, 0);
-
-			final Intent intnt = new Intent(context, ProxyActivity.class);
-			intnt.putExtra(WidgetUtils.TAG_CURRENT_SELECTION, "143");
-
-			if (service == null) {
-				service = PendingIntent.getActivity(context, 0, intnt, 0);
+		try{
+			if (currentAction.equals(WidgetUtils.WIDGET_UP_ACTION)) {
+				currentSelection = WidgetUtils.updateSharedPref(context,
+						WidgetUtils.WIDGET_UP_VALUE);
+				updateWidget = true;
 			}
-
-			m.setRepeating(AlarmManager.RTC, TIME.getTime().getTime(), 1000,
-					service);
 			
-			updateWidget = true;
-		}
+			if (currentAction.equals(WidgetUtils.WIDGET_LEFT_ACTION)) {
+				currentSelection = WidgetUtils.updateSharedPref(context,
+						WidgetUtils.WIDGET_LEFT_VALUE);
+				updateWidget = true;
+			}
+			
+			if (currentAction.equals(WidgetUtils.WIDGET_RIGHT_ACTION)) {
+				currentSelection = WidgetUtils.updateSharedPref(context,
+						WidgetUtils.WIDGET_RIGHT_VALUE);
+				updateWidget = true;
+			}
+			
+			if (currentAction.equals(WidgetUtils.WIDGET_DOWN_ACTION)) {
+				currentSelection = WidgetUtils.updateSharedPref(context,
+						WidgetUtils.WIDGET_DOWN_VALUE);
+				updateWidget = true;
+			}
+			
+			if (currentAction.equals(WidgetUtils.WIDGET_CLEAR_ACTION)) {
+				Log.d(AppManager.LOG_WIDGET, "Clear Selection");
+				WidgetUtils.clearSharedPref(context);
+				isMatchFound = false;
+				AppManager.getInstance().getListApplications().clear();
+				updateWidget = true;
+			}
+			
+		}catch(Exception e){/*TODO add action */}
+		
 		if (updateWidget) {
 			try {
-				
 				SharedPreferences sharedPref = context.getApplicationContext()
 						.getSharedPreferences(AppManager.ID_PRE_FFILE,
 								Context.MODE_PRIVATE);
-				if (currentSelection != null
-						&& isPatternAssigned(currentSelection, sharedPref)) {
-					
-					WidgetUtils
-							.clearSharedPref(context.getApplicationContext());
-					
-					KeyguardManager mKeyguardManager = (KeyguardManager) context
+				
+				KeyguardManager mKeyguardManager = (KeyguardManager) context
 							.getSystemService(Context.KEYGUARD_SERVICE);
-					
-					if (mKeyguardManager.isKeyguardLocked()) {
-						Log.d(AppManager.LOG_WIDGET,
-								"Launching Proxy Application ");
-
-						Intent i = new Intent(context,
-								ProxyActivity.class);
-						i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-						i.putExtra(WidgetUtils.TAG_CURRENT_SELECTION,
-								currentSelection);
-						context.getApplicationContext().startActivity(i);
-
-					} else {
-						Intent i = getPatternIntent(currentSelection,
-								sharedPref, context.getPackageManager());
-						Log.d(AppManager.LOG_WIDGET, "Launching Application");
-						if (i != null) {
-							i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-							context.getApplicationContext().startActivity(i);
-						}
-					}
-
+				
+				String applicationName = getApplicationNameByPattern(currentSelection, sharedPref);
+				
+				if (applicationName != null){
+					isMatchFound = true;
+					ApplicationVo application = new ApplicationVo(applicationName);
+					application.setPatter(currentSelection);
+					AppManager.getInstance().getListApplications().add(application);
 				}
+				
+				if (mKeyguardManager.isKeyguardLocked()) { } else { }
+				
 				updateWidgetPictureAndButtonListener(context);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -148,13 +115,52 @@ public class AppShortcutLauncherWidgetReceiver extends BroadcastReceiver {
 		remoteViews.setOnClickPendingIntent(R.id.clearSelection,
 				AppShortcutLauncherWidgetProvider
 						.buildClearButtonPendingIntent(context));
+		
+		if( isMatchFound ){
+			currentSelection = (currentSelection != null)?currentSelection:"";
+			Log.d(AppManager.LOG_WIDGET, "applicatoin List Size: " + AppManager.getInstance().getListApplications().size());
+			int i = 0;
+			for (ApplicationVo app : AppManager.getInstance().getListApplications()){
+				if (i == 0){
+					remoteViews.setOnClickPendingIntent(R.id.option1,
+							AppShortcutLauncherWidgetProvider
+							.buildLunchApplicationBtnPendingIntent(context, app.getPatter()));
+				}
+				if (i == 1){
+					remoteViews.setOnClickPendingIntent(R.id.option2,
+							AppShortcutLauncherWidgetProvider
+							.buildLunchApplicationBtnPendingIntent(context, app.getPatter()));
+				}
+				if (i == 2){
+					remoteViews.setOnClickPendingIntent(R.id.option3,
+							AppShortcutLauncherWidgetProvider
+							.buildLunchApplicationBtnPendingIntent(context, app.getPatter()));
+				}
+				
+				Log.d(AppManager.LOG_WIDGET, i + "; Application: " + app.getName() + " ++ " + app.getPatter());
+				i++;
+			}
+		}else{
+			Intent i = new Intent();
+			PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
+			remoteViews.setOnClickPendingIntent(R.id.option1,pi);
+			remoteViews.setOnClickPendingIntent(R.id.option2,pi);
+			remoteViews.setOnClickPendingIntent(R.id.option3,pi);
+		}
 
 		AppShortcutLauncherWidgetProvider.pushWidgetUpdate(
 				context.getApplicationContext(), remoteViews);
+		
 	}
 
 	private String getDesc(Context context) {
-		return WidgetUtils.getWidgetSelectionSharedPref(context);
+		try{
+			return WidgetUtils.getWidgetSelectionSharedPref(context);
+		}catch(Exception e){
+			Toast.makeText(context, "Erro retriving saved selection", Toast.LENGTH_SHORT).show();
+			return "";
+		}
 	}
+	
 
 }

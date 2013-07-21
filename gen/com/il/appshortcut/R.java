@@ -53,39 +53,43 @@ public final class R {
         public static final int ic_launcher=0x7f020005;
     }
     public static final class id {
-        public static final int action_clear=0x7f0b0018;
-        public static final int action_filter_delete=0x7f0b001a;
-        public static final int action_search=0x7f0b0019;
-        public static final int action_settings=0x7f0b0017;
-        public static final int app_name=0x7f0b0008;
-        public static final int applicatoin_action_name=0x7f0b0005;
-        public static final int assignPattern=0x7f0b000d;
-        public static final int clearSelection=0x7f0b0016;
-        public static final int contentContainer=0x7f0b000f;
+        public static final int action_clear=0x7f0b001c;
+        public static final int action_filter_delete=0x7f0b001e;
+        public static final int action_search=0x7f0b001d;
+        public static final int action_settings=0x7f0b001b;
+        public static final int app_name=0x7f0b0009;
+        public static final int applicatoin_action_name=0x7f0b0006;
+        public static final int assignPattern=0x7f0b000e;
+        public static final int clearSelection=0x7f0b001a;
+        public static final int contentContainer=0x7f0b0010;
         public static final int editText1=0x7f0b0000;
-        public static final int fragment_container_application=0x7f0b0003;
-        public static final int gridview=0x7f0b000e;
-        public static final int icon_app_selected=0x7f0b0007;
-        public static final int icon_image=0x7f0b000c;
-        public static final int list_possible_actions=0x7f0b000a;
-        public static final int list_selected_actions=0x7f0b0009;
+        public static final int fragment_container_application=0x7f0b0004;
+        public static final int gridview=0x7f0b000f;
+        public static final int icon_app_selected=0x7f0b0008;
+        public static final int icon_image=0x7f0b000d;
+        public static final int list_possible_actions=0x7f0b000b;
+        public static final int list_selected_actions=0x7f0b000a;
         public static final int luncher_widget=0x7f0b0001;
         public static final int manage=0x7f0b0002;
-        public static final int pager=0x7f0b0004;
-        public static final int row=0x7f0b000b;
-        public static final int search_criteria=0x7f0b0006;
-        public static final int selected_patter_widget=0x7f0b0010;
-        public static final int tableRow1=0x7f0b0012;
-        public static final int widget_down_button=0x7f0b0015;
-        public static final int widget_left_button=0x7f0b0013;
-        public static final int widget_right_button=0x7f0b0014;
-        public static final int widget_up_button=0x7f0b0011;
+        public static final int manage_activities=0x7f0b0003;
+        public static final int option1=0x7f0b0012;
+        public static final int option2=0x7f0b0013;
+        public static final int option3=0x7f0b0014;
+        public static final int pager=0x7f0b0005;
+        public static final int row=0x7f0b000c;
+        public static final int search_criteria=0x7f0b0007;
+        public static final int selected_patter_widget=0x7f0b0011;
+        public static final int tableRow1=0x7f0b0016;
+        public static final int widget_down_button=0x7f0b0019;
+        public static final int widget_left_button=0x7f0b0017;
+        public static final int widget_right_button=0x7f0b0018;
+        public static final int widget_up_button=0x7f0b0015;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
-        public static final int activity_manage_application=0x7f030001;
-        public static final int activity_manage_patterns=0x7f030002;
-        public static final int activity_proxy=0x7f030003;
+        public static final int activity_manage_acivities_list=0x7f030001;
+        public static final int activity_manage_application=0x7f030002;
+        public static final int activity_manage_patterns=0x7f030003;
         public static final int comp_app_action_item=0x7f030004;
         public static final int comp_app_filter=0x7f030005;
         public static final int comp_app_info=0x7f030006;
@@ -93,15 +97,15 @@ public final class R {
         public static final int comp_app_select_pattern=0x7f030008;
         public static final int comp_grid_view=0x7f030009;
         public static final int comp_pager_view=0x7f03000a;
-        public static final int fragment_section_dummy=0x7f03000b;
-        public static final int widget_app_shortcut_launcher=0x7f03000c;
+        public static final int widget_app_shortcut_launcher=0x7f03000b;
     }
     public static final class menu {
         public static final int grid_view=0x7f0a0000;
         public static final int main=0x7f0a0001;
-        public static final int manage_application=0x7f0a0002;
-        public static final int manage_patterns=0x7f0a0003;
-        public static final int proxy=0x7f0a0004;
+        public static final int manage_acivities_list=0x7f0a0002;
+        public static final int manage_application=0x7f0a0003;
+        public static final int manage_patterns=0x7f0a0004;
+        public static final int proxy=0x7f0a0005;
     }
     public static final class string {
         public static final int action_clear=0x7f070002;
@@ -112,24 +116,26 @@ public final class R {
          */
         public static final int app_name=0x7f070000;
         public static final int apply=0x7f070007;
-        public static final int assigned=0x7f07000d;
+        public static final int assigned=0x7f07000e;
         public static final int cancel=0x7f070005;
         public static final int confirm=0x7f070006;
-        public static final int desc_backround=0x7f07000b;
-        public static final int desc_temporal=0x7f07000c;
-        public static final int dummy_section_text=0x7f07000f;
+        public static final int desc_backround=0x7f07000c;
+        public static final int desc_temporal=0x7f07000d;
+        public static final int dummy_section_text=0x7f070010;
         public static final int filter=0x7f070003;
-        public static final int hello_world=0x7f070011;
+        public static final int hello_world=0x7f070012;
+        public static final int manageActivities=0x7f07000b;
         /**  specific 
          */
         public static final int managePatterns=0x7f07000a;
-        public static final int not_assigned=0x7f07000e;
+        public static final int not_assigned=0x7f07000f;
         public static final int search=0x7f070004;
+        public static final int title_activity_manage_acivities_list=0x7f070013;
         public static final int title_activity_manage_application=0x7f070009;
         /**  activities captions 
          */
         public static final int title_activity_manage_patterns=0x7f070008;
-        public static final int title_activity_proxy=0x7f070010;
+        public static final int title_activity_proxy=0x7f070011;
     }
     public static final class style {
         /** 

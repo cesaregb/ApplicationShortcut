@@ -16,13 +16,32 @@
             android:id="@+id/selected_patter_widget"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:maxLines="5"
             android:text="Initial Text"
-            android:textColor="#fcfcfc"
-            android:textSize="13sp"
-            android:textStyle="normal" />
+            android:textSize="13sp" />
     </LinearLayout>
+    
+	 <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
 
+         <Button
+        	android:id="@+id/option1"
+	        android:layout_width="50dp"
+	        android:layout_height="50dp"
+	        android:text="O1" />
+         <Button
+        	android:id="@+id/option2"
+	        android:layout_width="50dp"
+	        android:layout_height="50dp"
+	        android:text="O2" />
+         <Button
+        	android:id="@+id/option3"
+	        android:layout_width="50dp"
+	        android:layout_height="50dp"
+	        android:text="O3" />
+         
+    </LinearLayout>
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -57,7 +76,6 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
         android:orientation="horizontal" >
 
         <Button
@@ -77,6 +95,7 @@
 	        android:layout_width="50dp"
 	        android:layout_height="50dp"
 	        android:text="Clear" />
+         
     </LinearLayout>
     
 </LinearLayout>

@@ -19,6 +19,7 @@
 
     <!-- specific -->
     <string name="managePatterns">Manage Patterns</string>
+    <string name="manageActivities">Manage Activities</string>
     <string name="desc_backround">Background image</string>
     <string name="desc_temporal">Background image</string>
     <string name="assigned">Assigned</string>
@@ -33,5 +34,6 @@
     <string name="dummy_section_text">Section %1d is just a dummy section.</string>
     <string name="title_activity_proxy">ProxyActivity</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_manage_acivities_list">ManageAcivitiesListActivity</string>
 
 </resources>

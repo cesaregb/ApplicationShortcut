@@ -1,24 +1,31 @@
 package com.il.appshortcut.views;
 
-
 public class ActionVo {
-	private String name;
-	private String patter;
-	private String description;
+	private int idAction;
+	private String activityName;
 	private String actionPackage;
-	private boolean assigned = false;
+	private String applicationPackage;
+	private String pattern;
+	private boolean assigned;
+	private int type;
 	
-	public String getPatter() {
-		return patter;
+	public int getIdAction() {
+		return idAction;
 	}
-	public void setPatter(String patter) {
-		this.patter = patter;
+	public void setIdAction(int idAction) {
+		this.idAction = idAction;
 	}
-	public String getName() {
-		return name;
+	public String getActivityName() {
+		return activityName;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public void setActivityName(String activityName) {
+		this.activityName = activityName;
+	}
+	public String getPattern() {
+		return pattern;
+	}
+	public void setPattern(String pattern) {
+		this.pattern = pattern;
 	}
 	public boolean isAssigned() {
 		return assigned;
@@ -26,17 +33,23 @@ public class ActionVo {
 	public void setAssigned(boolean assigned) {
 		this.assigned = assigned;
 	}
-	public String getDescription() {
-		return description;
+	public int getType() {
+		return type;
 	}
-	public void setDescription(String description) {
-		this.description = description;
+	public void setType(int type) {
+		this.type = type;
 	}
 	public String getActionPackage() {
 		return actionPackage;
 	}
 	public void setActionPackage(String actionPackage) {
 		this.actionPackage = actionPackage;
+	}
+	public String getApplicationPackage() {
+		return applicationPackage;
+	}
+	public void setApplicationPackage(String applicationPackage) {
+		this.applicationPackage = applicationPackage;
 	}
 	
 }

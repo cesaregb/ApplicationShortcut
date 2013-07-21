@@ -1,15 +1,18 @@
 package com.il.appshortcut.widgets;
 
+import static com.il.appshortcut.helpers.ActionHelper.getPatternIntent;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import com.il.appshortcut.R;
-
+import com.il.appshortcut.config.AppManager;
 public class AppShortcutLauncherWidgetProvider extends AppWidgetProvider {
 	
 	@Override
@@ -77,29 +80,31 @@ public class AppShortcutLauncherWidgetProvider extends AppWidgetProvider {
 	}
 	
 	public static PendingIntent buildClearButtonPendingIntent(Context context) {
-//		Intent intent = new Intent(context, MainActivity.class);
-//        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-//		return pendingIntent;
-		
 		Intent intent = new Intent();
 		intent.setAction(WidgetUtils.WIDGET_CLEAR_ACTION);
 		return PendingIntent.getBroadcast(context, 0, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
-//		
-//		SharedPreferences sharedPref = context.getApplicationContext()
-//				.getSharedPreferences(AppManager.ID_PRE_FFILE,
-//						Context.MODE_PRIVATE);
-//		Intent i = null;
-//		try{
-//			i = getPatternIntent("143",
-//					sharedPref, context.getPackageManager());
-//		}catch(Exception e){}
-//		
-//		return PendingIntent.getActivity(context, 0, i, 0);
+	}
+	
+	public static PendingIntent buildLunchApplicationBtnPendingIntent(Context context, String currentSelection) {
+		SharedPreferences sharedPref = context.getApplicationContext()
+				.getSharedPreferences(AppManager.ID_PRE_FFILE,
+						Context.MODE_PRIVATE);
+		Intent i = null;
+		try{
+			i = getPatternIntent(currentSelection,
+					sharedPref, context.getPackageManager());
+		}catch(Exception e){}
+		return PendingIntent.getActivity(context, 0, i, 0);
 	}
 
 	private static CharSequence getDesc(Context context) {
-		return WidgetUtils.getWidgetSelectionSharedPref(context);
+		try{
+			return WidgetUtils.getWidgetSelectionSharedPref(context);
+		}catch(Exception e){
+			Toast.makeText(context, "Error retriving saved information", Toast.LENGTH_SHORT).show();
+			return "";
+		}
 	}
 
 	public static void pushWidgetUpdate(Context context, RemoteViews remoteViews) {

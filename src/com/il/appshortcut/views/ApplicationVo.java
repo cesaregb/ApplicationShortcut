@@ -12,13 +12,13 @@ public class ApplicationVo {
 	private String applicationPackage;
 	private boolean assigned = false;
 	private String patter;
-	
 	private ApplicationInfo applicationInfo;
 	private Drawable icon;
 	private CommonActions actions;
 	private ComponentName componentName;
+	
 	//selected action, this is for manage application helper 
-	private ActionVo currentAction;
+	private ApplicationActionVo currentAction;
 	
 	public ApplicationVo(String applicationName){
 		this.name = applicationName;
@@ -70,10 +70,10 @@ public class ApplicationVo {
 	public String toString() {
 		return name;
 	}
-	public ActionVo getCurrentAction() {
+	public ApplicationActionVo getCurrentAction() {
 		return currentAction;
 	}
-	public void setCurrentAction(ActionVo currentAction) {
+	public void setCurrentAction(ApplicationActionVo currentAction) {
 		this.currentAction = currentAction;
 	}
 	public CommonActions getActions() {
