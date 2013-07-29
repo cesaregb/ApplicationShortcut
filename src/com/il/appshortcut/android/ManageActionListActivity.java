@@ -1,6 +1,4 @@
-package com.il.appshortcut;
-
-import static com.il.appshortcut.helpers.ActionHelper.isAssignedByApplication;
+package com.il.appshortcut.android;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,9 +10,7 @@ import android.app.Dialog;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -25,23 +21,25 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.il.appshortcut.R;
 import com.il.appshortcut.actions.ActionsFactory;
 import com.il.appshortcut.adapters.GridPagerAdapter;
-import com.il.appshortcut.config.AppManager;
+import com.il.appshortcut.android.fragments.ApplicationListFragment;
+import com.il.appshortcut.android.fragments.FilterApplicationsFragment;
 import com.il.appshortcut.config.AppShortcutApplication;
-import com.il.appshortcut.fragments.ApplicationListFragment;
-import com.il.appshortcut.fragments.FilterApplications;
+import com.il.appshortcut.dao.impl.ActionsDAO;
+import com.il.appshortcut.dao.impl.AppshortcutDAO;
+import com.il.appshortcut.views.ActionVo;
 import com.il.appshortcut.views.AllAppsList;
 import com.il.appshortcut.views.ApplicationVo;
 
-public class ManageAppListActivity extends FragmentActivity implements
-		FilterApplications.FilterDialogListener,
+public class ManageActionListActivity extends FragmentActivity implements
+		FilterApplicationsFragment.FilterDialogListener,
 		ApplicationListFragment.ApplicationListListener, ActionBar.TabListener {
 
 	public ActionBar actionBar;
@@ -55,13 +53,16 @@ public class ManageAppListActivity extends FragmentActivity implements
 	private List<ApplicationVo> listApplications;
 
 	boolean removeFilter = false;
-
+	
+	ActionsDAO actionsDao = null;
+	List<ActionVo> list = null;
+	
 	public void init() {
+		actionsDao = new ActionsDAO(getApplicationContext());
 		filterAppName = "";
 		filterType = 0;
 		listApplications = new ArrayList<ApplicationVo>();
 		applicationItems = new ArrayList<ApplicationVo>();
-
 	}
 
 	@Override
@@ -74,8 +75,7 @@ public class ManageAppListActivity extends FragmentActivity implements
 		actionBar.setDisplayShowTitleEnabled(false);
 
 		init();
-		new LoadApplication().execute();
-
+		
 		mGridPagerAdapter = new GridPagerAdapter(getSupportFragmentManager());
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mGridPagerAdapter);
@@ -89,7 +89,9 @@ public class ManageAppListActivity extends FragmentActivity implements
 						}
 					});
 		}
-
+		//set information from db into context. 
+		AppshortcutDAO appDao = new AppshortcutDAO();
+		appDao.refreshDataDb(getApplicationContext());
 	}
 
 	public void refrestTabs() {
@@ -167,7 +169,7 @@ public class ManageAppListActivity extends FragmentActivity implements
 			}
 			break;
 		case R.id.action_search:
-			FilterApplications fa = new FilterApplications();
+			FilterApplicationsFragment fa = new FilterApplicationsFragment();
 			fa.show(getSupportFragmentManager(), "Filter Applications");
 			break;
 		case R.id.action_filter_delete:
@@ -195,14 +197,14 @@ public class ManageAppListActivity extends FragmentActivity implements
 	public void onApplicationSelected(ApplicationVo _appSelected) {
 		AppShortcutApplication appState = (AppShortcutApplication) getApplicationContext();
 		appState.setAppSelected(_appSelected);
-		Intent intent = new Intent(ManageAppListActivity.this,
-				ManageApplicationActivity.class);
+		Intent intent = new Intent(ManageActionListActivity.this,
+				ManageActionActivity.class);
 		startActivity(intent);
 	}
 
 	@Override
 	public void onDialogPositiveClick(DialogFragment dialog) {
-		FilterApplications filterDialog = (FilterApplications) dialog;
+		FilterApplicationsFragment filterDialog = (FilterApplicationsFragment) dialog;
 		filterType = filterDialog.filterCheckbox;
 		Dialog d = filterDialog.getDialog();
 		EditText et = (EditText) d.findViewById(R.id.search_criteria);
@@ -236,7 +238,7 @@ public class ManageAppListActivity extends FragmentActivity implements
 	public class LoadApplication extends AsyncTask<String, Integer, String> {
 		@Override
 		protected void onPreExecute() {
-			progressDialog = new ProgressDialog(ManageAppListActivity.this);
+			progressDialog = new ProgressDialog(ManageActionListActivity.this);
 			progressDialog.setMessage("Loading Applications...");
 			progressDialog.setIndeterminate(false);
 			progressDialog.setMax(100);
@@ -269,14 +271,28 @@ public class ManageAppListActivity extends FragmentActivity implements
 					item.setComponentName(new ComponentName(info.activityInfo.packageName, info.activityInfo.name));
 					item.setApplicationInfo(applicationInfo);
 					item.setApplicationPackage(applicationInfo.packageName);
-					
-					SharedPreferences sharedPref = getApplicationContext()
-							.getSharedPreferences(
-									AppManager.ID_PRE_FFILE,
-									Context.MODE_PRIVATE);
-					
-					item.setAssigned(isAssignedByApplication(item, sharedPref));
+					item.setAssigned(false);
 					item.setActions(ActionsFactory.create(item));
+					try{
+						for(ActionVo action : list){
+							if (item.getApplicationPackage().equalsIgnoreCase(action.getParentPackage())){
+								item.setAssigned(true);
+								
+								if (item.getActions() != null && item.getActions().getActions() != null){
+									int i = 0;
+									for (ActionVo a : item.getActions().getActions()){
+										if (a.getActionPackage().equalsIgnoreCase(action.getActionPackage())){
+											item.getActions().getActions().get(i).setAssigned(true);
+											item.getActions().getActions().get(i).setIdAction(a.getIdAction());
+										}
+										i++;
+									}
+								}
+							}
+						}
+//						item.setAssigned(actionsDao.isActionActive(item.getApplicationPackage()));
+					}catch (Exception ase){ }
+					
 					allApp.add(item);
 				}
 			}
@@ -292,6 +308,14 @@ public class ManageAppListActivity extends FragmentActivity implements
 			refresList();
 			progressDialog.dismiss();
 		}
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		AppShortcutApplication appState = ((AppShortcutApplication) getApplicationContext());
+		list = appState.getCurrentDBActions();
+		new LoadApplication().execute();
 	}
 
 }

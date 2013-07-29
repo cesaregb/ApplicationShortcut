@@ -7,7 +7,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 
-import com.il.appshortcut.views.ApplicationActionVo;
+import com.il.appshortcut.views.ActionVo;
 
 public class CommonActions {
 
@@ -20,25 +20,27 @@ public class CommonActions {
 	
 	public static final String ACTION_OPEN = "open";
 	
-	protected List<ApplicationActionVo> actions; 
+	protected List<ActionVo> actions; 
 	
 	private String appPackage; 
 	private PackageManager pm;
 	
-	public List<ApplicationActionVo> getActions(){
+	public List<ActionVo> getActions(){
 		return actions;
 	}
 	
-	public CommonActions(){
-		actions = new ArrayList<ApplicationActionVo>();
-		ApplicationActionVo action = new ApplicationActionVo();
-		action.setName(ACTION_OPEN);
+	public CommonActions(String actionPackage, String className){
+		actions = new ArrayList<ActionVo>();
+		ActionVo action = new ActionVo();
+		action.setActionName(ACTION_OPEN);
 		action.setAssigned(false);
-		action.setActionPackage("");
-		action.setDescription("Open the application");
-		action.setPatter("");
+		action.setActionPackage(actionPackage);
+		action.setActionDescription("Open the application");
+		action.setPattern("");
+		action.setClassName(className);
 		actions.add(action);
 	}
+	
 	
 	
 	public CommonActions(String appPackage, PackageManager pm){

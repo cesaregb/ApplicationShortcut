@@ -9,7 +9,7 @@ import android.util.Log;
 public class ActivityDetailsOpenHelper extends SQLiteOpenHelper{
 	private static final int DATABASE_VERSION = 1;
 	
-	private static final String ACTIVITY_OPTIONS_TABLE_NAME = "activity_options";
+	private static final String TABLE_NAME = "activity_options";
 	
 	private static final String FIELD_ID = "id_activity_option";
 	private static final String FIELD_TYPE = "type";
@@ -19,8 +19,8 @@ public class ActivityDetailsOpenHelper extends SQLiteOpenHelper{
 	private static final String FIELD_ID_ACTIVITY = "id_activity";
 	private static final String FIELD_ID_ACTION = "id_action";
 	
-	private static final String ACTIVITY_OPTIONS_TABLE_CREATE = "CREATE TABLE "
-			+ ACTIVITY_OPTIONS_TABLE_NAME + " ( " + FIELD_ID + " integer primay key autoincrement," 
+	private static final String ACTIVITY_OPTIONS_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
+			+ TABLE_NAME + " ( " + FIELD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," 
 			+ FIELD_TYPE + " int, "
 			+ FIELD_ORDER + " int, "
 			+ FIELD_TOP + " int, "
@@ -30,7 +30,7 @@ public class ActivityDetailsOpenHelper extends SQLiteOpenHelper{
 			
 	public ActivityDetailsOpenHelper(Context context, String name,
 			CursorFactory factory, int version) {
-		super(context, ACTIVITY_OPTIONS_TABLE_NAME, factory, DATABASE_VERSION);
+		super(context, TABLE_NAME, factory, DATABASE_VERSION);
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class ActivityDetailsOpenHelper extends SQLiteOpenHelper{
 		Log.w(ActivityOpenHelper.class.getName(),
 	        "Upgrading database from version " + oldVersion + " to "
 	            + newVersion + ", which will destroy all old data");
-	    db.execSQL("DROP TABLE IF EXISTS " + ACTIVITY_OPTIONS_TABLE_NAME);
+	    db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
 	    onCreate(db);
 	}
 

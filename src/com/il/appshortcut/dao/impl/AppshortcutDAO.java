@@ -5,18 +5,16 @@ import java.util.List;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.il.appshortcut.android.widgets.WidgetUtils;
 import com.il.appshortcut.config.AppManager;
-import com.il.appshortcut.dao.IAppshortcutDAO;
+import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.exception.AppShortcutException;
-import com.il.appshortcut.views.ActionVo;
-import com.il.appshortcut.views.ActivityDetailVo;
-import com.il.appshortcut.views.ActivityVo;
-import com.il.appshortcut.views.ApplicationActionVo;
-import com.il.appshortcut.widgets.WidgetUtils;
 
-public class AppshortcutDAO implements IAppshortcutDAO {
+public class AppshortcutDAO {
+	
+	public static int PREF_TYPE_ACTION = 1;
+	public static int PREF_TYPE_ACTIVITY = 2;
 
-	@Override
 	public String updateWidgetSelection(Context context, String currentSelection)
 			throws AppShortcutException {
 		
@@ -28,7 +26,6 @@ public class AppshortcutDAO implements IAppshortcutDAO {
 		return updatedSelection;
 	}
 
-	@Override
 	public void clearWidgetSelection(Context context)
 			throws AppShortcutException {
 		SharedPreferences sharedPref = context.getSharedPreferences(AppManager.ID_PRE_FFILE, Context.MODE_PRIVATE);
@@ -37,7 +34,6 @@ public class AppshortcutDAO implements IAppshortcutDAO {
 		editor.commit();
 	}
 
-	@Override
 	public String getWidgetSelection(Context context)
 			throws AppShortcutException {
 		
@@ -47,123 +43,50 @@ public class AppshortcutDAO implements IAppshortcutDAO {
 		return result; 
 	}
 
-	@Override
-	public void savePattern(String currentSelection, Context context)
+	public void savePattern(String pattern, Context context, int type)
 			throws AppShortcutException {
 		
 		SharedPreferences sharedPref = context.getSharedPreferences(
 				AppManager.ID_PRE_FFILE, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = sharedPref.edit();
-		editor.putInt(currentSelection, 1); 
+		editor.putInt(pattern, type); 
 		editor.commit();
 	}
 
-	@Override
-	public void saveAction(ActionVo application) throws AppShortcutException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void saveActivity(ActivityVo activity) throws AppShortcutException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void saveActivityDetail(ActivityDetailVo detail)
-			throws AppShortcutException {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void removePattern(String pattern) throws AppShortcutException {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
-	public ActivityVo getActivityByPattern(String pattern)
-			throws AppShortcutException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ActivityDetailVo getActivityDetailsByActivity(String activityId)
-			throws AppShortcutException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ActionVo getActionByPattern(String pattern)
-			throws AppShortcutException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<ApplicationActionVo> getActionsByApplication(
-			ActionVo application) throws AppShortcutException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public List<String> getAllPatternAssigned() throws AppShortcutException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
-	public List<ActivityVo> getAllActivitiesAssigned()
+
+	public boolean isPatternAssigned(String pattern, Context context)
 			throws AppShortcutException {
-		// TODO Auto-generated method stub
-		return null;
+		SharedPreferences sharedPref = context.getSharedPreferences(
+				AppManager.ID_PRE_FFILE, Context.MODE_PRIVATE);
+		
+		int tmpVal = sharedPref.getInt(pattern, 0);
+		return (tmpVal > 0);
 	}
-
-	@Override
-	public List<ActionVo> getAllActionsAssigned() throws AppShortcutException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<ActionVo> getApplicationActionsByApplication(String app_package)
+	
+	public int getTypePatternAssigned(String pattern, Context context)
 			throws AppShortcutException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean isPatternAssigned(String pattern)
-			throws AppShortcutException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isActivityActive(String activityId)
-			throws AppShortcutException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isActionActive(String actionId) throws AppShortcutException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isPackageActive(String app_package)
-			throws AppShortcutException {
-		// TODO Auto-generated method stub
-		return false;
+		SharedPreferences sharedPref = context.getSharedPreferences(
+				AppManager.ID_PRE_FFILE, Context.MODE_PRIVATE);
+		
+		int tmpVal = sharedPref.getInt(pattern, 0);
+		return tmpVal;
 	}
 
 	
+	public void refreshDataDb(Context context){
+		ActionsDAO actionsDao = new ActionsDAO(context);
+		AppShortcutApplication appState = ((AppShortcutApplication) context);
+		appState.setCurrentDBActions(actionsDao.getAllActions());
+	}
 
 }

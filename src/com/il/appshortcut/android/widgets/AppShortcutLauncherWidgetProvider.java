@@ -1,18 +1,18 @@
-package com.il.appshortcut.widgets;
+package com.il.appshortcut.android.widgets;
 
-import static com.il.appshortcut.helpers.ActionHelper.getPatternIntent;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.il.appshortcut.R;
-import com.il.appshortcut.config.AppManager;
+import com.il.appshortcut.dao.impl.ActionsDAO;
+import com.il.appshortcut.dao.impl.AppshortcutDAO;
+import com.il.appshortcut.views.ActionVo;
 public class AppShortcutLauncherWidgetProvider extends AppWidgetProvider {
 	
 	@Override
@@ -87,14 +87,24 @@ public class AppShortcutLauncherWidgetProvider extends AppWidgetProvider {
 	}
 	
 	public static PendingIntent buildLunchApplicationBtnPendingIntent(Context context, String currentSelection) {
-		SharedPreferences sharedPref = context.getApplicationContext()
-				.getSharedPreferences(AppManager.ID_PRE_FFILE,
-						Context.MODE_PRIVATE);
 		Intent i = null;
 		try{
-			i = getPatternIntent(currentSelection,
-					sharedPref, context.getPackageManager());
-		}catch(Exception e){}
+			AppshortcutDAO dao = new AppshortcutDAO();
+			ActionsDAO actionsDao = new ActionsDAO(context);
+			int typePattern = dao.getTypePatternAssigned(currentSelection,
+					context);
+			if (typePattern > 0) {
+				if (typePattern == AppshortcutDAO.PREF_TYPE_ACTION) {
+					ActionVo action = actionsDao
+							.getActionByPattern(currentSelection);
+					i = com.il.appshortcut.helpers.ActionHelper
+							.getPatternIntent(action,
+									context.getPackageManager());
+				}
+				if (typePattern == AppshortcutDAO.PREF_TYPE_ACTIVITY) {
+				}
+			}
+		} catch (Exception e){}
 		return PendingIntent.getActivity(context, 0, i, 0);
 	}
 
@@ -102,6 +112,7 @@ public class AppShortcutLauncherWidgetProvider extends AppWidgetProvider {
 		try{
 			return WidgetUtils.getWidgetSelectionSharedPref(context);
 		}catch(Exception e){
+			//TODO Add String...
 			Toast.makeText(context, "Error retriving saved information", Toast.LENGTH_SHORT).show();
 			return "";
 		}

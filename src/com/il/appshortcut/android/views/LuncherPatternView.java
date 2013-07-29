@@ -29,10 +29,14 @@ public class LuncherPatternView extends View {
 	private String currentSelection;
 	Handler lunchAppTimer = new Handler();
 	
+	View thisContainer = null;
 	private Runnable runnable = new Runnable()  {
 		@Override
 	    public void run() {
-	    	onItemPressedListener.fireApplication(currentSelection);
+        	if (thisContainer !=null){
+        		thisContainer.invalidate();
+        	}
+        	onItemPressedListener.fireApplication(currentSelection);
         	currentSelection = "";
 	    }
 	};
@@ -192,6 +196,7 @@ public class LuncherPatternView extends View {
 
 	@Override
 	protected void onDraw(Canvas canvas) {
+		thisContainer = this;
 		canvas.drawRect(2, 2, getWidth() - 2, getHeight() - 2, background);
 		canvas.save();
 		drawDots(canvas);
@@ -291,7 +296,6 @@ public class LuncherPatternView extends View {
 	}
 	
 	public void onItemPressed(int itemPressed) {
-		
 		currentSelection += String.valueOf(itemPressed);
 		com.il.appshortcut.helpers.UserInputHelpers.pressEffect(
 				(Vibrator) getContext().getSystemService(
@@ -303,7 +307,6 @@ public class LuncherPatternView extends View {
 		
 		lunchAppTimer.removeCallbacks(runnable);
 		lunchAppTimer.postDelayed(runnable, 2000);
-		
 		this.invalidate();
 	}
 	

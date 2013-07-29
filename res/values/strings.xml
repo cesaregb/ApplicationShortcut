@@ -35,5 +35,8 @@
     <string name="title_activity_proxy">ProxyActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_manage_acivities_list">ManageAcivitiesListActivity</string>
+    <string name="addItemHint">New To Do Item</string>
+    <string name="addItemContentDescription">New To Do Item</string>
+    <string name="title_activity_manage_activity">ManageActivityActivity</string>
 
 </resources>

@@ -2,24 +2,30 @@ package com.il.appshortcut.views;
 
 public class ActionVo {
 	private int idAction;
-	private String activityName;
+	private String actionName;
+	private String actionDescription;
 	private String actionPackage;
-	private String applicationPackage;
+	private String parentPackage;
 	private String pattern;
 	private boolean assigned;
 	private int type;
+	private String className;
+	
+	public static int TYPE_APPLICATION = 0;
+	public static int TYPE_SERVICE = 1;
+	
+	public ActionVo(){ }
+	
+	public ActionVo (int id, String appPackage){
+		this.idAction = id;
+		this.actionPackage = appPackage;
+	}
 	
 	public int getIdAction() {
 		return idAction;
 	}
 	public void setIdAction(int idAction) {
 		this.idAction = idAction;
-	}
-	public String getActivityName() {
-		return activityName;
-	}
-	public void setActivityName(String activityName) {
-		this.activityName = activityName;
 	}
 	public String getPattern() {
 		return pattern;
@@ -45,11 +51,33 @@ public class ActionVo {
 	public void setActionPackage(String actionPackage) {
 		this.actionPackage = actionPackage;
 	}
-	public String getApplicationPackage() {
-		return applicationPackage;
+	public String getActionName() {
+		return actionName;
 	}
-	public void setApplicationPackage(String applicationPackage) {
-		this.applicationPackage = applicationPackage;
+	public void setActionName(String actionName) {
+		this.actionName = actionName;
+	}
+	public String getParentPackage() {
+		return parentPackage;
+	}
+	public void setParentPackage(String parentPackage) {
+		this.parentPackage = parentPackage;
+	}
+
+	public String getActionDescription() {
+		return actionDescription;
+	}
+
+	public void setActionDescription(String actionDescription) {
+		this.actionDescription = actionDescription;
+	}
+
+	public String getClassName() {
+		return className;
+	}
+
+	public void setClassName(String className) {
+		this.className = className;
 	}
 	
 }

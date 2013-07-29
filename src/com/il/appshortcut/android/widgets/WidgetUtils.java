@@ -1,8 +1,7 @@
-package com.il.appshortcut.widgets;
+package com.il.appshortcut.android.widgets;
 
 import android.content.Context;
 
-import com.il.appshortcut.dao.IAppshortcutDAO;
 import com.il.appshortcut.dao.impl.AppshortcutDAO;
 import com.il.appshortcut.exception.AppShortcutException;
 
@@ -26,17 +25,17 @@ public class WidgetUtils {
 	public final static String EMPTY_STRING = "NOTHING SELECTED";
 	
 	public static String updateSharedPref(Context context, String value) throws AppShortcutException{
-		IAppshortcutDAO dao = new AppshortcutDAO();
+		AppshortcutDAO dao = new AppshortcutDAO();
 		return dao.updateWidgetSelection(context, value);
 	}
 	
 	public static void clearSharedPref(Context context) throws AppShortcutException{
-		IAppshortcutDAO dao = new AppshortcutDAO();
+		AppshortcutDAO dao = new AppshortcutDAO();
 		dao.clearWidgetSelection(context);
 	}
 	
 	public static String getWidgetSelectionSharedPref(Context context) throws AppShortcutException{
-		IAppshortcutDAO dao = new AppshortcutDAO();
+		AppshortcutDAO dao = new AppshortcutDAO();
 		return dao.getWidgetSelection(context);
 	}
 }

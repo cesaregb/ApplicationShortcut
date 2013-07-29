@@ -18,7 +18,7 @@ public class ApplicationVo {
 	private ComponentName componentName;
 	
 	//selected action, this is for manage application helper 
-	private ApplicationActionVo currentAction;
+	private ActionVo currentAction;
 	
 	public ApplicationVo(String applicationName){
 		this.name = applicationName;
@@ -64,17 +64,9 @@ public class ApplicationVo {
 	public void setApplicationPackage(String applicationPackage) {
 		this.applicationPackage = applicationPackage;
 	}
-
-
 	@Override
 	public String toString() {
 		return name;
-	}
-	public ApplicationActionVo getCurrentAction() {
-		return currentAction;
-	}
-	public void setCurrentAction(ApplicationActionVo currentAction) {
-		this.currentAction = currentAction;
 	}
 	public CommonActions getActions() {
 		return actions;
@@ -87,5 +79,11 @@ public class ApplicationVo {
 	}
 	public void setComponentName(ComponentName componentName) {
 		this.componentName = componentName;
+	}
+	public ActionVo getCurrentAction() {
+		return currentAction;
+	}
+	public void setCurrentAction(ActionVo currentAction) {
+		this.currentAction = currentAction;
 	}
 }

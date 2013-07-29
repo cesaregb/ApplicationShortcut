@@ -5,7 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.il.appshortcut.fragments.ApplicationListFragment;
+import com.il.appshortcut.android.fragments.ApplicationListFragment;
 
 //public class GridPagerAdapter extends FragmentPagerAdapter {
 public class GridPagerAdapter extends FragmentStatePagerAdapter {

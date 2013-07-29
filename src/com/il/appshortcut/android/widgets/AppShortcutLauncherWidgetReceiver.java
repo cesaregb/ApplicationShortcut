@@ -1,18 +1,19 @@
-package com.il.appshortcut.widgets;
+package com.il.appshortcut.android.widgets;
 
-import static com.il.appshortcut.helpers.ActionHelper.getApplicationNameByPattern;
 import android.app.KeyguardManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.il.appshortcut.R;
 import com.il.appshortcut.config.AppManager;
+import com.il.appshortcut.dao.impl.ActionsDAO;
+import com.il.appshortcut.dao.impl.AppshortcutDAO;
+import com.il.appshortcut.views.ActionVo;
 import com.il.appshortcut.views.ApplicationVo;
 
 public class AppShortcutLauncherWidgetReceiver extends BroadcastReceiver {
@@ -62,14 +63,26 @@ public class AppShortcutLauncherWidgetReceiver extends BroadcastReceiver {
 		
 		if (updateWidget) {
 			try {
-				SharedPreferences sharedPref = context.getApplicationContext()
-						.getSharedPreferences(AppManager.ID_PRE_FFILE,
-								Context.MODE_PRIVATE);
-				
 				KeyguardManager mKeyguardManager = (KeyguardManager) context
 							.getSystemService(Context.KEYGUARD_SERVICE);
 				
-				String applicationName = getApplicationNameByPattern(currentSelection, sharedPref);
+				String applicationName = null;
+				AppshortcutDAO dao = new AppshortcutDAO();
+				ActionsDAO actionsDao = new ActionsDAO(context);
+				int typePattern = dao.getTypePatternAssigned(currentSelection,
+						context);
+				if (typePattern > 0) {
+					//TODO assign more information as icon and stuff!!! 
+					if (typePattern == AppshortcutDAO.PREF_TYPE_ACTION) {
+						ActionVo action = actionsDao
+								.getActionByPattern(currentSelection);
+						applicationName = action.getActionName();
+						
+					}
+					if (typePattern == AppshortcutDAO.PREF_TYPE_ACTIVITY) {
+					}
+				}
+				
 				
 				if (applicationName != null){
 					isMatchFound = true;
@@ -82,6 +95,7 @@ public class AppShortcutLauncherWidgetReceiver extends BroadcastReceiver {
 				
 				updateWidgetPictureAndButtonListener(context);
 			} catch (Exception e) {
+				//TODO Add String...
 				e.printStackTrace();
 				Toast.makeText(context.getApplicationContext(),
 						"Exception.. so bad right? ", Toast.LENGTH_SHORT)
@@ -157,6 +171,7 @@ public class AppShortcutLauncherWidgetReceiver extends BroadcastReceiver {
 		try{
 			return WidgetUtils.getWidgetSelectionSharedPref(context);
 		}catch(Exception e){
+			//TODO Add String...
 			Toast.makeText(context, "Erro retriving saved selection", Toast.LENGTH_SHORT).show();
 			return "";
 		}

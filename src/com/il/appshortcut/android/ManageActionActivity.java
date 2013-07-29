@@ -1,9 +1,7 @@
-package com.il.appshortcut;
+package com.il.appshortcut.android;
 
 import android.app.ActionBar;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
@@ -15,18 +13,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.il.appshortcut.R;
+import com.il.appshortcut.android.fragments.ApplicationInfoFragment;
+import com.il.appshortcut.android.fragments.ApplicationSelectPatternFragment;
 import com.il.appshortcut.android.views.LuncherPatternView;
 import com.il.appshortcut.config.AppManager;
 import com.il.appshortcut.config.AppShortcutApplication;
-import com.il.appshortcut.dao.IAppshortcutDAO;
+import com.il.appshortcut.dao.impl.ActionsDAO;
 import com.il.appshortcut.dao.impl.AppshortcutDAO;
-import com.il.appshortcut.fragments.ApplicationInfoFragment;
-import com.il.appshortcut.fragments.ApplicationSelectPatternFragment;
-import com.il.appshortcut.helpers.ActionHelper;
-import com.il.appshortcut.views.ApplicationActionVo;
+import com.il.appshortcut.views.ActionVo;
 import com.il.appshortcut.views.ApplicationVo;
 
-public class ManageApplicationActivity extends FragmentActivity
+public class ManageActionActivity extends FragmentActivity
 		implements
 		ApplicationInfoFragment.ApplicationInfoListener,
 		ApplicationSelectPatternFragment.ApplicationSelectPatternFragmentListener,
@@ -57,7 +55,7 @@ public class ManageApplicationActivity extends FragmentActivity
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			Intent upIntent = new Intent(this, ManageAppListActivity.class);
+			Intent upIntent = new Intent(this, ManageActionListActivity.class);
 			if (NavUtils.shouldUpRecreateTask(this, upIntent)) {
 				TaskStackBuilder.create(this).addNextIntent(upIntent)
 						.startActivities();
@@ -79,68 +77,69 @@ public class ManageApplicationActivity extends FragmentActivity
 	}
 
 	@Override
-	public void onApplicationActionItem(ApplicationActionVo item) {
+	public void onApplicationActionItem(ActionVo item) {
 		AppShortcutApplication appState = ((AppShortcutApplication)getApplicationContext());
 		ApplicationVo appSelected = appState.getAppSelected();
+		//regardless action set the common information for this type of applications.
+		item.setParentPackage(appSelected.getApplicationPackage());
+		item.setType(ActionVo.TYPE_APPLICATION);
+		item.setAssigned(true);
 		if (item.getActionPackage() == null) {
 			item.setActionPackage(appSelected.getApplicationPackage());
 		}
 		appSelected.setCurrentAction(item);
-//		appSelected.getActions().addAction(item);
 		appState.setAppSelected(appSelected);
-		
 		
 		ApplicationSelectPatternFragment newFragment = new ApplicationSelectPatternFragment();
 		FragmentTransaction transaction = getSupportFragmentManager()
 				.beginTransaction();
 		transaction.replace(R.id.fragment_container_application, newFragment)
 				.addToBackStack(null).commit();
-
-		Toast.makeText(this, "Action S: " + item.getActionPackage(),
-				Toast.LENGTH_SHORT).show();
+		
+		Log.d(AppManager.LOG_MANAGE_APPLICATIONS, "Application seleted.");
 	}
 
 	@Override
-	public void onApplicationActionItemSelected(ApplicationActionVo item) {
-		Log.d(AppManager.LOG_APPLICATION_INFO_FRAGMENT, "pattern: " + item.getPatter());
+	public void onApplicationActionItemSelected(ActionVo item) {
+		Log.d(AppManager.LOG_APPLICATION_INFO_FRAGMENT, "pattern: " + item.getPattern());
 		ApplicationVo appSelected = ((AppShortcutApplication)getApplicationContext()).getAppSelected();
 		if (item.getActionPackage() == null) {
 			item.setActionPackage(appSelected.getApplicationPackage());
 		}
 		appSelected.setCurrentAction(item);
-		if (appSelected != null 
-				&& item != null) {
-			
-			SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
-					AppManager.ID_PRE_FFILE, Context.MODE_PRIVATE);
-			SharedPreferences.Editor editor = sharedPref.edit();
-
-				
-			String actionPackage = "";
-			if (appSelected.getCurrentAction() != null){
-				actionPackage = appSelected.getCurrentAction().getActionPackage();
-			}
-			String appInfo = ActionHelper.getApplicationInfo(appSelected.getComponentName());
-			String actionId = ActionHelper.getActionId(appInfo, actionPackage);
-			String appId = ActionHelper.getAppId(appInfo);
-			String appIdPatt = ActionHelper.getPatternId(selectedPattern);
-
-			editor.remove(actionId);
-			editor.remove(appIdPatt);
-			if (numberOfActionByApplication-- == 0)
-				editor.remove(appId);
-			
-			editor.commit();
-			
-			
-			ApplicationInfoFragment fragment = (ApplicationInfoFragment)
-	                getSupportFragmentManager().findFragmentById(R.id.fragment_container_application);
-
-	        if (fragment != null) {
-	        	fragment.updateApplicationView(appSelected);
-	        }
-			
-		}
+//		if (appSelected != null 
+//				&& item != null) {
+//			
+//			SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
+//					AppManager.ID_PRE_FFILE, Context.MODE_PRIVATE);
+//			SharedPreferences.Editor editor = sharedPref.edit();
+//
+//				
+//			String actionPackage = "";
+//			if (appSelected.getCurrentAction() != null){
+//				actionPackage = appSelected.getCurrentAction().getActionPackage();
+//			}
+//			String appInfo = ActionHelper.getApplicationInfo(appSelected.getComponentName());
+//			String actionId = ActionHelper.getActionId(appInfo, actionPackage);
+//			String appId = ActionHelper.getAppId(appInfo);
+//			String appIdPatt = ActionHelper.getPatternId(selectedPattern);
+//
+//			editor.remove(actionId);
+//			editor.remove(appIdPatt);
+//			if (numberOfActionByApplication-- == 0)
+//				editor.remove(appId);
+//			
+//			editor.commit();
+//			
+//			
+//			ApplicationInfoFragment fragment = (ApplicationInfoFragment)
+//	                getSupportFragmentManager().findFragmentById(R.id.fragment_container_application);
+//
+//	        if (fragment != null) {
+//	        	fragment.updateApplicationView(appSelected);
+//	        }
+//			
+//		}
 	}
 
 	@Override
@@ -167,36 +166,22 @@ public class ManageApplicationActivity extends FragmentActivity
 		
 		if (appSelected != null) {
 			
-			IAppshortcutDAO dao = new AppshortcutDAO();
+			AppshortcutDAO dao = new AppshortcutDAO();
+			ActionsDAO actionsDao = new ActionsDAO(getApplicationContext());
 			try{
-				dao.savePattern(selectedPattern, getApplicationContext());
+				Log.d(AppManager.LOG_MANAGE_APPLICATIONS, "saving applicatoin...");
+				if(dao.isPatternAssigned(selectedPattern, getApplicationContext())){
+					Toast.makeText(getApplicationContext(), "Pattern assigned Show confirmation ", Toast.LENGTH_SHORT).show();
+				}else{
+					dao.savePattern(selectedPattern, getApplicationContext(), AppshortcutDAO.PREF_TYPE_ACTION);
+					appSelected.getCurrentAction().setPattern(selectedPattern);
+					actionsDao.addAction(appSelected.getCurrentAction());
+					dao.refreshDataDb(getApplicationContext());
+				}
 			}catch(Exception e){
-				Toast.makeText(getApplicationContext(), "Error Saving Information", Toast.LENGTH_SHORT);
+				//TODO Add String...
+				Toast.makeText(getApplicationContext(), "Error Saving Information", Toast.LENGTH_SHORT).show();
 			}
-			
-//			Context context = getApplicationContext();
-//			SharedPreferences sharedPref = context.getSharedPreferences(
-//					AppManager.ID_PRE_FFILE, Context.MODE_PRIVATE);
-//			SharedPreferences.Editor editor = sharedPref.edit();
-//
-//			String actionPackage = "";
-//			if (appSelected.getCurrentAction() != null){
-//				actionPackage = appSelected.getCurrentAction().getActionPackage();
-//			}
-//			String appInfo = ActionHelper.getApplicationInfo(appSelected.getComponentName());
-//			String actionId = ActionHelper.getActionId(appInfo, actionPackage);
-//			String appId = ActionHelper.getAppId(appInfo);
-//			String appIdPatt = ActionHelper.getPatternId(selectedPattern);
-// 
-//			editor.putString(actionId, selectedPattern); // search by application  + action 
-//			editor.putString(appId, selectedPattern); // search by application 
-//			editor.putString(appIdPatt, appInfo + ActionHelper.SEPARATOR + actionPackage + ActionHelper.SEPARATOR + appSelected.getName()); //search by pattern
-//
-//			Toast.makeText(getApplicationContext(),
-//					"Pattern: " + appIdPatt + " saved", Toast.LENGTH_SHORT)
-//					.show();
-//			editor.commit();
-
 		}
 		onBackPressed();
 	}

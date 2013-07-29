@@ -10,7 +10,7 @@ public class ActivityOpenHelper extends SQLiteOpenHelper{
 	
 	private static final int DATABASE_VERSION = 1;
 	
-	private static final String ACTIVITY_TABLE_NAME = "activities";
+	private static final String TABLE_NAME = "activities";
 	
 	private static final String FIELD_ID = "id_activity";
 	private static final String FIELD_NAME = "name";
@@ -18,8 +18,8 @@ public class ActivityOpenHelper extends SQLiteOpenHelper{
 	private static final String FIELD_PATTERN = "pattern";
 	private static final String FIELD_ASSIGNED = "assigned";
 	
-	private static final String ACTIVITY_TABLE_CREATE = "CREATE TABLE "
-			+ ACTIVITY_TABLE_NAME + " ( " + FIELD_ID + " integer primay key autoincrement," 
+	private static final String ACTIVITY_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
+			+ TABLE_NAME + " ( " + FIELD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," 
 			+ FIELD_NAME + " TEXT, "
 			+ FIELD_DESCRIPTION + " TEXT, "
 			+ FIELD_PATTERN + " TEXT, "
@@ -27,7 +27,7 @@ public class ActivityOpenHelper extends SQLiteOpenHelper{
 			
 	public ActivityOpenHelper(Context context, String name,
 			CursorFactory factory, int version) {
-		super(context, ACTIVITY_TABLE_NAME, factory, DATABASE_VERSION);
+		super(context, TABLE_NAME, factory, DATABASE_VERSION);
 	}
 
 	@Override
@@ -41,7 +41,7 @@ public class ActivityOpenHelper extends SQLiteOpenHelper{
 		Log.w(ActivityOpenHelper.class.getName(),
 	        "Upgrading database from version " + oldVersion + " to "
 	            + newVersion + ", which will destroy all old data");
-	    db.execSQL("DROP TABLE IF EXISTS " + ACTIVITY_TABLE_NAME);
+	    db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
 	    onCreate(db);
 	}
 
