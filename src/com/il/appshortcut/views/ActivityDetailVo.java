@@ -1,5 +1,7 @@
 package com.il.appshortcut.views;
 
+import android.graphics.drawable.Drawable;
+
 public class ActivityDetailVo {
 	private int idActivityOption;
 	private int type;
@@ -8,6 +10,7 @@ public class ActivityDetailVo {
 	private int actionType;
 	private int idActivity;
 	private int idAction;
+	private Drawable icon;
 	
 	public int getIdActivityOption() {
 		return idActivityOption;
@@ -50,6 +53,12 @@ public class ActivityDetailVo {
 	}
 	public void setIdAction(int idAction) {
 		this.idAction = idAction;
+	}
+	public Drawable getIcon() {
+		return icon;
+	}
+	public void setIcon(Drawable icon) {
+		this.icon = icon;
 	}
 	
 }

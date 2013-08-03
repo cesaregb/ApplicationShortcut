@@ -13,7 +13,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 
 import com.il.appshortcut.R;
-import com.il.appshortcut.adapters.ApplicationListItemAdapter;
+import com.il.appshortcut.android.adapters.ApplicationListItemAdapter;
 import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.views.ApplicationVo;
 
@@ -63,11 +63,11 @@ public class ApplicationListFragment extends Fragment {
 		Bundle args = getArguments();
 		position =  args.getInt(ARG_SECTION_NUMBER);
 		
-        View view = inflater.inflate(R.layout.comp_grid_view, container, false); 
+        View view = inflater.inflate(R.layout.comp_application_grid_view, container, false); 
         gridView = (GridView) view.findViewById(R.id.gridview);
 
         applicationItems = new ArrayList<ApplicationVo>();
-		int resID = R.layout.comp_app_list_item;
+		int resID = R.layout.comp_application_list_item;
 		aa = new ApplicationListItemAdapter(view.getContext(), resID, applicationItems);
         gridView.setAdapter(aa);
 

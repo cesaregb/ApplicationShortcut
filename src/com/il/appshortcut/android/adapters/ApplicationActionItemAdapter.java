@@ -1,4 +1,4 @@
-package com.il.appshortcut.adapters;
+package com.il.appshortcut.android.adapters;
 
 import java.util.List;
 

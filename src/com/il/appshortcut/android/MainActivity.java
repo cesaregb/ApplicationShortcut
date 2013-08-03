@@ -1,5 +1,6 @@
 package com.il.appshortcut.android;
 
+import static com.il.appshortcut.helpers.ActionHelper.getPatternIntent;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -15,11 +16,9 @@ import android.widget.Toast;
 import com.il.appshortcut.R;
 import com.il.appshortcut.android.views.LuncherPatternView;
 import com.il.appshortcut.config.AppManager;
-import com.il.appshortcut.dao.impl.ActionsDAO;
-import com.il.appshortcut.dao.impl.AppshortcutDAO;
+import com.il.appshortcut.dao.ActionsDAO;
+import com.il.appshortcut.dao.AppshortcutDAO;
 import com.il.appshortcut.views.ActionVo;
-
-import static com.il.appshortcut.helpers.ActionHelper.getPatternIntent;
 
 
 public class MainActivity extends Activity implements
@@ -77,8 +76,9 @@ public class MainActivity extends Activity implements
 	 * @param view
 	 * this fires the Manage Applications  
 	 */
-	public void openManagePatterns(View view){
+	public void openManageActions(View view){
 		Intent intent = new Intent(MainActivity.this, ManageActionListActivity.class);
+		intent.putExtra(AppManager.ACTIVITY_ACTION_PARAM, AppManager.ACTIVITY_ACTION_FROM_MAIN);
 		startActivity(intent);
 	}
 	
@@ -90,7 +90,7 @@ public class MainActivity extends Activity implements
 		Intent intent = new Intent(MainActivity.this, ManageAcivitiesListActivity.class);
 		startActivity(intent);
 	}
-
+	
 	@Override
 	public void fireApplication(String currentSelection) {
 		try {

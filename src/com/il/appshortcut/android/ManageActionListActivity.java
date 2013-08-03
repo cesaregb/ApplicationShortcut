@@ -28,12 +28,13 @@ import android.widget.Toast;
 
 import com.il.appshortcut.R;
 import com.il.appshortcut.actions.ActionsFactory;
-import com.il.appshortcut.adapters.GridPagerAdapter;
+import com.il.appshortcut.android.adapters.GridPagerAdapter;
 import com.il.appshortcut.android.fragments.ApplicationListFragment;
 import com.il.appshortcut.android.fragments.FilterApplicationsFragment;
+import com.il.appshortcut.config.AppManager;
 import com.il.appshortcut.config.AppShortcutApplication;
-import com.il.appshortcut.dao.impl.ActionsDAO;
-import com.il.appshortcut.dao.impl.AppshortcutDAO;
+import com.il.appshortcut.dao.ActionsDAO;
+import com.il.appshortcut.dao.AppshortcutDAO;
 import com.il.appshortcut.views.ActionVo;
 import com.il.appshortcut.views.AllAppsList;
 import com.il.appshortcut.views.ApplicationVo;
@@ -51,6 +52,8 @@ public class ManageActionListActivity extends FragmentActivity implements
 	private int filterType;
 	private ArrayList<ApplicationVo> applicationItems;
 	private List<ApplicationVo> listApplications;
+	int activityActionParam = AppManager.ACTIVITY_ACTION_FROM_MAIN;
+	
 
 	boolean removeFilter = false;
 	
@@ -75,6 +78,13 @@ public class ManageActionListActivity extends FragmentActivity implements
 		actionBar.setDisplayShowTitleEnabled(false);
 
 		init();
+
+		//validate if the call is from main or from activities 
+		activityActionParam = getIntent().getIntExtra(AppManager.ACTIVITY_ACTION_PARAM,0);
+		
+		AppShortcutApplication appState = (AppShortcutApplication) getApplicationContext();
+		appState.setTypeSelectAppReturn(activityActionParam);
+		
 		
 		mGridPagerAdapter = new GridPagerAdapter(getSupportFragmentManager());
 		mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -89,9 +99,12 @@ public class ManageActionListActivity extends FragmentActivity implements
 						}
 					});
 		}
+		
 		//set information from db into context. 
-		AppshortcutDAO appDao = new AppshortcutDAO();
-		appDao.refreshDataDb(getApplicationContext());
+		if (activityActionParam == AppManager.ACTIVITY_ACTION_FROM_MAIN){
+			AppshortcutDAO appDao = new AppshortcutDAO();
+			appDao.refreshDataDb(getApplicationContext());
+		}
 	}
 
 	public void refrestTabs() {
@@ -197,11 +210,37 @@ public class ManageActionListActivity extends FragmentActivity implements
 	public void onApplicationSelected(ApplicationVo _appSelected) {
 		AppShortcutApplication appState = (AppShortcutApplication) getApplicationContext();
 		appState.setAppSelected(_appSelected);
-		Intent intent = new Intent(ManageActionListActivity.this,
-				ManageActionActivity.class);
-		startActivity(intent);
+		if (activityActionParam == AppManager.ACTIVITY_ACTION_FROM_MAIN){
+			Intent intent = new Intent(ManageActionListActivity.this,
+					ManageActionActivity.class);
+			startActivity(intent);
+		}else{
+			Intent intent = new Intent(ManageActionListActivity.this, ManageActionActivity.class);
+			intent.putExtra(AppManager.ACTIVITY_ACTION_PARAM, AppManager.ACTIVITY_ACTION_FROM_ACTIVITIES);
+			startActivityForResult(intent, 1);
+		}
+		
 	}
 
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == 1) {
+			if (resultCode == RESULT_OK) {
+				Intent returnIntent = new Intent();
+				returnIntent.putExtra(AppManager.ACTIVITY_ACTION_RESULT_PARAM, 1);
+				if (getParent() == null) {
+					setResult(RESULT_OK, returnIntent);
+				} else {
+					getParent().setResult(RESULT_OK, returnIntent);
+				}
+				finish();
+			}
+			if (resultCode == RESULT_CANCELED) {
+				finish();
+				Toast.makeText(getApplicationContext(), "something went wrong", Toast.LENGTH_SHORT).show();
+			}
+		}
+	}
+	
 	@Override
 	public void onDialogPositiveClick(DialogFragment dialog) {
 		FilterApplicationsFragment filterDialog = (FilterApplicationsFragment) dialog;
@@ -249,6 +288,7 @@ public class ManageActionListActivity extends FragmentActivity implements
 
 		@Override
 		protected String doInBackground(String... params) {
+			listApplications.clear();
 			AllAppsList allApp = new AllAppsList(); // Application list helper 
 			List<ResolveInfo> applicationList = null; // android object list... 
 			
@@ -273,26 +313,26 @@ public class ManageActionListActivity extends FragmentActivity implements
 					item.setApplicationPackage(applicationInfo.packageName);
 					item.setAssigned(false);
 					item.setActions(ActionsFactory.create(item));
-					try{
-						for(ActionVo action : list){
-							if (item.getApplicationPackage().equalsIgnoreCase(action.getParentPackage())){
-								item.setAssigned(true);
-								
-								if (item.getActions() != null && item.getActions().getActions() != null){
-									int i = 0;
-									for (ActionVo a : item.getActions().getActions()){
-										if (a.getActionPackage().equalsIgnoreCase(action.getActionPackage())){
-											item.getActions().getActions().get(i).setAssigned(true);
-											item.getActions().getActions().get(i).setIdAction(a.getIdAction());
+					if (activityActionParam == AppManager.ACTIVITY_ACTION_FROM_MAIN){
+						try{
+							for(ActionVo action : list){
+								if (item.getApplicationPackage().equalsIgnoreCase(action.getParentPackage())){
+									item.setAssigned(true);
+									
+									if (item.getActions() != null && item.getActions().getActions() != null){
+										int i = 0;
+										for (ActionVo a : item.getActions().getActions()){
+											if (a.getActionPackage().equalsIgnoreCase(action.getActionPackage())){
+												item.getActions().getActions().get(i).setAssigned(true);
+												item.getActions().getActions().get(i).setIdAction(a.getIdAction());
+											}
+											i++;
 										}
-										i++;
 									}
 								}
 							}
-						}
-//						item.setAssigned(actionsDao.isActionActive(item.getApplicationPackage()));
-					}catch (Exception ase){ }
-					
+						}catch (Exception ase){ }
+					}
 					allApp.add(item);
 				}
 			}

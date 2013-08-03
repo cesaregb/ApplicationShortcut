@@ -1,4 +1,4 @@
-package com.il.appshortcut.dao.impl;
+package com.il.appshortcut.dao;
 
 import java.util.List;
 

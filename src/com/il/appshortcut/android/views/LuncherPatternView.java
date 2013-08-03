@@ -33,11 +33,12 @@ public class LuncherPatternView extends View {
 	private Runnable runnable = new Runnable()  {
 		@Override
 	    public void run() {
-        	if (thisContainer !=null){
-        		thisContainer.invalidate();
-        	}
         	onItemPressedListener.fireApplication(currentSelection);
         	currentSelection = "";
+        	cellProps.setLastPressed(0);
+        	if (thisContainer != null){
+        		thisContainer.invalidate();
+        	}
 	    }
 	};
 	

@@ -11,8 +11,8 @@ import android.widget.Toast;
 
 import com.il.appshortcut.R;
 import com.il.appshortcut.config.AppManager;
-import com.il.appshortcut.dao.impl.ActionsDAO;
-import com.il.appshortcut.dao.impl.AppshortcutDAO;
+import com.il.appshortcut.dao.ActionsDAO;
+import com.il.appshortcut.dao.AppshortcutDAO;
 import com.il.appshortcut.views.ActionVo;
 import com.il.appshortcut.views.ApplicationVo;
 

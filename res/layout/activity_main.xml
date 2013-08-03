@@ -33,9 +33,10 @@
             style="@style/button"
             android:layout_width="90dp"
             android:layout_height="90dp"
-            android:onClick="openManagePatterns"
+            android:onClick="openManageActions"
             android:text="@string/managePatterns" >
         </Button>
+        
     </LinearLayout>
 
 </LinearLayout>

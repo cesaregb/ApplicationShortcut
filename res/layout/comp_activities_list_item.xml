@@ -4,7 +4,7 @@
     android:layout_height="match_parent" >
 
     <TextView
-        android:id="@+id/rowDate"
+        android:id="@+id/activityRowName"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
@@ -15,13 +15,15 @@
         android:textColor="#F000" />
 
     <com.il.appshortcut.android.views.ActivityListItemView
-        android:id="@+id/row"
+        android:id="@+id/activityRowDescription"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_toLeftOf="@+id/rowDate"
+        android:layout_toLeftOf="@+id/activityRowName"
         android:fadingEdge="vertical"
         android:padding="10dp"
         android:scrollbars="vertical"
         android:textColor="@color/notepad_text" />
 
 </RelativeLayout>
+
+

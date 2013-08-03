@@ -1,4 +1,4 @@
-package com.il.appshortcut.adapters;
+package com.il.appshortcut.android.adapters;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -7,13 +7,11 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.il.appshortcut.android.fragments.ApplicationListFragment;
 
-//public class GridPagerAdapter extends FragmentPagerAdapter {
 public class GridPagerAdapter extends FragmentStatePagerAdapter {
 
 	@Override
 	public int getItemPosition(Object object) {
 		return FragmentStatePagerAdapter.POSITION_NONE;
-//		return super.getItemPosition(object);
 	}
 
 	private int mViews = 0;

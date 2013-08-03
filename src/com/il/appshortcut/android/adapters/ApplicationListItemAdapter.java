@@ -1,4 +1,4 @@
-package com.il.appshortcut.adapters;
+package com.il.appshortcut.android.adapters;
 
 import java.util.List;
 
@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 
 import com.il.appshortcut.R;
 import com.il.appshortcut.android.views.ApplicationListItemView;
+import com.il.appshortcut.android.views.Utilities;
 import com.il.appshortcut.views.ApplicationVo;
 
 /**

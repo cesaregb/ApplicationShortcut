@@ -1,6 +1,8 @@
 package com.il.appshortcut.android;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -19,8 +21,8 @@ import com.il.appshortcut.android.fragments.ApplicationSelectPatternFragment;
 import com.il.appshortcut.android.views.LuncherPatternView;
 import com.il.appshortcut.config.AppManager;
 import com.il.appshortcut.config.AppShortcutApplication;
-import com.il.appshortcut.dao.impl.ActionsDAO;
-import com.il.appshortcut.dao.impl.AppshortcutDAO;
+import com.il.appshortcut.dao.ActionsDAO;
+import com.il.appshortcut.dao.AppshortcutDAO;
 import com.il.appshortcut.views.ActionVo;
 import com.il.appshortcut.views.ApplicationVo;
 
@@ -31,7 +33,7 @@ public class ManageActionActivity extends FragmentActivity
 		LuncherPatternView.LuncherPatternListener {
 	
 	private String selectedPattern = "";
-	private int numberOfActionByApplication = 0;
+//	private int numberOfActionByApplication = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -80,24 +82,48 @@ public class ManageActionActivity extends FragmentActivity
 	public void onApplicationActionItem(ActionVo item) {
 		AppShortcutApplication appState = ((AppShortcutApplication)getApplicationContext());
 		ApplicationVo appSelected = appState.getAppSelected();
+		int getTypeResponse = appState.getTypeSelectAppReturn();
 		//regardless action set the common information for this type of applications.
 		item.setParentPackage(appSelected.getApplicationPackage());
 		item.setType(ActionVo.TYPE_APPLICATION);
-		item.setAssigned(true);
 		if (item.getActionPackage() == null) {
 			item.setActionPackage(appSelected.getApplicationPackage());
 		}
 		appSelected.setCurrentAction(item);
 		appState.setAppSelected(appSelected);
 		
-		ApplicationSelectPatternFragment newFragment = new ApplicationSelectPatternFragment();
-		FragmentTransaction transaction = getSupportFragmentManager()
-				.beginTransaction();
-		transaction.replace(R.id.fragment_container_application, newFragment)
-				.addToBackStack(null).commit();
-		
 		Log.d(AppManager.LOG_MANAGE_APPLICATIONS, "Application seleted.");
+
+		if (getTypeResponse == AppManager.ACTIVITY_ACTION_FROM_MAIN) {
+			ApplicationSelectPatternFragment newFragment = new ApplicationSelectPatternFragment();
+			FragmentTransaction transaction = getSupportFragmentManager()
+					.beginTransaction();
+			transaction
+					.replace(R.id.fragment_container_application, newFragment)
+					.addToBackStack(null).commit();
+		} else {
+			Intent returnIntent = new Intent();
+			try{
+				returnIntent.putExtra(AppManager.ACTIVITY_ACTION_RESULT_PARAM, 1);
+				if (getParent() == null) {
+					setResult(RESULT_OK, returnIntent);
+				} else {
+					getParent().setResult(RESULT_OK, returnIntent);
+				}
+				
+			}catch(Exception e){
+				if (getParent() == null) {
+					setResult(RESULT_CANCELED, returnIntent);
+				} else {
+					getParent().setResult(RESULT_CANCELED, returnIntent);
+				}
+				
+			}finally{
+				finish();
+			}
+		}
 	}
+	
 
 	@Override
 	public void onApplicationActionItemSelected(ActionVo item) {
@@ -162,33 +188,70 @@ public class ManageActionActivity extends FragmentActivity
 	 *            information for a pattern...
 	 */
 	public void assignPattern(View view) {
-		ApplicationVo appSelected = ((AppShortcutApplication)getApplicationContext()).getAppSelected();
-		
-		if (appSelected != null) {
-			
+		if (selectedPattern != null) {
 			AppshortcutDAO dao = new AppshortcutDAO();
-			ActionsDAO actionsDao = new ActionsDAO(getApplicationContext());
 			try{
 				Log.d(AppManager.LOG_MANAGE_APPLICATIONS, "saving applicatoin...");
 				if(dao.isPatternAssigned(selectedPattern, getApplicationContext())){
-					Toast.makeText(getApplicationContext(), "Pattern assigned Show confirmation ", Toast.LENGTH_SHORT).show();
-				}else{
-					dao.savePattern(selectedPattern, getApplicationContext(), AppshortcutDAO.PREF_TYPE_ACTION);
-					appSelected.getCurrentAction().setPattern(selectedPattern);
-					actionsDao.addAction(appSelected.getCurrentAction());
-					dao.refreshDataDb(getApplicationContext());
+					Toast.makeText(getApplicationContext(),
+							"Pattern assigned Show confirmation ",
+							Toast.LENGTH_SHORT).show();
+					
+					new AlertDialog.Builder(this)
+							.setIcon(android.R.drawable.ic_dialog_alert)
+							.setTitle("Confirmation")
+							.setMessage("Bla bla bla.... ")
+							.setPositiveButton("Confirm",
+									new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											removeActionByPattern();
+											saveAction();
+											onBackPressed();
+										}
+
+									}).setNegativeButton("Cancel", null).show();
+
+				} else {
+					saveAction();
+					onBackPressed();
 				}
 			}catch(Exception e){
 				//TODO Add String...
 				Toast.makeText(getApplicationContext(), "Error Saving Information", Toast.LENGTH_SHORT).show();
 			}
 		}
-		onBackPressed();
+	}
+	
+	public void removeActionByPattern(){
+		try{
+			ActionsDAO actionsDao = new ActionsDAO(getApplicationContext());
+			actionsDao.removeActionByPattern(selectedPattern);
+		}catch(Exception e){
+			//TODO exception handle... 
+		}
+	}
+	
+	public void saveAction(){
+		try{
+			ApplicationVo appSelected = ((AppShortcutApplication)getApplicationContext()).getAppSelected();
+			AppshortcutDAO dao = new AppshortcutDAO();
+			ActionsDAO actionsDao = new ActionsDAO(getApplicationContext());
+			dao.savePattern(selectedPattern, getApplicationContext(), AppshortcutDAO.PREF_TYPE_ACTION);
+			appSelected.getCurrentAction().setPattern(selectedPattern);
+			appSelected.getCurrentAction().setAssigned(true);
+			actionsDao.addUpdateAction(appSelected.getCurrentAction());
+			dao.refreshDataDb(getApplicationContext());
+		}catch(Exception e){
+			//TODO exception handle... 
+		}
 	}
 
 	@Override
 	public void updateNumberOfActionsByApplication(int number) {
-		this.numberOfActionByApplication = number;
+//		this.numberOfActionByApplication = number;
 	}
 
 }

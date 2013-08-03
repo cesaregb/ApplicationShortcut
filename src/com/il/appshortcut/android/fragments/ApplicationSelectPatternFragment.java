@@ -45,7 +45,7 @@ public class ApplicationSelectPatternFragment extends Fragment {
 		AppShortcutApplication appState = (AppShortcutApplication)getActivity().getApplicationContext();
 		mCurrentApplication = (ApplicationVo) appState.getAppSelected();
 		
-		return inflater.inflate(R.layout.comp_app_select_pattern, container, false);
+		return inflater.inflate(R.layout.comp_action_select_pattern, container, false);
 	}
 
 	@Override

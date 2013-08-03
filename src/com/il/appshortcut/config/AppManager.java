@@ -17,6 +17,10 @@ public class AppManager {
 	private static AppManager _instance;
 	public static String CLEAR_STRING = "";
 	public static String ID_PRE_FFILE = "com.il.appshortcut";
+	public static String ACTIVITY_ACTION_PARAM = "ACTIVITY_ACTION";
+	public static String ACTIVITY_ACTION_RESULT_PARAM = "ACTIVITY_ACTION_RESULT";
+	public static int ACTIVITY_ACTION_FROM_MAIN = 0;
+	public static int ACTIVITY_ACTION_FROM_ACTIVITIES = 1;
 	
 	private List<ApplicationVo> listApplications;
 	

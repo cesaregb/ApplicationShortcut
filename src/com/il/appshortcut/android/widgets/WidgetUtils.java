@@ -2,7 +2,7 @@ package com.il.appshortcut.android.widgets;
 
 import android.content.Context;
 
-import com.il.appshortcut.dao.impl.AppshortcutDAO;
+import com.il.appshortcut.dao.AppshortcutDAO;
 import com.il.appshortcut.exception.AppShortcutException;
 
 public class WidgetUtils {

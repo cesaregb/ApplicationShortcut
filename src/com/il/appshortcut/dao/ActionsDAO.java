@@ -1,4 +1,4 @@
-package com.il.appshortcut.dao.impl;
+package com.il.appshortcut.dao;
 
 import static com.il.appshortcut.converter.ActionsConverter.convertActions2ContentValues;
 import static com.il.appshortcut.converter.ActionsConverter.convertCursor2Action;
@@ -21,7 +21,7 @@ public class ActionsDAO {
 
 	private ActionsOpenHelper dbHelper;
 
-	private String[] allColumns = { ActionsOpenHelper.FIELD_ID,
+	public String[] allColumns = { ActionsOpenHelper.FIELD_ID,
 			ActionsOpenHelper.FIELD_ACTION_NAME,
 			ActionsOpenHelper.FIELD_ACTION_PACKAGE,
 			ActionsOpenHelper.FIELD_PARENT_PACKAGE,
@@ -29,7 +29,7 @@ public class ActionsDAO {
 			ActionsOpenHelper.FIELD_TYPE,
 			ActionsOpenHelper.FIELD_ACTION_DESCRIPTION, 
 			ActionsOpenHelper.FIELD_ACTION_CLASS_NAME 
-			};
+	};
 
 	public ActionsDAO(Context context) {
 		dbHelper = new ActionsOpenHelper(context);
@@ -51,13 +51,39 @@ public class ActionsDAO {
 	public boolean isActionActive(ActionVo action) {
 		return false;
 	}
-
-	public void addAction(ActionVo action) {
+	
+	public void addUpdateAction(ActionVo action) {
 		this.open();
 		ContentValues values = convertActions2ContentValues(action);
-		database.insert(ActionsOpenHelper.TABLE_NAME, null, values);
+		if (action.getIdAction() > 0){
+			database.update(ActionsOpenHelper.TABLE_NAME, values, ActionsOpenHelper.FIELD_ID +"=?", new String[]{ String.valueOf(action.getIdAction()) });
+		}else{
+			database.insert(ActionsOpenHelper.TABLE_NAME, null, values);
+		}
+		
 		database.close();
 		this.close();
+	}
+	
+	public ActionVo removeActionByPattern(String pattern) {
+		this.open();
+		ActionVo result = null;
+		if (pattern != null) {
+			database.delete(ActionsOpenHelper.TABLE_NAME,
+					ActionsOpenHelper.FIELD_PATTERN + "=?", new String[] { pattern });
+		}
+		this.close();
+		return result;
+	}
+	
+	public List<ActionVo> getAllActions() {
+		List<ActionVo> list = null;
+		this.open();
+		Cursor cursor = database.query(ActionsOpenHelper.TABLE_NAME,
+				allColumns, null, null, null, null, null, null);
+		if (cursor != null) { list = convertCursor2ListAction(cursor); }
+		this.close();
+		return list;
 	}
 
 	public boolean isActionActive(String appPackage) {
@@ -100,13 +126,4 @@ public class ActionsDAO {
 		return result;
 	}
 	
-	public List<ActionVo> getAllActions() {
-		List<ActionVo> list = null;
-		this.open();
-		Cursor cursor = database.query(ActionsOpenHelper.TABLE_NAME,
-				allColumns, null, null, null, null, null, null);
-		if (cursor != null) { list = convertCursor2ListAction(cursor); }
-		this.close();
-		return list;
-	}
 }

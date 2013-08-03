@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+	Custom Item for the application List (Grid) 
+	Component that contains the backgroud + image + app name + selecte|not_selected
+ -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    
+    <com.il.appshortcut.android.views.ApplicationListItemView
+        android:id="@+id/row"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fadingEdge="vertical"
+        android:padding="10dp"
+        android:scrollbars="vertical"
+        android:textColor="@color/notepad_text" />
+    
+    <ImageView
+        android:id="@+id/icon_image"
+        android:layout_marginBottom = "10dp"
+        android:layout_width="wrap_content" 
+        android:layout_height="wrap_content" 
+        android:contentDescription="@string/desc_temporal">
+    </ImageView>
+    
+</RelativeLayout>

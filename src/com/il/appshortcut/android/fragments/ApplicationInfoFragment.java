@@ -20,7 +20,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.il.appshortcut.R;
-import com.il.appshortcut.adapters.ApplicationActionItemAdapter;
+import com.il.appshortcut.android.adapters.ApplicationActionItemAdapter;
 import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.views.ActionVo;
 import com.il.appshortcut.views.ApplicationVo;
@@ -69,7 +69,7 @@ public class ApplicationInfoFragment extends Fragment {
 		AppShortcutApplication appState = (AppShortcutApplication)getActivity().getApplicationContext();
 		mCurrentApplication = (ApplicationVo) appState.getAppSelected();
 		
-		return inflater.inflate(R.layout.comp_app_info, container, false);
+		return inflater.inflate(R.layout.comp_action_info, container, false);
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class ApplicationInfoFragment extends Fragment {
 
 		listView = (ListView)getActivity().findViewById(R.id.list_selected_actions);
 		applicationActionItems = new ArrayList<ActionVo>();
-		int resID = R.layout.comp_app_action_item;
+		int resID = R.layout.comp_action_list_item;
 		aa = new ApplicationActionItemAdapter(getActivity(), resID, applicationActionItems);
 		listView.setAdapter(aa);
 
@@ -132,7 +132,7 @@ public class ApplicationInfoFragment extends Fragment {
 		
 		listViewSelected = (ListView)getActivity().findViewById(R.id.list_possible_actions);
 		applicationActionItemsSelected = new ArrayList<ActionVo>();
-		resID = R.layout.comp_app_action_item;
+		resID = R.layout.comp_action_list_item;
 		aaSelected = new ApplicationActionItemAdapter(getActivity(), resID, applicationActionItemsSelected);
 		listViewSelected.setAdapter(aaSelected);
 		OnItemClickListener listenerSelected = new android.widget.AdapterView.OnItemClickListener() {

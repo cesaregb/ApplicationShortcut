@@ -38,7 +38,7 @@ public class FilterApplicationsFragment extends DialogFragment {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		LayoutInflater inflater = getActivity().getLayoutInflater();
 		filterCheckbox = 0;
-		builder.setView(inflater.inflate(R.layout.comp_app_filter, null))
+		builder.setView(inflater.inflate(R.layout.comp_application_filter, null))
 				.setTitle(R.string.filter)
 				.setPositiveButton(R.string.apply,
 						new DialogInterface.OnClickListener() {
