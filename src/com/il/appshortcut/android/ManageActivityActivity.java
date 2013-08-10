@@ -1,5 +1,8 @@
 package com.il.appshortcut.android;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,18 +13,25 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.il.appshortcut.R;
+import com.il.appshortcut.android.adapters.ServicesItemAdapter;
 import com.il.appshortcut.android.fragments.ActivityFormFragment;
+import com.il.appshortcut.android.fragments.ActivityListFragment;
 import com.il.appshortcut.config.AppManager;
 import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.dao.ActivitiesDAO;
+import com.il.appshortcut.helpers.ServicesHelper;
+import com.il.appshortcut.services.ServiceVo;
 import com.il.appshortcut.views.ActivityVo;
 import com.il.appshortcut.views.ApplicationVo;
 
 public class ManageActivityActivity extends FragmentActivity implements
-		ActivityFormFragment.ActivityFormListener {
+		ActivityFormFragment.ActivityFormListener, ServicesItemAdapter.ServicesItemAdapterListener {
 	
 	ActivityVo activity;
 	ActivitiesDAO activitiesDao;
+	
+	List<ServiceVo> serviceItems = new ArrayList<ServiceVo>();
+	private ServicesItemAdapter servicesArrayAdapter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +91,23 @@ public class ManageActivityActivity extends FragmentActivity implements
 	}
 	
 	public void addService(View view){
-		//TODO show service list... 
+		ActivityListFragment listFragment = new ActivityListFragment();
+		
+		serviceItems = new ArrayList<ServiceVo>();
+		int resID = R.layout.comp_activity_services_list_dialog;
+		servicesArrayAdapter = new ServicesItemAdapter(this, resID, serviceItems);
+		servicesArrayAdapter.setCallback(this);
+		listFragment.setListAdapter(servicesArrayAdapter);
+		getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container_activity, listFragment).commit();
+		
+		addServicesList();
+		
+	}
+	
+	public void addServicesList(){
+		ServicesHelper helper = new ServicesHelper(getApplicationContext());
+		serviceItems.addAll(helper.getServiceList());
+		servicesArrayAdapter.notifyDataSetChanged();
 	}
 	
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -98,6 +124,11 @@ public class ManageActivityActivity extends FragmentActivity implements
 				//TODO no application selected!!  
 			}
 		}
+	}
+
+	@Override
+	public void itemSelected(ServiceVo activity) {
+		// TODO Auto-generated method stub
 	}
 
 }

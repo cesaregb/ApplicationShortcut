@@ -16,6 +16,9 @@
 
 package com.il.appshortcut.android.views;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -29,8 +32,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.PaintDrawable;
 
 import com.il.appshortcut.R;
-
-import com.il.appshortcut.android.views.FastBitmapDrawable;
 
 /**
  * Various utilities shared amongst the Launcher's classes.
@@ -203,5 +204,23 @@ public final class Utilities {
         }
 
         return bitmap;
+    }
+    
+    
+    public static void CopyStream(InputStream is, OutputStream os)
+    {
+        final int buffer_size=1024;
+        try
+        {
+            byte[] bytes=new byte[buffer_size];
+            for(;;)
+            {
+              int count=is.read(bytes, 0, buffer_size);
+              if(count==-1)
+                  break;
+              os.write(bytes, 0, count);
+            }
+        }
+        catch(Exception ex){}
     }
 }

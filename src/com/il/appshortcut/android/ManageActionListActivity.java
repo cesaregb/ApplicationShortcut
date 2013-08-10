@@ -30,7 +30,7 @@ import com.il.appshortcut.R;
 import com.il.appshortcut.actions.ActionsFactory;
 import com.il.appshortcut.android.adapters.GridPagerAdapter;
 import com.il.appshortcut.android.fragments.ApplicationListFragment;
-import com.il.appshortcut.android.fragments.FilterApplicationsFragment;
+import com.il.appshortcut.android.fragments.FilterApplicationsDialogFragment;
 import com.il.appshortcut.config.AppManager;
 import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.dao.ActionsDAO;
@@ -40,7 +40,7 @@ import com.il.appshortcut.views.AllAppsList;
 import com.il.appshortcut.views.ApplicationVo;
 
 public class ManageActionListActivity extends FragmentActivity implements
-		FilterApplicationsFragment.FilterDialogListener,
+		FilterApplicationsDialogFragment.FilterDialogListener,
 		ApplicationListFragment.ApplicationListListener, ActionBar.TabListener {
 
 	public ActionBar actionBar;
@@ -182,7 +182,7 @@ public class ManageActionListActivity extends FragmentActivity implements
 			}
 			break;
 		case R.id.action_search:
-			FilterApplicationsFragment fa = new FilterApplicationsFragment();
+			FilterApplicationsDialogFragment fa = new FilterApplicationsDialogFragment();
 			fa.show(getSupportFragmentManager(), "Filter Applications");
 			break;
 		case R.id.action_filter_delete:
@@ -243,7 +243,7 @@ public class ManageActionListActivity extends FragmentActivity implements
 	
 	@Override
 	public void onDialogPositiveClick(DialogFragment dialog) {
-		FilterApplicationsFragment filterDialog = (FilterApplicationsFragment) dialog;
+		FilterApplicationsDialogFragment filterDialog = (FilterApplicationsDialogFragment) dialog;
 		filterType = filterDialog.filterCheckbox;
 		Dialog d = filterDialog.getDialog();
 		EditText et = (EditText) d.findViewById(R.id.search_criteria);

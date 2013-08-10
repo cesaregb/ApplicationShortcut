@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.ActionBar;
-import android.app.Activity;
-import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
 import android.view.Menu;
@@ -23,7 +23,7 @@ import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.dao.ActivitiesDAO;
 import com.il.appshortcut.views.ActivityVo;
 
-public class ManageAcivitiesListActivity extends Activity implements
+public class ManageAcivitiesListActivity extends FragmentActivity implements
 		ActivityItemAdapter.ActivityListListener {
 
 	private ArrayList<ActivityVo> activityItems;
@@ -40,7 +40,7 @@ public class ManageAcivitiesListActivity extends Activity implements
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(false);
 		
-		FragmentManager fm = getFragmentManager();
+		FragmentManager fm =  getSupportFragmentManager();
 		
 		ActivityListFragment listFragment = (ActivityListFragment) fm
 				.findFragmentById(R.id.ActivityFragment);

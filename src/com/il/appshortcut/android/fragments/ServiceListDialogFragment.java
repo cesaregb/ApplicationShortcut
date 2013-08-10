@@ -9,15 +9,18 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 
 import com.il.appshortcut.R;
+import com.il.appshortcut.android.fragments.FilterApplicationsDialogFragment.FilterDialogListener;
+import com.il.appshortcut.helpers.ServicesHelper;
 
-public class FilterApplicationsFragment extends DialogFragment {
+public class ServiceListDialogFragment extends DialogFragment {
+
 	public int typeFilter;
 	public String searchString;
 	public int filterCheckbox;
 
 	FilterDialogListener mListener;
 	
-	public interface FilterDialogListener {
+	public interface ServiceListDialogFragmentListener {
 		public void onDialogPositiveClick(DialogFragment dialog);
 		public void onDialogNegativeClick(DialogFragment dialog);
 	}
@@ -37,22 +40,24 @@ public class FilterApplicationsFragment extends DialogFragment {
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		LayoutInflater inflater = getActivity().getLayoutInflater();
+		final ServicesHelper helper = new ServicesHelper(getActivity().getApplicationContext());
+		
 		filterCheckbox = 0;
-		builder.setView(inflater.inflate(R.layout.comp_application_filter, null))
+		builder.setView(inflater.inflate(R.layout.comp_activity_services_list_dialog, null))
 				.setTitle(R.string.filter)
 				.setPositiveButton(R.string.apply,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								mListener.onDialogPositiveClick(FilterApplicationsFragment.this);
+								mListener.onDialogPositiveClick(ServiceListDialogFragment.this);
 							}
 						})
 				.setNegativeButton(R.string.cancel,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								mListener.onDialogNegativeClick(FilterApplicationsFragment.this);
+								mListener.onDialogNegativeClick(ServiceListDialogFragment.this);
 							}
 						})
-				.setSingleChoiceItems(R.array.filter_options_string_array,
+				.setSingleChoiceItems(helper.getServicesAsStringArray(),
 						0,
 						new DialogInterface.OnClickListener() {
 							@Override
