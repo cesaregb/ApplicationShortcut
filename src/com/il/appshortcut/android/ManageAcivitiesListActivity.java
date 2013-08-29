@@ -126,6 +126,9 @@ public class ManageAcivitiesListActivity extends FragmentActivity implements
 
 		@Override
 		protected String doInBackground(String... params) {
+			if (listActivities == null){
+				listActivities = new ArrayList<ActivityVo>();
+			}
 			listActivities.clear();
 			listActivities = activitiesDao.getAllActivities();
 			return null;

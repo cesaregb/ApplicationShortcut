@@ -16,7 +16,13 @@
         android:layout_marginRight="5dip"
         android:background="@drawable/image_bg"
         android:padding="3dip" >
-
+		
+        <CheckBox 
+            android:id="@+id/selectedCheckbox"
+            android:layout_width="50dip"
+            android:layout_height="50dip"
+            />
+        
         <ImageView
             android:id="@+id/list_image"
             android:layout_width="50dip"
@@ -72,5 +78,5 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:src="@drawable/content_new" />
-
+    
 </RelativeLayout>

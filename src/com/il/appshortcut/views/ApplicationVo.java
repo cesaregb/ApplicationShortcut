@@ -86,4 +86,16 @@ public class ApplicationVo {
 	public void setCurrentAction(ActionVo currentAction) {
 		this.currentAction = currentAction;
 	}
+	@Override
+	public boolean equals(Object o) {
+		ApplicationVo app = (ApplicationVo) o;
+		boolean result = false;
+		if ((((app != null && this != null) 
+				&& (app.getCurrentAction() != null && this.getCurrentAction() != null)) 
+				&& (app.getCurrentAction().getActionPackage() != null && this.getCurrentAction().getActionPackage() != null))
+				&& (app.getCurrentAction().getActionPackage().equalsIgnoreCase(this.getCurrentAction().getActionPackage()))) {
+			result = true;
+		}
+		return result;
+	}
 }

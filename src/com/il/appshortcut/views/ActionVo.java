@@ -11,9 +11,6 @@ public class ActionVo {
 	private int type;
 	private String className;
 	
-	public static int TYPE_APPLICATION = 0;
-	public static int TYPE_SERVICE = 1;
-	
 	public ActionVo(){ }
 	
 	public ActionVo (int id, String appPackage){

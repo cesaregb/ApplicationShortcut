@@ -6,7 +6,10 @@ import android.os.Build;
 import android.provider.Settings;
 
 public class AirplaneModeService extends ServiceVo{
-
+	public AirplaneModeService(){
+		ID = 1;
+	}
+	
 	@Override
 	public boolean run(Context context) {
 		boolean isEnabled = isAirplaneModeOn(context);

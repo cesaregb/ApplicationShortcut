@@ -12,9 +12,10 @@ import com.il.appshortcut.exception.AppShortcutException;
 
 public class AppshortcutDAO {
 	
-	public static int PREF_TYPE_ACTION = 1;
-	public static int PREF_TYPE_ACTIVITY = 2;
+	public static final int TYPE_ACTION = 1;
+	public static final int TYPE_ACTIVITY = 2;
 
+	
 	public String updateWidgetSelection(Context context, String currentSelection)
 			throws AppShortcutException {
 		
@@ -86,7 +87,7 @@ public class AppshortcutDAO {
 	public void refreshDataDb(Context context){
 		ActionsDAO actionsDao = new ActionsDAO(context);
 		AppShortcutApplication appState = ((AppShortcutApplication) context);
-		appState.setCurrentDBActions(actionsDao.getAllActions());
+		appState.setCurrentDBActions(actionsDao.getAllActionsByType(AppshortcutDAO.TYPE_ACTION));
 	}
 
 }

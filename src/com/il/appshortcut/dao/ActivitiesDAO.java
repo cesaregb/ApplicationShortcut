@@ -17,6 +17,9 @@ public class ActivitiesDAO {
 	private SQLiteDatabase database;
 	private ActivityOpenHelper dbHelper;
 	
+	public static final int TYPE_ACTION = 1;
+	public static final int TYPE_SERVICE = 2;
+	
 	public String[] allColumns = { 
 			ActivityOpenHelper.FIELD_ID,
 			ActivityOpenHelper.FIELD_NAME,
@@ -42,17 +45,22 @@ public class ActivitiesDAO {
 		dbHelper.close();
 	}
 	
-	public void addUpdateActivity(ActivityVo activity) {
+	public Long addUpdateActivity(ActivityVo activity) {
+		long insertId = 0;
 		this.open();
 		ContentValues values = convertActivity2ContentValues(activity);
-		if (activity.getIdActivity() > 0){
-			database.update(ActivityOpenHelper.TABLE_NAME, values, ActivityOpenHelper.FIELD_ID +"=?", new String[]{ String.valueOf(activity.getIdActivity()) });
+		if (activity.getIdActivity() > 0) {
+			database.update(ActivityOpenHelper.TABLE_NAME, values,
+					ActivityOpenHelper.FIELD_ID + "=?",
+					new String[] { String.valueOf(activity.getIdActivity()) });
+			insertId = activity.getIdActivity();
 		}else{
-			database.insert(ActivityOpenHelper.TABLE_NAME, null, values);
+			insertId = database.insert(ActivityOpenHelper.TABLE_NAME, null, values);
 		}
 		
 		database.close();
 		this.close();
+		return insertId;
 	}
 	
 	public List<ActivityVo> getAllActivities() {

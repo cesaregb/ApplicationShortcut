@@ -1,10 +1,20 @@
 package com.il.appshortcut.android;
 
 import static com.il.appshortcut.helpers.ActionHelper.getPatternIntent;
+
+import java.util.Collections;
+import java.util.List;
+
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
@@ -14,11 +24,15 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.il.appshortcut.R;
+import com.il.appshortcut.actions.ActionsFactory;
 import com.il.appshortcut.android.views.LuncherPatternView;
 import com.il.appshortcut.config.AppManager;
+import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.dao.ActionsDAO;
 import com.il.appshortcut.dao.AppshortcutDAO;
 import com.il.appshortcut.views.ActionVo;
+import com.il.appshortcut.views.AllAppsList;
+import com.il.appshortcut.views.ApplicationVo;
 
 
 public class MainActivity extends Activity implements
@@ -28,12 +42,18 @@ public class MainActivity extends Activity implements
 	AppshortcutDAO dao = new AppshortcutDAO();
 	ActionsDAO actionsDao;
 	
+	private AllAppsList allAppsList;
+	int activityActionParam = AppManager.ACTIVITY_ACTION_FROM_MAIN;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
 		luncherWidget = (LuncherPatternView) findViewById(R.id.luncher_widget);
 		actionsDao = new ActionsDAO(getApplicationContext());
+		
+		new LoadApplication().execute();
 	}
 
 	
@@ -64,7 +84,6 @@ public class MainActivity extends Activity implements
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -97,14 +116,14 @@ public class MainActivity extends Activity implements
 			int typePattern = dao.getTypePatternAssigned(currentSelection, getApplicationContext());
 			if (typePattern > 0){
 				Toast.makeText(getApplicationContext(), "it is assigned", Toast.LENGTH_SHORT).show();
-				if (typePattern == AppshortcutDAO.PREF_TYPE_ACTION){
+				if (typePattern == AppshortcutDAO.TYPE_ACTION){
 					ActionVo action = actionsDao.getActionByPattern(currentSelection);
 					Intent i = getPatternIntent(action, getPackageManager());
 					if (i != null){
 						startActivity(i);
 					}else{ Toast.makeText(getApplicationContext(), "Exception.. so bad right? ", Toast.LENGTH_SHORT).show(); }
 				}
-				if (typePattern == AppshortcutDAO.PREF_TYPE_ACTIVITY){
+				if (typePattern == AppshortcutDAO.TYPE_ACTIVITY){
 				}
 			}else{
 				Toast.makeText(getApplicationContext(), "Pattern not assigned", Toast.LENGTH_SHORT).show();
@@ -120,5 +139,66 @@ public class MainActivity extends Activity implements
 	public void registerSelection(String currentSelection) {
 		// Not Used
 	}
+
+	/**
+	 * @author cesaregb progress dialog loads application list
+	 */
+	private ProgressDialog progressDialog;
+
+	public class LoadApplication extends AsyncTask<String, Integer, String> {
+		@Override
+		protected void onPreExecute() {
+			progressDialog = new ProgressDialog(MainActivity.this);
+			progressDialog.setMessage("Loading Applications...");
+			progressDialog.setIndeterminate(false);
+			progressDialog.setMax(100);
+			progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			progressDialog.setCancelable(true);
+			progressDialog.show();
+		}
+
+		@Override
+		protected String doInBackground(String... params) {
+			allAppsList = new AllAppsList(); // Application list helper 
+			List<ResolveInfo> applicationList = null; // android object list... 
+			
+			final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
+			mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+			
+			PackageManager manager = getPackageManager();
+			applicationList = manager.queryIntentActivities(mainIntent, 0);
+
+			Collections.sort(applicationList, new ResolveInfo.DisplayNameComparator(manager));
+			
+			if (applicationList.size() > 0 ){
+				for (ResolveInfo info : applicationList) {
+					ApplicationInfo applicationInfo = info.activityInfo.applicationInfo;
+					ApplicationVo item = new ApplicationVo(info.loadLabel(manager).toString());
+					item.setIcon(info.loadIcon(manager));
+					item.setComponentName(new ComponentName(info.activityInfo.packageName, info.activityInfo.name));
+					item.setApplicationInfo(applicationInfo);
+					item.setApplicationPackage(applicationInfo.packageName);
+					item.setAssigned(false);
+					item.setActions(ActionsFactory.create(item));
+					allAppsList.add(item);
+				}
+			}
+			return null;
+		}
+
+		protected void onProgressUpdate(Integer... progress) {
+			progressDialog.setProgress(progress[0]);
+		}
+
+		protected void onPostExecute(String params) {
+			addApplicationsToContext();
+			progressDialog.dismiss();
+		}
+	}
 	
+	public void addApplicationsToContext(){
+		AppShortcutApplication appState = (AppShortcutApplication) getApplicationContext();
+		appState.setAllAppsList(allAppsList);
+	}
+
 }

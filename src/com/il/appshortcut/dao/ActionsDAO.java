@@ -52,17 +52,22 @@ public class ActionsDAO {
 		return false;
 	}
 	
-	public void addUpdateAction(ActionVo action) {
+	public Long addUpdateAction(ActionVo action) {
+		long insertId = 0;
 		this.open();
 		ContentValues values = convertActions2ContentValues(action);
-		if (action.getIdAction() > 0){
-			database.update(ActionsOpenHelper.TABLE_NAME, values, ActionsOpenHelper.FIELD_ID +"=?", new String[]{ String.valueOf(action.getIdAction()) });
+		if (action.getIdAction() > 0) {
+			database.update(ActionsOpenHelper.TABLE_NAME, values,
+					ActionsOpenHelper.FIELD_ID + "=?",
+					new String[] { String.valueOf(action.getIdAction()) });
+			insertId = action.getIdAction();
 		}else{
-			database.insert(ActionsOpenHelper.TABLE_NAME, null, values);
+			insertId = database.insert(ActionsOpenHelper.TABLE_NAME, null, values);
 		}
 		
 		database.close();
 		this.close();
+		return insertId;
 	}
 	
 	public ActionVo removeActionByPattern(String pattern) {
@@ -75,12 +80,34 @@ public class ActionsDAO {
 		this.close();
 		return result;
 	}
+	public ActionVo removeActionById(String id) {
+		this.open();
+		ActionVo result = null;
+		if (id != null) {
+			database.delete(ActionsOpenHelper.TABLE_NAME,
+					ActionsOpenHelper.FIELD_PATTERN + "=?", new String[] { id });
+		}
+		this.close();
+		return result;
+	}
 	
 	public List<ActionVo> getAllActions() {
 		List<ActionVo> list = null;
 		this.open();
 		Cursor cursor = database.query(ActionsOpenHelper.TABLE_NAME,
 				allColumns, null, null, null, null, null, null);
+		if (cursor != null) { list = convertCursor2ListAction(cursor); }
+		this.close();
+		return list;
+	}
+	
+	public List<ActionVo> getAllActionsByType(int type) {
+		List<ActionVo> list = null;
+		this.open();
+		Cursor cursor = database.query(ActionsOpenHelper.TABLE_NAME,
+				allColumns, ActionsOpenHelper.FIELD_TYPE + "=?",
+				new String[] { String.valueOf(type) },
+				null, null, null, null);
 		if (cursor != null) { list = convertCursor2ListAction(cursor); }
 		this.close();
 		return list;
@@ -102,6 +129,23 @@ public class ActionsDAO {
 					new String[] { String.valueOf(action.getActionPackage()) },
 					null, null, null, null);
 
+			if (cursor != null) {
+				result = convertCursor2Action(cursor);
+			}
+		}
+		this.close();
+		return result;
+	}
+	
+	public ActionVo getActionById(int id) {
+		this.open();
+		ActionVo result = null;
+		if (id > 0) {
+			Cursor cursor = database.query(ActionsOpenHelper.TABLE_NAME,
+					allColumns, ActionsOpenHelper.FIELD_ID + "=?",
+					new String[] { String.valueOf(id) },
+					null, null, null, null);
+			
 			if (cursor != null) {
 				result = convertCursor2Action(cursor);
 			}

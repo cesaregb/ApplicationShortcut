@@ -2,8 +2,10 @@ package com.il.appshortcut.views;
 
 import android.graphics.drawable.Drawable;
 
+import com.il.appshortcut.services.ServiceVo;
+
 public class ActivityDetailVo {
-	private int idActivityOption;
+	private int idActivityDetail;
 	private int type;
 	private int order;
 	private int top;
@@ -11,13 +13,9 @@ public class ActivityDetailVo {
 	private int idActivity;
 	private int idAction;
 	private Drawable icon;
+	private ApplicationVo application;
+	private ServiceVo service;
 	
-	public int getIdActivityOption() {
-		return idActivityOption;
-	}
-	public void setIdActivityOption(int idActivityOption) {
-		this.idActivityOption = idActivityOption;
-	}
 	public int getType() {
 		return type;
 	}
@@ -59,6 +57,29 @@ public class ActivityDetailVo {
 	}
 	public void setIcon(Drawable icon) {
 		this.icon = icon;
+	}
+	public int getIdActivityDetail() {
+		return idActivityDetail;
+	}
+	public void setIdActivityDetail(int idActivityDetail) {
+		this.idActivityDetail = idActivityDetail;
+	}
+	@Override
+	public boolean equals(Object o) {
+		ActivityDetailVo detail = (ActivityDetailVo) o;
+		return (this.order == detail.getOrder());
+	}
+	public ApplicationVo getApplication() {
+		return application;
+	}
+	public void setApplication(ApplicationVo application) {
+		this.application = application;
+	}
+	public ServiceVo getService() {
+		return service;
+	}
+	public void setService(ServiceVo service) {
+		this.service = service;
 	}
 	
 }

@@ -94,14 +94,14 @@ public class AppShortcutLauncherWidgetProvider extends AppWidgetProvider {
 			int typePattern = dao.getTypePatternAssigned(currentSelection,
 					context);
 			if (typePattern > 0) {
-				if (typePattern == AppshortcutDAO.PREF_TYPE_ACTION) {
+				if (typePattern == AppshortcutDAO.TYPE_ACTION) {
 					ActionVo action = actionsDao
 							.getActionByPattern(currentSelection);
 					i = com.il.appshortcut.helpers.ActionHelper
 							.getPatternIntent(action,
 									context.getPackageManager());
 				}
-				if (typePattern == AppshortcutDAO.PREF_TYPE_ACTIVITY) {
+				if (typePattern == AppshortcutDAO.TYPE_ACTIVITY) {
 				}
 			}
 		} catch (Exception e){}

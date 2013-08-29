@@ -99,7 +99,6 @@ public class ApplicationListFragment extends Fragment {
 			aa.notifyDataSetChanged();
 		}
 	}
-	
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {

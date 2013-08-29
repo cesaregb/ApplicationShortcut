@@ -73,13 +73,13 @@ public class AppShortcutLauncherWidgetReceiver extends BroadcastReceiver {
 						context);
 				if (typePattern > 0) {
 					//TODO assign more information as icon and stuff!!! 
-					if (typePattern == AppshortcutDAO.PREF_TYPE_ACTION) {
+					if (typePattern == AppshortcutDAO.TYPE_ACTION) {
 						ActionVo action = actionsDao
 								.getActionByPattern(currentSelection);
 						applicationName = action.getActionName();
 						
 					}
-					if (typePattern == AppshortcutDAO.PREF_TYPE_ACTIVITY) {
+					if (typePattern == AppshortcutDAO.TYPE_ACTIVITY) {
 					}
 				}
 				

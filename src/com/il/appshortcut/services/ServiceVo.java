@@ -8,7 +8,7 @@ public abstract class ServiceVo {
 	private String description; 
 	private Drawable icon;
 	private boolean selected;
-	
+	public int ID = 0;
 	
 	public String getName() {
 		return name;
@@ -36,6 +36,12 @@ public abstract class ServiceVo {
 	}
 	
 	abstract public boolean run(Context context);
+	
+	@Override
+	public boolean equals(Object o) {
+		ServiceVo item = (ServiceVo) o;
+		return (item.ID == this.ID);
+	}
 	
 }
 

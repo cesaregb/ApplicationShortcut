@@ -4,7 +4,10 @@ import android.content.Context;
 import android.net.wifi.WifiManager;
 
 public class WifiService extends ServiceVo {
-
+	public WifiService(){
+		ID = 6;
+	}
+	
 	@Override
 	public boolean run(Context context) {
 		WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
@@ -15,6 +18,5 @@ public class WifiService extends ServiceVo {
 		}
 		return true;
 	}
-
 	
 }

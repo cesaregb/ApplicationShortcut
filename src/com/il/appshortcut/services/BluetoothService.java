@@ -5,8 +5,10 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 
-
 public class BluetoothService extends ServiceVo {
+	public BluetoothService(){
+		ID = 2;
+	}
 	private static final int REQUEST_ENABLE_BT = 0;
     
 	@Override

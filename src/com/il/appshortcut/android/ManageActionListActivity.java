@@ -1,7 +1,6 @@
 package com.il.appshortcut.android;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import android.app.ActionBar;
@@ -9,11 +8,7 @@ import android.app.ActionBar.Tab;
 import android.app.Dialog;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -27,7 +22,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.il.appshortcut.R;
-import com.il.appshortcut.actions.ActionsFactory;
 import com.il.appshortcut.android.adapters.GridPagerAdapter;
 import com.il.appshortcut.android.fragments.ApplicationListFragment;
 import com.il.appshortcut.android.fragments.FilterApplicationsDialogFragment;
@@ -132,6 +126,7 @@ public class ManageActionListActivity extends FragmentActivity implements
 		appState.setCurrentListApplications(applicationItems);
 
 		mGridPagerAdapter.notifyDataSetChanged();
+		
 		if (isOrderSelected) {
 			refrestTabs();
 		}
@@ -288,55 +283,48 @@ public class ManageActionListActivity extends FragmentActivity implements
 
 		@Override
 		protected String doInBackground(String... params) {
-			listApplications.clear();
-			AllAppsList allApp = new AllAppsList(); // Application list helper 
-			List<ResolveInfo> applicationList = null; // android object list... 
-			
-			//generate the intent to get the application list 
-			final Intent mainIntent = new Intent(Intent.ACTION_MAIN, null);
-			mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-			
-			PackageManager manager = getPackageManager();
-			applicationList = manager.queryIntentActivities(mainIntent, 0);
 
-			//sort the list 
-			Collections.sort(applicationList, new ResolveInfo.DisplayNameComparator(manager));
-			
-			//user in calculating percentage. 
-			if (applicationList.size() > 0 ){
-				for (ResolveInfo info : applicationList) {
-					ApplicationInfo applicationInfo = info.activityInfo.applicationInfo;
-					ApplicationVo item = new ApplicationVo(info.loadLabel(manager).toString());
-					item.setIcon(info.loadIcon(manager));
-					item.setComponentName(new ComponentName(info.activityInfo.packageName, info.activityInfo.name));
-					item.setApplicationInfo(applicationInfo);
-					item.setApplicationPackage(applicationInfo.packageName);
-					item.setAssigned(false);
-					item.setActions(ActionsFactory.create(item));
-					if (activityActionParam == AppManager.ACTIVITY_ACTION_FROM_MAIN){
-						try{
-							for(ActionVo action : list){
-								if (item.getApplicationPackage().equalsIgnoreCase(action.getParentPackage())){
-									item.setAssigned(true);
-									
-									if (item.getActions() != null && item.getActions().getActions() != null){
-										int i = 0;
-										for (ActionVo a : item.getActions().getActions()){
-											if (a.getActionPackage().equalsIgnoreCase(action.getActionPackage())){
-												item.getActions().getActions().get(i).setAssigned(true);
-												item.getActions().getActions().get(i).setIdAction(a.getIdAction());
-											}
-											i++;
+			AppShortcutApplication appState = (AppShortcutApplication) getApplicationContext();
+			AllAppsList allApp = appState.getAllAppsList();
+			listApplications.clear();
+			listApplications.addAll(allApp.data);
+			if (allApp != null
+					&& allApp.data != null
+					&& allApp.data.size() > 0
+					&& (activityActionParam == AppManager.ACTIVITY_ACTION_FROM_MAIN)) {
+				for (ApplicationVo item : listApplications) {
+					try {
+						for (ActionVo action : list) {
+							if (item.getApplicationPackage().equalsIgnoreCase(
+									action.getParentPackage())) {
+								
+								item.setAssigned(true);
+
+								if (item.getActions() != null
+										&& item.getActions().getActions() != null) {
+									int i = 0;
+									for (ActionVo a : item.getActions()
+											.getActions()) {
+										if (a.getActionPackage()
+												.equalsIgnoreCase(
+														action.getActionPackage())) {
+											item.getActions().getActions()
+													.get(i).setAssigned(true);
+											item.getActions()
+													.getActions()
+													.get(i)
+													.setIdAction(
+															a.getIdAction());
 										}
+										i++;
 									}
 								}
 							}
-						}catch (Exception ase){ }
+						}
+					} catch (Exception ase) {
 					}
-					allApp.add(item);
 				}
 			}
-			listApplications.addAll(allApp.data);
 			return null;
 		}
 

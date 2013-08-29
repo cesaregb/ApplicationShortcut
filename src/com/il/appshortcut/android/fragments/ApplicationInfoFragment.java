@@ -112,12 +112,11 @@ public class ApplicationInfoFragment extends Fragment {
 		Bitmap bmpIcon = ((BitmapDrawable) icon).getBitmap();
 		image.setImageBitmap(bmpIcon);
 
-		listView = (ListView)getActivity().findViewById(R.id.list_selected_actions);
+		listView = (ListView) getActivity().findViewById(R.id.list_selected_actions);
 		applicationActionItems = new ArrayList<ActionVo>();
 		int resID = R.layout.comp_action_list_item;
 		aa = new ApplicationActionItemAdapter(getActivity(), resID, applicationActionItems);
 		listView.setAdapter(aa);
-
 		OnItemClickListener listener = new android.widget.AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,int position, long id) {

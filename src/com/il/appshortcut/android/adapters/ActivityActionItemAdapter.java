@@ -34,16 +34,6 @@ public class ActivityActionItemAdapter extends ArrayAdapter<ActivityDetailVo> {
 	}
 	
 	@Override
-    public int getCount() {
-        return (items != null) ? items.size() : 0;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return items.get(position).getIdActivity();
-    }
-	
-	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		LinearLayout activityListView;
 		ActivityDetailVo item = getItem(position);
@@ -56,6 +46,7 @@ public class ActivityActionItemAdapter extends ArrayAdapter<ActivityDetailVo> {
 		} else {
 			activityListView = (LinearLayout) convertView;
 		}
+		
 		ImageView iconImage = (ImageView) activityListView.findViewById(R.id.activity_action_list_icon_image);
 		iconImage.setImageDrawable(item.getIcon());
 		

@@ -6,7 +6,10 @@ import android.net.Uri;
 import android.provider.Settings;
 
 public class GPSService extends ServiceVo {
-
+	public GPSService(){
+		ID = 3;
+	}
+	
 	@Override
 	public boolean run(Context context) {
 		String provider = Settings.Secure.getString(

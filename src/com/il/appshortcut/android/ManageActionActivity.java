@@ -41,9 +41,7 @@ public class ManageActionActivity extends FragmentActivity
 		setContentView(R.layout.activity_manage_application);
 		
 		if (findViewById(R.id.fragment_container_application) != null) {
-			if (savedInstanceState != null) {
-				return;
-			}
+			if (savedInstanceState != null) { return; }
 
 			final ActionBar actionBar = getActionBar();
 			actionBar.setDisplayHomeAsUpEnabled(true);
@@ -85,7 +83,7 @@ public class ManageActionActivity extends FragmentActivity
 		int getTypeResponse = appState.getTypeSelectAppReturn();
 		//regardless action set the common information for this type of applications.
 		item.setParentPackage(appSelected.getApplicationPackage());
-		item.setType(ActionVo.TYPE_APPLICATION);
+		item.setType(AppshortcutDAO.TYPE_ACTION); // this is override if activity calls it
 		if (item.getActionPackage() == null) {
 			item.setActionPackage(appSelected.getApplicationPackage());
 		}
@@ -239,7 +237,7 @@ public class ManageActionActivity extends FragmentActivity
 			ApplicationVo appSelected = ((AppShortcutApplication)getApplicationContext()).getAppSelected();
 			AppshortcutDAO dao = new AppshortcutDAO();
 			ActionsDAO actionsDao = new ActionsDAO(getApplicationContext());
-			dao.savePattern(selectedPattern, getApplicationContext(), AppshortcutDAO.PREF_TYPE_ACTION);
+			dao.savePattern(selectedPattern, getApplicationContext(), AppshortcutDAO.TYPE_ACTION);
 			appSelected.getCurrentAction().setPattern(selectedPattern);
 			appSelected.getCurrentAction().setAssigned(true);
 			actionsDao.addUpdateAction(appSelected.getCurrentAction());

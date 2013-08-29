@@ -4,6 +4,9 @@ import android.content.Context;
 import android.media.AudioManager;
 
 public class SoundOffService extends ServiceVo{
+	public SoundOffService(){
+		ID = 5;
+	}
 	AudioManager mAudioManager;
 	@Override
 	public boolean run(Context context) {
