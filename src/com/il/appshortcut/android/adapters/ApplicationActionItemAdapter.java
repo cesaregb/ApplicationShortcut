@@ -3,10 +3,12 @@ package com.il.appshortcut.android.adapters;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -28,7 +30,9 @@ public class ApplicationActionItemAdapter extends ArrayAdapter<ActionVo>{
 		this.resource = textViewResourceId;
 	}
 	
-	public ApplicationActionItemAdapter(Context context, int textViewResourceId, List<ActionVo> items) {
+	public ApplicationActionItemAdapter(Context context,
+			int textViewResourceId, List<ActionVo> items) {
+		
 		super(context, textViewResourceId, items);
 		this.resource = textViewResourceId;
 	}
@@ -47,7 +51,12 @@ public class ApplicationActionItemAdapter extends ArrayAdapter<ActionVo>{
 		} else {
 			applicationActionView = (LinearLayout) convertView;
 		}
-		TextView taskView = (TextView)applicationActionView.findViewById(R.id.applicatoin_action_name);
+		TextView taskView = (TextView)applicationActionView.findViewById(R.id.title);
+		ImageView imageView = (ImageView) applicationActionView.findViewById(R.id.item_image);
+		if (item.isAssigned()){
+			Drawable navigationAccept = getContext().getResources().getDrawable(R.drawable.navigation_accept);
+			imageView.setImageDrawable(navigationAccept);
+		}
 		taskView.setText(taskString);
 		return applicationActionView;
 	}

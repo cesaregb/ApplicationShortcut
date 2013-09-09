@@ -54,9 +54,12 @@ public class AppshortcutDAO {
 		editor.commit();
 	}
 
-	public void removePattern(String pattern) throws AppShortcutException {
-		// TODO Auto-generated method stub
-		
+	public void removePattern(String pattern, Context context) throws AppShortcutException {
+		SharedPreferences sharedPref = context.getSharedPreferences(
+				AppManager.ID_PRE_FFILE, Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = sharedPref.edit();
+		editor.remove(pattern);
+		editor.commit();
 	}
 
 	public List<String> getAllPatternAssigned() throws AppShortcutException {
@@ -64,12 +67,9 @@ public class AppshortcutDAO {
 		return null;
 	}
 
-
 	public boolean isPatternAssigned(String pattern, Context context)
 			throws AppShortcutException {
-		SharedPreferences sharedPref = context.getSharedPreferences(
-				AppManager.ID_PRE_FFILE, Context.MODE_PRIVATE);
-		
+		SharedPreferences sharedPref = context.getSharedPreferences(AppManager.ID_PRE_FFILE, Context.MODE_PRIVATE);
 		int tmpVal = sharedPref.getInt(pattern, 0);
 		return (tmpVal > 0);
 	}

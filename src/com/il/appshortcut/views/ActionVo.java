@@ -76,5 +76,15 @@ public class ActionVo {
 	public void setClassName(String className) {
 		this.className = className;
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		ActionVo oAction = (ActionVo) o;
+		return (this.getActionPackage().equalsIgnoreCase(oAction.getActionPackage()));
+	}
+	
+	public boolean isSaved(){
+		return (this != null && this.getIdAction() > 0);
+	}
 	
 }

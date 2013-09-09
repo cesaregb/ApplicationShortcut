@@ -1,5 +1,6 @@
 package com.il.appshortcut.android;
 
+import static com.il.appshortcut.converter.ActivitiesConverter.convertActivity2SelectPatternInfoView;
 import static com.il.appshortcut.helpers.ApplicationHelper.safeLongToInt;
 
 import java.util.ArrayList;
@@ -8,15 +9,20 @@ import java.util.List;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.il.appshortcut.R;
 import com.il.appshortcut.android.fragments.ActivityFormFragment;
+import com.il.appshortcut.android.fragments.ActivitySelectIconDialogFragment;
+import com.il.appshortcut.android.fragments.ApplicationSelectPatternFragment;
 import com.il.appshortcut.android.fragments.SelectServicesFragment;
+import com.il.appshortcut.android.views.LuncherPatternView;
 import com.il.appshortcut.config.AppManager;
 import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.dao.ActionsDAO;
@@ -26,13 +32,17 @@ import com.il.appshortcut.helpers.ServicesHelper;
 import com.il.appshortcut.services.ServiceVo;
 import com.il.appshortcut.views.ActionVo;
 import com.il.appshortcut.views.ActivityDetailVo;
+import com.il.appshortcut.views.ActivityIconVo;
 import com.il.appshortcut.views.ActivityVo;
 import com.il.appshortcut.views.AllAppsList;
 import com.il.appshortcut.views.ApplicationVo;
 
 public class ManageActivityActivity extends FragmentActivity implements
 		ActivityFormFragment.ActivityFormListener,
-		SelectServicesFragment.SelectServicesListener{
+		SelectServicesFragment.SelectServicesListener,
+		ApplicationSelectPatternFragment.ApplicationSelectPatternFragmentListener,
+		LuncherPatternView.LuncherPatternListener, 
+		ActivitySelectIconDialogFragment.ActivitySelectIconDialogListener{
 	
 	ActivitiesDAO activitiesDao;
 	ActionsDAO actionsDao;
@@ -45,7 +55,8 @@ public class ManageActivityActivity extends FragmentActivity implements
 	private int topOrderServices = 0;
 	private int topOrderApplications = 0;
 	ServicesHelper servicesHelper;
-	
+	private String selectedPattern = "";
+	private ActivityIconVo selectedIcon;
 	protected ActivityFormFragment formFragment;
 	SelectServicesFragment selectServicesFragment;
 	
@@ -85,16 +96,11 @@ public class ManageActivityActivity extends FragmentActivity implements
 				AllAppsList allAppsList = appState.getAllAppsList();
 				
 				if (listDetails != null && listDetails.size() > 0) {
-					
 					for (ActivityDetailVo item : listDetails) {
-						
 						if (item.getType() == ActivitiesDAO.TYPE_ACTION) {
-							
 							ActionVo action = actionsDao.getActionById(item
 									.getIdAction());
-							
 							for (ApplicationVo application : allAppsList.data) {
-								
 								boolean addItem = false;
 								if (application.getComponentName().getClassName() != null) {
 									addItem = application.getComponentName().getClassName()
@@ -104,7 +110,6 @@ public class ManageActivityActivity extends FragmentActivity implements
 											.getApplicationPackage()
 											.equalsIgnoreCase(action.getActionPackage());
 								}
-								
 								if (addItem) {
 									selectedActions.add(application);
 									item.setApplication(application);
@@ -151,10 +156,16 @@ public class ManageActivityActivity extends FragmentActivity implements
 			EditText editTextDescription = (EditText) formView
 					.findViewById(R.id.acticityDescription);
 			textDescription = editTextDescription.getText().toString();
-
 		}
 		activitySelected.setName(textName);
 		activitySelected.setDescription(textDescription);
+		if (selectedPattern != null && selectedPattern != ""){
+			activitySelected.setPattern(selectedPattern);
+		}
+		if(selectedIcon != null 
+				&& selectedIcon.getIdIcon() > 0){
+			activitySelected.setIdIcon(selectedIcon.getIdIcon());
+		}
 		long idActivity = activitiDao.addUpdateActivity(activitySelected);
 		if (detailsUpdated) {
 			saveLists(mergeLists(), idActivity);
@@ -270,12 +281,14 @@ public class ManageActivityActivity extends FragmentActivity implements
 			// REMOVE INFORMATION 
 			List<ActivityDetailVo> lDetails = activitiesDetailsDao
 						.getAllActivityDetailsByActivity(String.valueOf(activityId));
-			for (ActivityDetailVo detailItem : lDetails ){
-				if (detailItem.getType() == ActivitiesDAO.TYPE_ACTION){
-					actionsDao.removeActionById(String.valueOf(detailItem.getIdAction()));
+			if (lDetails != null){
+				for (ActivityDetailVo detailItem : lDetails ){
+					if (detailItem.getType() == ActivitiesDAO.TYPE_ACTION){
+						actionsDao.removeActionById(String.valueOf(detailItem.getIdAction()));
+					}
 				}
-				
 			}
+			
 			activitiesDetailsDao
 					.removeActivityDetailsByActivity(safeLongToInt(activityId));
 			
@@ -344,5 +357,56 @@ public class ManageActivityActivity extends FragmentActivity implements
 	public List<ServiceVo> getParentList() {
 		return selectedServices;
 	}
+	
+	public void assignPattern(View view){
+		if (activitySelected != null){
+			ApplicationSelectPatternFragment newFragment = new ApplicationSelectPatternFragment();
+			newFragment.setmCurrentInformation(convertActivity2SelectPatternInfoView(activitySelected, getResources()));
+			getSupportFragmentManager().beginTransaction()
+					.replace(R.id.fragment_container_activity, newFragment)
+					.commit();
+		}else{
+			//TODO Handle expception.
+		}
+	}
 
+	@Override
+	public void onSomething(String something) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void fireApplication(String currentSelection) {
+		// Not used
+	}
+
+	@Override
+	public void registerSelection(String currentSelection) {
+		this.selectedPattern = currentSelection;
+		
+	}
+
+	@Override
+	public void selectIcon(ActivityIconVo icon) {
+		selectedIcon = icon;  
+	}
+	
+	public void selectImage(View view){
+		ActivitySelectIconDialogFragment fa = new ActivitySelectIconDialogFragment();
+		fa.show(getSupportFragmentManager(), "Select Icon...");
+	}
+
+	@Override
+	public void onDialogPositiveClick(DialogFragment dialog, ActivityIconVo activityIcon) {
+		Toast.makeText(getApplicationContext(), "Selected: " + activityIcon.getIdIcon(), Toast.LENGTH_SHORT).show();
+		if (formFragment != null){
+			formFragment.updateIcon(activityIcon);
+		}
+	}
+
+	@Override
+	public void onDialogNegativeClick(DialogFragment dialog) {
+		// TODO Auto-generated method stub
+		
+	}
 }

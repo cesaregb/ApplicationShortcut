@@ -10,6 +10,7 @@ public class ActivityVo {
 	private String pattern;
 	private boolean assigned;
 	private List<ActionVo> actions;
+	private int idIcon;
 	
 	public ActivityVo(){}
 	
@@ -58,5 +59,13 @@ public class ActivityVo {
 	public String toString(){
 		return this.name + " -- " + this.description;
 	}
-	
+
+	public int getIdIcon() {
+		return idIcon;
+	}
+
+	public void setIdIcon(int idIcon) {
+		this.idIcon = idIcon;
+	}
+
 }

@@ -87,15 +87,9 @@ public class SelectServicesFragment extends Fragment implements
 	}
 	
 	public void updateServiceList(){
-//		AppShortcutApplication appState = (AppShortcutApplication) getApplicationContext();
-//		appState.setAppSelected(_appSelected);
-
 		Log.d(AppManager.LOG_ACTIVITIES, "Fragment size: " + returnSelectedServices.size());
-		
 		serviceItems.clear();
-		
 		serviceItems.addAll(helper.getServiceList(mCallback.getParentList()));
-		
 		servicesArrayAdapter.notifyDataSetChanged();
 	}
 	

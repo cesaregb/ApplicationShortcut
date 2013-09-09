@@ -4,12 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.ContentValues;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 
+import com.il.appshortcut.helpers.ActivityIconHelper;
 import com.il.appshortcut.sqlite.ActivityDetailsOpenHelper;
 import com.il.appshortcut.sqlite.ActivityOpenHelper;
 import com.il.appshortcut.views.ActivityDetailVo;
 import com.il.appshortcut.views.ActivityVo;
+import com.il.appshortcut.views.SelectPatternInfoVo;
 
 public class ActivitiesConverter {
 	
@@ -23,6 +27,7 @@ public class ActivitiesConverter {
 	    values.put(ActivityOpenHelper.FIELD_PATTERN, activity.getPattern());
 	    int assigned = (activity.isAssigned())?1:0;
 	    values.put(ActivityOpenHelper.FIELD_ASSIGNED, assigned);
+	    values.put(ActivityOpenHelper.FIELD_ID_ICON, activity.getIdIcon());
 	    return values;
 	}
 	
@@ -39,6 +44,7 @@ public class ActivitiesConverter {
 				int assigned = cursor.getInt(cursor.getColumnIndex(ActivityOpenHelper.FIELD_ASSIGNED));
 				item.setAssigned((assigned == 1));
 				item.setPattern(cursor.getString(cursor.getColumnIndex(ActivityOpenHelper.FIELD_PATTERN)));
+				item.setIdIcon(cursor.getInt(cursor.getColumnIndex(ActivityOpenHelper.FIELD_ID_ICON)));
 				result.add(item);
 			} while (cursor.moveToNext());
 		}
@@ -77,5 +83,20 @@ public class ActivitiesConverter {
 			} while (cursor.moveToNext());
 		}
 		return result;
+	}
+	
+	public static SelectPatternInfoVo convertActivity2SelectPatternInfoView(ActivityVo activity, Resources r){
+		SelectPatternInfoVo selectPatternInfoVo = new SelectPatternInfoVo();
+		selectPatternInfoVo.setType(SelectPatternInfoVo.TYPE_ACTIVITY);
+		selectPatternInfoVo.setName(activity.getName());
+		selectPatternInfoVo.setDescription(activity.getDescription());
+		
+		if (activity.getIdIcon() > 0){
+			Drawable d = r.getDrawable(ActivityIconHelper.getIconById( activity.getIdIcon()).getIdResource());
+			selectPatternInfoVo.setIcon(d);
+		}
+		
+		selectPatternInfoVo.setPattern(activity.getPattern());
+		return selectPatternInfoVo;
 	}
 }

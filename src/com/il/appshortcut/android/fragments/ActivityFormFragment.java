@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.il.appshortcut.R;
@@ -17,7 +18,9 @@ import com.il.appshortcut.android.adapters.ActivityActionItemAdapter;
 import com.il.appshortcut.android.listeners.SwipeDismissListViewTouchListener;
 import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.dao.ActivitiesDAO;
+import com.il.appshortcut.helpers.ActivityIconHelper;
 import com.il.appshortcut.views.ActivityDetailVo;
+import com.il.appshortcut.views.ActivityIconVo;
 import com.il.appshortcut.views.ActivityVo;
 
 public class ActivityFormFragment extends Fragment {
@@ -28,6 +31,7 @@ public class ActivityFormFragment extends Fragment {
 	public interface ActivityFormListener{
 		public void removeService(ActivityDetailVo detail);
 		public void removeAction(ActivityDetailVo detail);
+		public void selectIcon(ActivityIconVo idDrawable);
 	}
 	
 	public final static String ARG_POSITION = "position";
@@ -41,6 +45,7 @@ public class ActivityFormFragment extends Fragment {
 	private ActivityActionItemAdapter applicationServicesItemsArrayAdapter;
 	ListView listServices;
 	View view;
+	ImageView activityIcon;
 	
 	@Override
 	public void onAttach(Activity activity) {
@@ -56,14 +61,15 @@ public class ActivityFormFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, 
 			Bundle savedInstanceState) {
-		
 		view = inflater.inflate(R.layout.comp_activity_form, container, false);
 		
+		activityIcon = (ImageView) view.findViewById(R.id.activityIcon);
 		listActions = (ListView) view.findViewById(R.id.list_activity_actions);
 		int resID = R.layout.comp_activity_action_list_item;
-		applicationActionsItemsArrayAdapter = new ActivityActionItemAdapter(view.getContext(), resID, acticityApplicationActionsItems);
+		applicationActionsItemsArrayAdapter = new ActivityActionItemAdapter(
+				view.getContext(), resID, acticityApplicationActionsItems);
 		listActions.setAdapter(applicationActionsItemsArrayAdapter);
-		
+
 		SwipeDismissListViewTouchListener touchActionsListener = new SwipeDismissListViewTouchListener(
 				listActions,
 				new SwipeDismissListViewTouchListener.DismissCallbacks() {
@@ -71,13 +77,16 @@ public class ActivityFormFragment extends Fragment {
 					public boolean canDismiss(int position) {
 						return true;
 					}
-
 					@Override
 					public void onDismiss(ListView listView,
 							int[] reverseSortedPositions) {
 						for (int position : reverseSortedPositions) {
-							mCallback.removeAction(applicationActionsItemsArrayAdapter.getItem(position));
-							applicationActionsItemsArrayAdapter.remove(applicationActionsItemsArrayAdapter.getItem(position));
+							mCallback
+									.removeAction(applicationActionsItemsArrayAdapter
+											.getItem(position));
+							applicationActionsItemsArrayAdapter
+									.remove(applicationActionsItemsArrayAdapter
+											.getItem(position));
 						}
 						applicationActionsItemsArrayAdapter.notifyDataSetChanged();
 					}
@@ -86,11 +95,14 @@ public class ActivityFormFragment extends Fragment {
 		listActions.setOnTouchListener(touchActionsListener);
 		listActions.setOnScrollListener(touchActionsListener.makeScrollListener());
 		
-		listServices = (ListView)view.findViewById(R.id.list_activity_services);
+		listServices = (ListView) view
+				.findViewById(R.id.list_activity_services);
 		int resIDService = R.layout.comp_activity_service_list_item;
-		applicationServicesItemsArrayAdapter = new ActivityActionItemAdapter(view.getContext(), resIDService, acticityApplicationServicesItems);
+		applicationServicesItemsArrayAdapter = new ActivityActionItemAdapter(
+				view.getContext(), resIDService,
+				acticityApplicationServicesItems);
 		listServices.setAdapter(applicationServicesItemsArrayAdapter);
-		
+
 		SwipeDismissListViewTouchListener touchServicesListener = new SwipeDismissListViewTouchListener(
 				listServices,
 				new SwipeDismissListViewTouchListener.DismissCallbacks() {
@@ -113,20 +125,13 @@ public class ActivityFormFragment extends Fragment {
 		listServices.setOnTouchListener(touchServicesListener);
 		listServices.setOnScrollListener(touchServicesListener.makeScrollListener());
 		
-//		listServices.setOnItemLongClickListener(new OnItemLongClickListener() {
-//			@Override
-//			public boolean onItemLongClick(AdapterView<?> parent, View view,
-//					int position, long id) {
-//				registerForContextMenu(view);
-//				getActivity().openContextMenu(view);
-//
-//				return false;
-//			}
-//		});
-		
 		AppShortcutApplication appState = (AppShortcutApplication) view.getContext().getApplicationContext();
 		mCurrentactivity = appState.getCurrentActivity();
 		return view;
+	}
+	
+	public void updateIcon(ActivityIconVo icon){
+		activityIcon.setImageResource(icon.getIdResource());
 	}
 	
 	@Override
@@ -136,16 +141,23 @@ public class ActivityFormFragment extends Fragment {
 	}
 
 	public void updateArticleView() {
-		if (mCurrentactivity != null){ 
-			EditText editTextName = (EditText) getActivity().findViewById(R.id.activityName);
-			if (editTextName != null){
+		if (mCurrentactivity != null) {
+			EditText editTextName = (EditText) getActivity().findViewById(
+					R.id.activityName);
+			if (editTextName != null) {
 				editTextName.setText(mCurrentactivity.getName());
 			}
-			EditText editTextDescription = (EditText) getActivity().findViewById(R.id.acticityDescription);
-			if (editTextDescription != null){
+			EditText editTextDescription = (EditText) getActivity()
+					.findViewById(R.id.acticityDescription);
+			if (editTextDescription != null) {
 				editTextDescription.setText(mCurrentactivity.getDescription());
 			}
-		} 
+
+			if (mCurrentactivity.getIdIcon() > 0) {
+				activityIcon.setImageResource(ActivityIconHelper
+						.getDrawable(mCurrentactivity.getIdIcon()));
+			}
+		}
 		
 		if (activitiesDetails != null && activitiesDetails.size() > 0) {
 			acticityApplicationServicesItems.clear();
@@ -166,6 +178,7 @@ public class ActivityFormFragment extends Fragment {
 			acticityApplicationServicesItems.addAll(services);
 			applicationServicesItemsArrayAdapter.notifyDataSetChanged();
 		}
+		
 	}
 	
 	public void addItem2AppList(ActivityDetailVo item){

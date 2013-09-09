@@ -1,10 +1,8 @@
 package com.il.appshortcut.android.fragments;
 
 import android.app.Activity;
-import android.content.pm.ApplicationInfo;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -14,13 +12,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.il.appshortcut.R;
-import com.il.appshortcut.config.AppShortcutApplication;
-import com.il.appshortcut.views.ApplicationVo;
+import com.il.appshortcut.views.SelectPatternInfoVo;
 
 public class ApplicationSelectPatternFragment extends Fragment {
 	ApplicationSelectPatternFragmentListener mCallback;
 	public final static String ARG_POSITION = "application";
-	private ApplicationVo mCurrentApplication = null;
+	private SelectPatternInfoVo mCurrentInformation = null;
 
 	public interface ApplicationSelectPatternFragmentListener {
 		public void onSomething(String something);
@@ -42,30 +39,38 @@ public class ApplicationSelectPatternFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		//get the selected application..
-		AppShortcutApplication appState = (AppShortcutApplication)getActivity().getApplicationContext();
-		mCurrentApplication = (ApplicationVo) appState.getAppSelected();
-		
 		return inflater.inflate(R.layout.comp_action_select_pattern, container, false);
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
-		updateApplicationView(mCurrentApplication);
+		updateApplicationView();
 	}
 
-	public void updateApplicationView(ApplicationVo application) {
-		mCurrentApplication = application;
-		
+	public void updateApplicationView() {
 		TextView article = (TextView) getActivity().findViewById(R.id.app_name);
-		article.setText(application.getName());
+		article.setText(mCurrentInformation.getName());
 		ImageView image = (ImageView) getActivity().findViewById(
 				R.id.icon_app_selected);
-		ApplicationInfo appInfo = application.getApplicationInfo();
-		Drawable icon = appInfo.loadIcon(getActivity().getApplicationContext()
-				.getPackageManager());
-		Bitmap bmpIcon = ((BitmapDrawable) icon).getBitmap();
-		image.setImageBitmap(bmpIcon);
+//		if (mCurrentInformation.getCurrentAction().isAssigned()){
+		if (mCurrentInformation.getPattern() != null){
+			TextView selectedPattern = (TextView) getActivity().findViewById(R.id.selected_pattern);
+			selectedPattern.setText(mCurrentInformation.getPattern());
+		}
+		
+		if (mCurrentInformation.getIcon() != null){
+			Bitmap bmpIcon = ((BitmapDrawable) mCurrentInformation.getIcon()).getBitmap();
+			image.setImageBitmap(bmpIcon);
+		}
+	}
+
+	public SelectPatternInfoVo getmCurrentInformation() {
+		return mCurrentInformation;
+	}
+
+	public void setmCurrentInformation(SelectPatternInfoVo mCurrentInformation) {
+		this.mCurrentInformation = mCurrentInformation;
 	}
 
 	

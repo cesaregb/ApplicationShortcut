@@ -283,7 +283,6 @@ public class ManageActionListActivity extends FragmentActivity implements
 
 		@Override
 		protected String doInBackground(String... params) {
-
 			AppShortcutApplication appState = (AppShortcutApplication) getApplicationContext();
 			AllAppsList allApp = appState.getAllAppsList();
 			listApplications.clear();
@@ -294,27 +293,28 @@ public class ManageActionListActivity extends FragmentActivity implements
 					&& (activityActionParam == AppManager.ACTIVITY_ACTION_FROM_MAIN)) {
 				for (ApplicationVo item : listApplications) {
 					try {
-						for (ActionVo action : list) {
-							if (item.getApplicationPackage().equalsIgnoreCase(
-									action.getParentPackage())) {
+						for (ActionVo action : list) { //iterate db values
+							
+							if (item.getApplicationPackage().equalsIgnoreCase(action.getParentPackage())) {
 								
 								item.setAssigned(true);
 
-								if (item.getActions() != null
-										&& item.getActions().getActions() != null) {
+								if (item.getCommonActions() != null 
+										&& item.getCommonActions().getActions() != null) {
 									int i = 0;
-									for (ActionVo a : item.getActions()
-											.getActions()) {
-										if (a.getActionPackage()
-												.equalsIgnoreCase(
-														action.getActionPackage())) {
-											item.getActions().getActions()
+									for (ActionVo a : item.getCommonActions().getActions()) {
+										if (a.equals(action)) {
+											
+											item.getCommonActions().getActions()
 													.get(i).setAssigned(true);
-											item.getActions()
+											item.getCommonActions()
 													.getActions()
 													.get(i)
-													.setIdAction(
-															a.getIdAction());
+													.setIdAction(action.getIdAction());
+											item.getCommonActions()
+												.getActions()
+												.get(i)
+												.setPattern(action.getPattern());
 										}
 										i++;
 									}

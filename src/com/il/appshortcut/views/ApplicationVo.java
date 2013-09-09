@@ -14,7 +14,7 @@ public class ApplicationVo {
 	private String patter;
 	private ApplicationInfo applicationInfo;
 	private Drawable icon;
-	private CommonActions actions;
+	private CommonActions commonActions;
 	private ComponentName componentName;
 	
 	//selected action, this is for manage application helper 
@@ -68,12 +68,6 @@ public class ApplicationVo {
 	public String toString() {
 		return name;
 	}
-	public CommonActions getActions() {
-		return actions;
-	}
-	public void setActions(CommonActions actions) {
-		this.actions = actions;
-	}
 	public ComponentName getComponentName() {
 		return componentName;
 	}
@@ -97,5 +91,11 @@ public class ApplicationVo {
 			result = true;
 		}
 		return result;
+	}
+	public CommonActions getCommonActions() {
+		return commonActions;
+	}
+	public void setCommonActions(CommonActions commonActions) {
+		this.commonActions = commonActions;
 	}
 }

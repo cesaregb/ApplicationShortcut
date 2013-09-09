@@ -25,7 +25,8 @@ public class ActivitiesDAO {
 			ActivityOpenHelper.FIELD_NAME,
 			ActivityOpenHelper.FIELD_DESCRIPTION,
 			ActivityOpenHelper.FIELD_PATTERN,
-			ActivityOpenHelper.FIELD_ASSIGNED
+			ActivityOpenHelper.FIELD_ASSIGNED,
+			ActivityOpenHelper.FIELD_ID_ICON
 			};
 
 	public ActivitiesDAO(Context context) {

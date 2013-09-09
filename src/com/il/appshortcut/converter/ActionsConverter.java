@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.database.Cursor;
 
 import com.il.appshortcut.sqlite.ActionsOpenHelper;
 import com.il.appshortcut.views.ActionVo;
+import com.il.appshortcut.views.ApplicationVo;
+import com.il.appshortcut.views.SelectPatternInfoVo;
 
 public class ActionsConverter {
 	
@@ -72,4 +76,15 @@ public class ActionsConverter {
 		return result;
 	}
 	
+	
+	public static SelectPatternInfoVo convertApplication2SelectPatternInfoView(ApplicationVo app, Context ctx){
+		SelectPatternInfoVo selectPatternInfoVo = new SelectPatternInfoVo();
+		ApplicationInfo appInfo = app.getApplicationInfo();
+		selectPatternInfoVo.setName(app.getCurrentAction().getActionName());
+		selectPatternInfoVo.setDescription(app.getCurrentAction().getActionDescription());
+		selectPatternInfoVo.setIcon(appInfo.loadIcon(ctx.getPackageManager()));
+		selectPatternInfoVo.setType(SelectPatternInfoVo.TYPE_APPLICATAION);
+		selectPatternInfoVo.setPattern(app.getCurrentAction().getPattern());
+		return selectPatternInfoVo;
+	}
 }

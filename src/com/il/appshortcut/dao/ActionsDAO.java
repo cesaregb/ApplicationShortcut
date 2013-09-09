@@ -85,7 +85,7 @@ public class ActionsDAO {
 		ActionVo result = null;
 		if (id != null) {
 			database.delete(ActionsOpenHelper.TABLE_NAME,
-					ActionsOpenHelper.FIELD_PATTERN + "=?", new String[] { id });
+					ActionsOpenHelper.FIELD_ID + "=?", new String[] { id });
 		}
 		this.close();
 		return result;

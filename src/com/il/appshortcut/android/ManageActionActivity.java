@@ -10,7 +10,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -23,8 +25,11 @@ import com.il.appshortcut.config.AppManager;
 import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.dao.ActionsDAO;
 import com.il.appshortcut.dao.AppshortcutDAO;
+import com.il.appshortcut.helpers.ApplicationHelper;
 import com.il.appshortcut.views.ActionVo;
 import com.il.appshortcut.views.ApplicationVo;
+
+import static com.il.appshortcut.converter.ActionsConverter.convertApplication2SelectPatternInfoView;
 
 public class ManageActionActivity extends FragmentActivity
 		implements
@@ -33,21 +38,25 @@ public class ManageActionActivity extends FragmentActivity
 		LuncherPatternView.LuncherPatternListener {
 	
 	private String selectedPattern = "";
-//	private int numberOfActionByApplication = 0;
-
+	protected Object mActionMode;
+	private ActionVo mActionLongOver;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_manage_application);
 		
 		if (findViewById(R.id.fragment_container_application) != null) {
-			if (savedInstanceState != null) { return; }
-
+			if (savedInstanceState != null) {
+				return;
+			}
 			final ActionBar actionBar = getActionBar();
 			actionBar.setDisplayHomeAsUpEnabled(true);
-			
+
 			ApplicationInfoFragment newFragment = new ApplicationInfoFragment();
-			getSupportFragmentManager().beginTransaction().add(R.id.fragment_container_application, newFragment).commit();
+			getSupportFragmentManager().beginTransaction()
+					.add(R.id.fragment_container_application, newFragment)
+					.commit();
 		}
 	}
 	
@@ -78,6 +87,9 @@ public class ManageActionActivity extends FragmentActivity
 
 	@Override
 	public void onApplicationActionItem(ActionVo item) {
+		
+		if (mActionMode != null) {((ActionMode) mActionMode).finish();}
+		
 		AppShortcutApplication appState = ((AppShortcutApplication)getApplicationContext());
 		ApplicationVo appSelected = appState.getAppSelected();
 		int getTypeResponse = appState.getTypeSelectAppReturn();
@@ -94,6 +106,9 @@ public class ManageActionActivity extends FragmentActivity
 
 		if (getTypeResponse == AppManager.ACTIVITY_ACTION_FROM_MAIN) {
 			ApplicationSelectPatternFragment newFragment = new ApplicationSelectPatternFragment();
+			
+			newFragment.setmCurrentInformation(convertApplication2SelectPatternInfoView(appSelected, getApplicationContext()));
+			
 			FragmentTransaction transaction = getSupportFragmentManager()
 					.beginTransaction();
 			transaction
@@ -122,50 +137,6 @@ public class ManageActionActivity extends FragmentActivity
 		}
 	}
 	
-
-	@Override
-	public void onApplicationActionItemSelected(ActionVo item) {
-		Log.d(AppManager.LOG_APPLICATION_INFO_FRAGMENT, "pattern: " + item.getPattern());
-		ApplicationVo appSelected = ((AppShortcutApplication)getApplicationContext()).getAppSelected();
-		if (item.getActionPackage() == null) {
-			item.setActionPackage(appSelected.getApplicationPackage());
-		}
-		appSelected.setCurrentAction(item);
-//		if (appSelected != null 
-//				&& item != null) {
-//			
-//			SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(
-//					AppManager.ID_PRE_FFILE, Context.MODE_PRIVATE);
-//			SharedPreferences.Editor editor = sharedPref.edit();
-//
-//				
-//			String actionPackage = "";
-//			if (appSelected.getCurrentAction() != null){
-//				actionPackage = appSelected.getCurrentAction().getActionPackage();
-//			}
-//			String appInfo = ActionHelper.getApplicationInfo(appSelected.getComponentName());
-//			String actionId = ActionHelper.getActionId(appInfo, actionPackage);
-//			String appId = ActionHelper.getAppId(appInfo);
-//			String appIdPatt = ActionHelper.getPatternId(selectedPattern);
-//
-//			editor.remove(actionId);
-//			editor.remove(appIdPatt);
-//			if (numberOfActionByApplication-- == 0)
-//				editor.remove(appId);
-//			
-//			editor.commit();
-//			
-//			
-//			ApplicationInfoFragment fragment = (ApplicationInfoFragment)
-//	                getSupportFragmentManager().findFragmentById(R.id.fragment_container_application);
-//
-//	        if (fragment != null) {
-//	        	fragment.updateApplicationView(appSelected);
-//	        }
-//			
-//		}
-	}
-
 	@Override
 	public void onSomething(String something) {
 	}
@@ -240,16 +211,82 @@ public class ManageActionActivity extends FragmentActivity
 			dao.savePattern(selectedPattern, getApplicationContext(), AppshortcutDAO.TYPE_ACTION);
 			appSelected.getCurrentAction().setPattern(selectedPattern);
 			appSelected.getCurrentAction().setAssigned(true);
-			actionsDao.addUpdateAction(appSelected.getCurrentAction());
+			appSelected.getCurrentAction().setIdAction(
+					ApplicationHelper.safeLongToInt(actionsDao
+							.addUpdateAction(appSelected.getCurrentAction())));
 			dao.refreshDataDb(getApplicationContext());
 		}catch(Exception e){
 			//TODO exception handle... 
 		}
 	}
 
-	@Override
-	public void updateNumberOfActionsByApplication(int number) {
-//		this.numberOfActionByApplication = number;
-	}
+	public void removeSelectedItem(){
+		if (mActionLongOver.isSaved()){
+			try{
+				ApplicationVo appSelected = ((AppShortcutApplication)getApplicationContext()).getAppSelected();
+				appSelected.getCurrentAction().setAssigned(false);
+				appSelected.getCurrentAction().setIdAction(0);
+				AppshortcutDAO dao = new AppshortcutDAO();
+				ActionsDAO actionsDao = new ActionsDAO(getApplicationContext());
+				dao.removePattern(mActionLongOver.getPattern(),
+						getApplicationContext());
+				actionsDao.removeActionById(String.valueOf(mActionLongOver
+						.getIdAction()));
+				dao.refreshDataDb(getApplicationContext());
+				ApplicationInfoFragment newFragment = new ApplicationInfoFragment();
+				getSupportFragmentManager()
+						.beginTransaction()
+						.replace(R.id.fragment_container_application,
+								newFragment).commit();
 
+			}catch(Exception e){
+				//TODO handle exception 
+			}
+		}
+	}
+	
+	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+
+	    @Override
+	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+	        MenuInflater inflater = mode.getMenuInflater();
+	        inflater.inflate(R.menu.manage_application_context, menu);
+	        return true;
+	    }
+
+	    @Override
+	    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+	        return false; // Return false if nothing is done
+	    }
+
+	    @Override
+	    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+	        switch (item.getItemId()) {
+	            case R.id.action_deselect:
+	                removeSelectedItem();
+	                mode.finish(); // Action picked, so close the CAB
+	                return true;
+	            default:
+	                return false;
+	        }
+	    }
+
+	    @Override
+	    public void onDestroyActionMode(ActionMode mode) {
+	    	mActionLongOver = null;
+	        mActionMode = null;
+	    }
+	};
+
+	@Override
+	public boolean longPressApplicationActionItem(ActionVo item, View eventView) {
+		if (mActionMode == null && item.isSaved()) {
+			mActionLongOver = item;
+			mActionMode = ManageActionActivity.this
+					.startActionMode(mActionModeCallback);
+			return true;
+		}else{
+			return false;
+		}
+	}
 }

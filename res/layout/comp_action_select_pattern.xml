@@ -23,22 +23,30 @@
 
         <TextView
             android:id="@+id/app_name"
-            android:layout_width="match_parent"
+            android:layout_width="20dp"
             android:layout_height="match_parent"
             android:padding="16dp"
             android:textSize="18sp" />
+        
     </LinearLayout>
+    
+	<TextView
+	    android:id="@+id/selected_pattern"
+	    android:layout_width="fill_parent"
+	    android:layout_height="50dp"
+	    android:padding="16dp"
+	    android:textSize="18sp" />
     
      <com.il.appshortcut.android.views.LuncherPatternView
         android:id="@+id/luncher_widget"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         android:layout_margin="10dp" />
      
      <Button 
         android:id="@+id/assignPattern"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="40dp"
         android:text="Assign Pattern"
         android:onClick="assignPattern"
         style="@style/button">

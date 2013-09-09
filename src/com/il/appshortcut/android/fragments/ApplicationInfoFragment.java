@@ -1,7 +1,6 @@
 package com.il.appshortcut.android.fragments;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.app.Activity;
 import android.content.pm.ApplicationInfo;
@@ -15,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -37,20 +37,16 @@ public class ApplicationInfoFragment extends Fragment {
 	public final static String ARG_POSITION = "position";
 	private ApplicationVo mCurrentApplication = null;
 
-	private ArrayList<ActionVo> applicationActionItems;
-	private ArrayList<ActionVo> applicationActionItemsSelected;
+	private ArrayList<ActionVo> applicationActionItems = new ArrayList<ActionVo>();
 	private ApplicationActionItemAdapter aa;
-	private ApplicationActionItemAdapter aaSelected;
+	View view;
 
 	public interface ApplicationInfoListener{
 		public void onApplicationActionItem(ActionVo item);
-		public void onApplicationActionItemSelected(ActionVo item);
-		public void updateNumberOfActionsByApplication(int number);
-
+		public boolean longPressApplicationActionItem(ActionVo item, View eventView);
 	}
 
 	ListView listView;
-	ListView listViewSelected;
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -64,87 +60,71 @@ public class ApplicationInfoFragment extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, 
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		AppShortcutApplication appState = (AppShortcutApplication)getActivity().getApplicationContext();
-		mCurrentApplication = (ApplicationVo) appState.getAppSelected();
 		
-		return inflater.inflate(R.layout.comp_action_info, container, false);
+		view = inflater.inflate(R.layout.comp_action_info, container, false);
+		listView = (ListView) view.findViewById(
+				R.id.list_application_actions);
+		
+		int resID = R.layout.comp_action_list_item;
+		aa = new ApplicationActionItemAdapter(view.getContext(), resID,
+				applicationActionItems);
+		listView.setAdapter(aa);
+		
+		listView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				ActionVo appItem = (ActionVo) listView
+						.getItemAtPosition(position);
+				mCallback.onApplicationActionItem(appItem);
+			}
+		});
+		
+		listView.setOnItemLongClickListener(new OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View eventView,
+					int position, long id) {
+				ActionVo appItem = (ActionVo) listView.getItemAtPosition(position);
+				return mCallback.longPressApplicationActionItem(appItem, eventView);
+			}
+		});
+		
+		return view;
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
-		updateApplicationView(mCurrentApplication);
+		AppShortcutApplication appState = (AppShortcutApplication) getActivity()
+				.getApplicationContext();
+		
+		mCurrentApplication = (ApplicationVo) appState.getAppSelected();
+		updateApplicationView();
 	}
 
 	/**
 	 * init list here is configured application actions (open, new message, etc...) 
 	 * @param application
 	 */
-	public void updateApplicationView(ApplicationVo application) {
-		
-		List<ActionVo> notSelectedActions = new ArrayList<ActionVo>(); 
-		List<ActionVo> selectedActions = new ArrayList<ActionVo>(); 
-		
-		int countActionsByApplication = 0;
-		
-		if (application.getActions() != null
-				&& application.getActions().getActions() != null ){
-			for (ActionVo a : application.getActions().getActions()){
-				if (a.isAssigned()){
-					countActionsByApplication++;
-					selectedActions.add(a);
-				}else{
-					notSelectedActions.add(a);
-				}
-			}
+	public void updateApplicationView() {
+		applicationActionItems.clear();
+		if (mCurrentApplication.getCommonActions() != null 
+				&& mCurrentApplication.getCommonActions().getActions() != null) {
+			applicationActionItems.addAll(mCurrentApplication.getCommonActions().getActions());
 		}
-		if(countActionsByApplication > 0){
-			mCallback.updateNumberOfActionsByApplication(countActionsByApplication);
-		}
-		
+		aa.notifyDataSetChanged();
+
 		TextView article = (TextView) getActivity().findViewById(R.id.app_name);
-		article.setText(application.getName());
-		ImageView image = (ImageView) getActivity().findViewById(R.id.icon_app_selected);
-		ApplicationInfo appInfo = application.getApplicationInfo();
-		Drawable icon = appInfo.loadIcon(getActivity().getApplicationContext().getPackageManager());
+		article.setText(mCurrentApplication.getName());
+		ImageView image = (ImageView) getActivity().findViewById(
+				R.id.icon_app_selected);
+		ApplicationInfo appInfo = mCurrentApplication.getApplicationInfo();
+		Drawable icon = appInfo.loadIcon(getActivity().getApplicationContext()
+				.getPackageManager());
 		Bitmap bmpIcon = ((BitmapDrawable) icon).getBitmap();
 		image.setImageBitmap(bmpIcon);
-
-		listView = (ListView) getActivity().findViewById(R.id.list_selected_actions);
-		applicationActionItems = new ArrayList<ActionVo>();
-		int resID = R.layout.comp_action_list_item;
-		aa = new ApplicationActionItemAdapter(getActivity(), resID, applicationActionItems);
-		listView.setAdapter(aa);
-		OnItemClickListener listener = new android.widget.AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
-				ActionVo appItem = (ActionVo) listView.getItemAtPosition(position);
-				mCallback.onApplicationActionItem(appItem);
-			}
-		};
-		listView.setOnItemClickListener(listener);
-		for (ActionVo item : notSelectedActions){
-			addApplicatoinActionItem(item, 0);
-		}
-		
-		listViewSelected = (ListView)getActivity().findViewById(R.id.list_possible_actions);
-		applicationActionItemsSelected = new ArrayList<ActionVo>();
-		resID = R.layout.comp_action_list_item;
-		aaSelected = new ApplicationActionItemAdapter(getActivity(), resID, applicationActionItemsSelected);
-		listViewSelected.setAdapter(aaSelected);
-		OnItemClickListener listenerSelected = new android.widget.AdapterView.OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
-				ActionVo appItem = (ActionVo) listViewSelected.getItemAtPosition(position);
-				mCallback.onApplicationActionItemSelected(appItem);
-			}
-		};
-		listViewSelected.setOnItemClickListener(listenerSelected);
-		for (ActionVo item : selectedActions){
-			addApplicatoinActionItem(item, 1);
-		}
 	}
 
 	public ApplicationVo getmCurrentApplication() {
@@ -155,23 +135,4 @@ public class ApplicationInfoFragment extends Fragment {
 		this.mCurrentApplication = mCurrentApplication;
 	}
 
-	/**
-	 * function to add items. 
-	 * @param item
-	 * @param type
-	 */
-	public void addApplicatoinActionItem(ActionVo item, int type){
-		if (item == null){
-			item = new ActionVo();
-			item.setActionName("Error");
-			item.setActionPackage(mCurrentApplication.getApplicationInfo().packageName);
-		}
-		if (type == 0){
-			applicationActionItems.add(0, item);
-			aa.notifyDataSetChanged();
-		}else{
-			applicationActionItemsSelected.add(0, item);
-			aaSelected.notifyDataSetChanged();
-		}
-	}
 }

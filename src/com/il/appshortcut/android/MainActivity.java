@@ -179,7 +179,7 @@ public class MainActivity extends Activity implements
 					item.setApplicationInfo(applicationInfo);
 					item.setApplicationPackage(applicationInfo.packageName);
 					item.setAssigned(false);
-					item.setActions(ActionsFactory.create(item));
+					item.setCommonActions(ActionsFactory.create(item));
 					allAppsList.add(item);
 				}
 			}

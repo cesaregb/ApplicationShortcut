@@ -27,16 +27,11 @@
             android:layout_height="match_parent"
             android:padding="16dp"
             android:textSize="18sp" />
+        
     </LinearLayout>
 		
-	<ListView
-	    android:id="@+id/list_selected_actions"
-	    android:background="@color/background_color"
-	    android:layout_width="match_parent"
-	    android:layout_height="wrap_content" />
-
      <ListView
-         android:id="@+id/list_possible_actions"
+         android:id="@+id/list_application_actions"
          android:layout_width="match_parent"
          android:layout_height="wrap_content" >
      </ListView>

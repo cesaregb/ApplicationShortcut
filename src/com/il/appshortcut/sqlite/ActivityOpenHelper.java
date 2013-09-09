@@ -8,7 +8,7 @@ import android.util.Log;
 
 public class ActivityOpenHelper extends SQLiteOpenHelper{
 	
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 	
 	public static final String TABLE_NAME = "activities";
 	
@@ -17,13 +17,15 @@ public class ActivityOpenHelper extends SQLiteOpenHelper{
 	public static final String FIELD_DESCRIPTION = "description";
 	public static final String FIELD_PATTERN = "pattern";
 	public static final String FIELD_ASSIGNED = "assigned";
+	public static final String FIELD_ID_ICON = "id_icon";
 	
 	private static final String ACTIVITY_TABLE_CREATE = "CREATE TABLE IF NOT EXISTS "
 			+ TABLE_NAME + " ( " + FIELD_ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL," 
 			+ FIELD_NAME + " TEXT, "
 			+ FIELD_DESCRIPTION + " TEXT, "
 			+ FIELD_PATTERN + " TEXT, "
-			+ FIELD_ASSIGNED + " int);";
+			+ FIELD_ASSIGNED + " int, "
+			+ FIELD_ID_ICON + " int);";
 			
 	public ActivityOpenHelper(Context context, String name,
 			CursorFactory factory, int version) {

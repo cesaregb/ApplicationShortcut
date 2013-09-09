@@ -14,10 +14,9 @@ public class AppShortcutApplication extends Application{
 	private List<ApplicationVo> currentListApplications;
 	private List<ActionVo> currentDBActions;
 	private ActivityVo currentActivity;
-	private int typeSelectAppReturn = AppManager.ACTIVITY_ACTION_FROM_MAIN; //0=main; 1=Activities;
-	
 	private AllAppsList allAppsList;
 	
+	private int typeSelectAppReturn = AppManager.ACTIVITY_ACTION_FROM_MAIN; //0=main; 1=Activities;
 
 	public ApplicationVo getAppSelected() {
 		return appSelected;
