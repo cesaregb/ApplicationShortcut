@@ -46,7 +46,7 @@ public class AppshortcutDAO {
 
 	public void savePattern(String pattern, Context context, int type)
 			throws AppShortcutException {
-		
+		overridePattern(pattern, context);
 		SharedPreferences sharedPref = context.getSharedPreferences(
 				AppManager.ID_PRE_FFILE, Context.MODE_PRIVATE);
 		SharedPreferences.Editor editor = sharedPref.edit();
@@ -89,5 +89,16 @@ public class AppshortcutDAO {
 		AppShortcutApplication appState = ((AppShortcutApplication) context);
 		appState.setCurrentDBActions(actionsDao.getAllActionsByType(AppshortcutDAO.TYPE_ACTION));
 	}
-
+	
+	public void overridePattern(String pattern, Context context){
+		SharedPreferences sharedPref = context.getSharedPreferences(AppManager.ID_PRE_FFILE, Context.MODE_PRIVATE);
+		int tmpVal = sharedPref.getInt(pattern, 0);
+		if (tmpVal == AppshortcutDAO.TYPE_ACTION){
+			ActionsDAO actionsDao = new ActionsDAO(context);
+			actionsDao.removeActionByPattern(pattern);
+		}else{
+			ActivitiesDAO activityDao = new ActivitiesDAO(context);
+			activityDao.removeActionByPattern(pattern);
+		}
+	}
 }

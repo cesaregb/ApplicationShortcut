@@ -1,6 +1,5 @@
 package com.il.appshortcut.views;
 
-import java.util.List;
 
 public class ActivityVo {
 	
@@ -9,7 +8,7 @@ public class ActivityVo {
 	private String description;
 	private String pattern;
 	private boolean assigned;
-	private List<ActionVo> actions;
+	private ActivityDetailListVo activityDetailListVo;
 	private int idIcon;
 	
 	public ActivityVo(){}
@@ -35,12 +34,6 @@ public class ActivityVo {
 	}
 	public void setDescription(String description) {
 		this.description = description;
-	}
-	public List<ActionVo> getActions() {
-		return actions;
-	}
-	public void setActions(List<ActionVo> actions) {
-		this.actions = actions;
 	}
 	public String getPattern() {
 		return pattern;
@@ -68,4 +61,16 @@ public class ActivityVo {
 		this.idIcon = idIcon;
 	}
 
+	public boolean isSavedActivity(){
+		return (this != null 
+					&& this.idActivity > 0);
+	}
+
+	public ActivityDetailListVo getActivityDetailListVo() {
+		return activityDetailListVo;
+	}
+
+	public void setActivityDetailListVo(ActivityDetailListVo activityDetailListVo) {
+		this.activityDetailListVo = activityDetailListVo;
+	}
 }

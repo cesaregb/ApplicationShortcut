@@ -2,6 +2,11 @@ package com.il.appshortcut.views;
 
 import android.graphics.drawable.Drawable;
 
+/**
+ * @author Administrator
+ * helper object to assign icons to activities.  
+ */
+
 public class ActivityIconVo {
 	private int idIcon;
 	private int idResource;

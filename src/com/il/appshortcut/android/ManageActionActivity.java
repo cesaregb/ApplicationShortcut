@@ -176,7 +176,6 @@ public class ManageActionActivity extends FragmentActivity
 										public void onClick(
 												DialogInterface dialog,
 												int which) {
-											removeActionByPattern();
 											saveAction();
 											onBackPressed();
 										}
@@ -191,15 +190,6 @@ public class ManageActionActivity extends FragmentActivity
 				//TODO Add String...
 				Toast.makeText(getApplicationContext(), "Error Saving Information", Toast.LENGTH_SHORT).show();
 			}
-		}
-	}
-	
-	public void removeActionByPattern(){
-		try{
-			ActionsDAO actionsDao = new ActionsDAO(getApplicationContext());
-			actionsDao.removeActionByPattern(selectedPattern);
-		}catch(Exception e){
-			//TODO exception handle... 
 		}
 	}
 	
@@ -238,7 +228,6 @@ public class ManageActionActivity extends FragmentActivity
 						.beginTransaction()
 						.replace(R.id.fragment_container_application,
 								newFragment).commit();
-
 			}catch(Exception e){
 				//TODO handle exception 
 			}
@@ -250,7 +239,7 @@ public class ManageActionActivity extends FragmentActivity
 	    @Override
 	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 	        MenuInflater inflater = mode.getMenuInflater();
-	        inflater.inflate(R.menu.manage_application_context, menu);
+	        inflater.inflate(R.menu.manage_common_list_context, menu);
 	        return true;
 	    }
 

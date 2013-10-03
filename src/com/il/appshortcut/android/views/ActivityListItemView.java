@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.il.appshortcut.R;
 
 public class ActivityListItemView extends TextView {
-
 	private Paint marginPaint;
 	private Paint linePaint;
 	private int paperColor;

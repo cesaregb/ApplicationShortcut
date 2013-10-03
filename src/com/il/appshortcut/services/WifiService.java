@@ -12,7 +12,8 @@ public class WifiService extends ServiceVo {
 	public boolean run(Context context) {
 		WifiManager wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 		if(wifi.isWifiEnabled()){
-			wifi.setWifiEnabled(false);
+			//TODO enable and disable are you fucking sure???? 
+//			wifi.setWifiEnabled(false);
 		}else{
 			wifi.setWifiEnabled(true);
 		}

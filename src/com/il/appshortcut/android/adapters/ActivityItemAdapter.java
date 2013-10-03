@@ -5,7 +5,6 @@ import java.util.List;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
@@ -18,7 +17,6 @@ public class ActivityItemAdapter extends ArrayAdapter<ActivityVo> {
 
 	ActivityListListener mCallback;
 	public interface ActivityListListener{
-		public void itemSelected(ActivityVo activity);
 	}
 	
 	public void setCallback(ActivityListListener callback){
@@ -65,18 +63,7 @@ public class ActivityItemAdapter extends ArrayAdapter<ActivityVo> {
 
 		descriptionText.setText(activityDescription);
 		nameText.setText(activityName);
-		final ActivityVo itemParam = item;
-		if (mCallback != null){
-			OnClickListener listener = new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					mCallback.itemSelected(itemParam);
-				}
-			};
-			activityListView.setOnClickListener(listener);
-			descriptionText.setOnClickListener(listener);
-			nameText.setOnClickListener(listener);
-		}
+		if (mCallback != null){ }
 		
 		return activityListView;
 	}

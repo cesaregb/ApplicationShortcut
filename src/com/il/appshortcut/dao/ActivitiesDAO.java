@@ -1,6 +1,8 @@
 package com.il.appshortcut.dao;
 
-import static com.il.appshortcut.converter.ActivitiesConverter.*;
+import static com.il.appshortcut.converter.ActivitiesConverter.convertActivity2ContentValues;
+import static com.il.appshortcut.converter.ActivitiesConverter.convertCursor2Activity;
+import static com.il.appshortcut.converter.ActivitiesConverter.convertCursor2ListActivity;
 
 import java.util.List;
 
@@ -10,7 +12,9 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.il.appshortcut.sqlite.ActionsOpenHelper;
 import com.il.appshortcut.sqlite.ActivityOpenHelper;
+import com.il.appshortcut.views.ActionVo;
 import com.il.appshortcut.views.ActivityVo;
 
 public class ActivitiesDAO {
@@ -74,5 +78,42 @@ public class ActivitiesDAO {
 		return list;
 	}
 	
+	public ActivityVo getActivityByPattern(String pattern) {
+		ActivityVo result = null;
+		this.open();
+		if (pattern != null) {
+			Cursor cursor = database.query(ActivityOpenHelper.TABLE_NAME,
+					allColumns, ActivityOpenHelper.FIELD_PATTERN + "=?",
+					new String[] { pattern },
+					null, null, null, null);
+			if (cursor != null) { 
+				result = convertCursor2Activity(cursor); 
+			}
+		}
+		this.close();
+		return result;
+	}
+	
+	public ActionVo removeActionByPattern(String pattern) {
+		this.open();
+		ActionVo result = null;
+		if (pattern != null) {
+			database.delete(ActivityOpenHelper.TABLE_NAME,
+					ActivityOpenHelper.FIELD_PATTERN + "=?", new String[] { pattern });
+		}
+		this.close();
+		return result;
+	}
+	
+	public ActionVo removeActionByActivity(ActivityVo activity) {
+		this.open();
+		ActionVo result = null;
+		if (activity != null && activity.getIdActivity() > 0) {
+			database.delete(ActivityOpenHelper.TABLE_NAME,
+					ActivityOpenHelper.FIELD_ID + "=?", new String[] { String.valueOf(activity.getIdActivity()) });
+		}
+		this.close();
+		return result;
+	}
 	
 }

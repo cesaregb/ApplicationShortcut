@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -28,13 +30,13 @@ import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.dao.ActionsDAO;
 import com.il.appshortcut.dao.ActivitiesDAO;
 import com.il.appshortcut.dao.ActivityDetailsDAO;
+import com.il.appshortcut.dao.AppshortcutDAO;
 import com.il.appshortcut.helpers.ServicesHelper;
 import com.il.appshortcut.services.ServiceVo;
-import com.il.appshortcut.views.ActionVo;
+import com.il.appshortcut.views.ActivityDetailListVo;
 import com.il.appshortcut.views.ActivityDetailVo;
 import com.il.appshortcut.views.ActivityIconVo;
 import com.il.appshortcut.views.ActivityVo;
-import com.il.appshortcut.views.AllAppsList;
 import com.il.appshortcut.views.ApplicationVo;
 
 public class ManageActivityActivity extends FragmentActivity implements
@@ -48,10 +50,11 @@ public class ManageActivityActivity extends FragmentActivity implements
 	ActionsDAO actionsDao;
 	ActivityDetailsDAO activitiesDetailsDao;
 	
-	ActivityVo activitySelected;
+	ActivityVo mCurrentActivity;
 	
-	private List<ServiceVo> selectedServices;
-	private List<ApplicationVo> selectedActions;
+	private List<ServiceVo> mCurrentSelectedServices;
+	private List<ApplicationVo> mCurrentApplications;
+	private ActivityDetailListVo mActivityDetailListVo;
 	private int topOrderServices = 0;
 	private int topOrderApplications = 0;
 	ServicesHelper servicesHelper;
@@ -59,74 +62,58 @@ public class ManageActivityActivity extends FragmentActivity implements
 	private ActivityIconVo selectedIcon;
 	protected ActivityFormFragment formFragment;
 	SelectServicesFragment selectServicesFragment;
-	
 	private boolean detailsUpdated = false;
+	private AppShortcutApplication appState;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_manage_activity);
-		
-		selectedServices = new ArrayList<ServiceVo>();
-		selectedActions = new ArrayList<ApplicationVo>();
-		
+		mCurrentSelectedServices = new ArrayList<ServiceVo>();
+		mCurrentApplications = new ArrayList<ApplicationVo>();
 		servicesHelper = new ServicesHelper(getApplicationContext());
-		
 		activitiesDao = new ActivitiesDAO(getApplicationContext());
 		actionsDao = new ActionsDAO(getApplicationContext());
 		activitiesDetailsDao = new ActivityDetailsDAO(getApplicationContext());
+		appState = ((AppShortcutApplication) getApplicationContext());
+		mActivityDetailListVo = new ActivityDetailListVo();
 		
 		if (findViewById(R.id.fragment_container_activity) != null) {
-			if (savedInstanceState != null) { return; }
-			
-			final ActionBar actionBar = getActionBar();
-			
-			actionBar.setDisplayHomeAsUpEnabled(true);
-			formFragment = new ActivityFormFragment();
-			
-			AppShortcutApplication appState = ((AppShortcutApplication) getApplicationContext());
-			activitySelected = appState.getCurrentActivity();
-			
-			if (activitySelected != null 
-					&& activitySelected.getIdActivity() > 0){
+			try{
+				if (savedInstanceState != null) { return; }
+				final ActionBar actionBar = getActionBar();
+				actionBar.setDisplayHomeAsUpEnabled(true);
 				
-				List<ActivityDetailVo> listDetails = activitiesDetailsDao
-						.getAllActivityDetailsByActivity(String.valueOf(activitySelected.getIdActivity()));
+				formFragment = new ActivityFormFragment();
+				getAppContextCurrentActivity();
 				
-				AllAppsList allAppsList = appState.getAllAppsList();
-				
-				if (listDetails != null && listDetails.size() > 0) {
-					for (ActivityDetailVo item : listDetails) {
-						if (item.getType() == ActivitiesDAO.TYPE_ACTION) {
-							ActionVo action = actionsDao.getActionById(item
-									.getIdAction());
-							for (ApplicationVo application : allAppsList.data) {
-								boolean addItem = false;
-								if (application.getComponentName().getClassName() != null) {
-									addItem = application.getComponentName().getClassName()
-											.equalsIgnoreCase(action.getClassName());
-								} else {
-									addItem = application
-											.getApplicationPackage()
-											.equalsIgnoreCase(action.getActionPackage());
-								}
-								if (addItem) {
-									selectedActions.add(application);
-									item.setApplication(application);
-								}
-							}
-						} else {
-							ServiceVo service = servicesHelper.getServiceById(item
-									.getIdAction());
-							selectedServices.add(service);
-							item.setService(service);
-						}
-						
-					}
-				}
-			}
-			formFragment.setActivitiesDetails(mergeLists());
+				if (mCurrentActivity != null 
+						&& mCurrentActivity.isSavedActivity()){
+					
+					// get ActivityDetails list with proper object mapping 
+					mActivityDetailListVo.data = activitiesDetailsDao
+							.getAllActivityDetailsByActivity(
+									String.valueOf(mCurrentActivity.getIdActivity()),
+									appState.getAllAppsList(),
+									getApplicationContext());
 
+					if (mActivityDetailListVo.size() > 0) {
+						mCurrentApplications.addAll(mActivityDetailListVo.getListApplications());
+						mCurrentSelectedServices.addAll(mActivityDetailListVo.getListServices());
+					}
+				}else{
+					mCurrentActivity = new ActivityVo();
+				}
+			}catch(Exception e){
+				e.printStackTrace();
+				Log.d(AppManager.LOG_EXCEPTIONS, "Exception: " + this.getClass()
+						+ " method: onCreate");
+				Toast.makeText(getApplicationContext(),
+						"Error retriving activity", Toast.LENGTH_SHORT).show();
+				mCurrentActivity = new ActivityVo();
+			}
+			mCurrentActivity.setActivityDetailListVo(mActivityDetailListVo);
+			formFragment.setmCurrentActivity(mCurrentActivity);
 			getSupportFragmentManager().beginTransaction()
 					.add(R.id.fragment_container_activity, formFragment)
 					.commit();
@@ -138,17 +125,16 @@ public class ManageActivityActivity extends FragmentActivity implements
 		getMenuInflater().inflate(R.menu.manage_activity, menu);
 		return true;
 	}
-
-	public void callSaveActivity(View view) {
-		AppShortcutApplication appState = ((AppShortcutApplication) getApplicationContext());
-		activitySelected = appState.getCurrentActivity();
-		if (activitySelected == null) {
-			activitySelected = new ActivityVo();
-		}
-		ActivitiesDAO activitiDao = new ActivitiesDAO(getApplicationContext());
+	
+	public void getAppContextCurrentActivity(){
+		mCurrentActivity = appState.getCurrentActivity();
+	}
+	
+	public void castCurrentActivityObject(){
+		View formView = findViewById(R.id.fragment_container_activity);
 		String textName = "";
 		String textDescription = "";
-		View formView = findViewById(R.id.fragment_container_activity);
+		
 		if (formView != null) {
 			EditText editTextName = (EditText) formView
 					.findViewById(R.id.activityName);
@@ -157,35 +143,51 @@ public class ManageActivityActivity extends FragmentActivity implements
 					.findViewById(R.id.acticityDescription);
 			textDescription = editTextDescription.getText().toString();
 		}
-		activitySelected.setName(textName);
-		activitySelected.setDescription(textDescription);
-		if (selectedPattern != null && selectedPattern != ""){
-			activitySelected.setPattern(selectedPattern);
-		}
+		mCurrentActivity.setName(textName);
+		mCurrentActivity.setDescription(textDescription);
 		if(selectedIcon != null 
 				&& selectedIcon.getIdIcon() > 0){
-			activitySelected.setIdIcon(selectedIcon.getIdIcon());
+			mCurrentActivity.setIdIcon(selectedIcon.getIdIcon());
 		}
-		long idActivity = activitiDao.addUpdateActivity(activitySelected);
-		if (detailsUpdated) {
-			saveLists(mergeLists(), idActivity);
+		
+		AppShortcutApplication appState = ((AppShortcutApplication) getApplicationContext());
+		appState.setCurrentActivity(mCurrentActivity);
+	}
+	
+	public void callSaveActivity(View view) {
+		try{
+			getAppContextCurrentActivity();
+			if (mCurrentActivity == null) {
+				mCurrentActivity = new ActivityVo();
+			}
+			castCurrentActivityObject();
+			ActivitiesDAO activitiDao = new ActivitiesDAO(getApplicationContext());
+			if (selectedPattern != null && selectedPattern != "") {
+				mCurrentActivity.setPattern(selectedPattern);
+				AppshortcutDAO dao = new AppshortcutDAO();
+				dao.savePattern(selectedPattern, getApplicationContext(),
+						AppshortcutDAO.TYPE_ACTIVITY);
+			}
+			
+			long idActivity = activitiDao.addUpdateActivity(mCurrentActivity);
+			if (detailsUpdated) {
+				saveLists(mergeLists(), idActivity);
+			}
+		}catch (Exception e){
+			Toast.makeText(getApplicationContext(), "Error saving activity.",
+					Toast.LENGTH_SHORT).show();
 		}
 		onBackPressed();
 	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-	}
+	
 	
 	/**
-	 * show app list for selection 
-	 * @param view
+	 * Add application selected
 	 */
-	public void addApplication(View view){
+	public void openAddApplication(View view){
+		castCurrentActivityObject();
 		AppShortcutApplication appState = ((AppShortcutApplication) getApplicationContext());
 		appState.setAppSelected(null);
-
 		Intent intent = new Intent(ManageActivityActivity.this,
 				ManageActionListActivity.class);
 		intent.putExtra(AppManager.ACTIVITY_ACTION_PARAM,
@@ -194,58 +196,68 @@ public class ManageActivityActivity extends FragmentActivity implements
 	}
 	
 	/**
-	 * thos service list for selection
-	 * @param view
+	 * Add services selected
 	 */
-	public void addService(View view) {
+	public void openAddService(View view) {
+		castCurrentActivityObject();
 		selectServicesFragment = new SelectServicesFragment();
 		getSupportFragmentManager()
 				.beginTransaction().replace(R.id.fragment_container_activity, selectServicesFragment).commit();
 	}
 
+	/**
+	 * update Services selected 
+	 */
 	public void callSelectServices(View view) {
+		getAppContextCurrentActivity();
 		detailsUpdated = true;
-		
-		selectedServices.clear();
-		selectedServices.addAll(selectServicesFragment.getSelections());
-		
-		Log.d(AppManager.LOG_ACTIVITIES, "Activity size: " + selectedServices.size());
-		
-		formFragment.setActivitiesDetails(mergeLists());
+		mCurrentSelectedServices.clear();
+		mCurrentSelectedServices.addAll(selectServicesFragment.getSelections());
+		Log.d(AppManager.LOG_ACTIVITIES, "Service: " + mCurrentSelectedServices.size());
+		mCurrentActivity.getActivityDetailListVo().data = mergeLists();
+		formFragment.setmCurrentActivity(mCurrentActivity);
 		getSupportFragmentManager().beginTransaction()
 				.replace(R.id.fragment_container_activity, formFragment)
 				.commit();
 	}
 	
+	/**
+	 * open dialog "Select application "
+	 */
 	public void callSelectApplication(int result) {
+		getAppContextCurrentActivity();
 		detailsUpdated = true;
 		AppShortcutApplication appState = ((AppShortcutApplication) getApplicationContext());
 		ApplicationVo appSelected = appState.getAppSelected();
 		if (appSelected != null) {
 			boolean found = false;
-			if (selectedActions.size() > 0) {
-				for (ApplicationVo app : selectedActions) {
-					if (app.equals(appSelected)) {
+			if (mCurrentApplications.size() > 0) {
+				for (ApplicationVo application : mCurrentApplications) {
+					if (application.equals(appSelected)) {
 						found = true;
 					}
 				}
 			}
 			if (!found) {
-				selectedActions.add(appSelected);
+				mCurrentApplications.add(appSelected);
 			}
 		}
-		formFragment.setActivitiesDetails(mergeLists());
+		mCurrentActivity.getActivityDetailListVo().data = mergeLists();
+		formFragment.setmCurrentActivity(mCurrentActivity);
+		formFragment.updateArticleView();
 	}
 	
+	/**
+	 * merge applications and services into activityDetails
+	 */
 	public List<ActivityDetailVo> mergeLists(){
 		List<ActivityDetailVo> result = new ArrayList<ActivityDetailVo>();
-		
-		if(selectedServices != null){
-			for (ServiceVo service : selectedServices){
+		if(mCurrentSelectedServices != null){
+			for (ServiceVo service : mCurrentSelectedServices){
 				if (service != null){
 					ActivityDetailVo detail = new ActivityDetailVo();
-					if(activitySelected != null){
-						detail.setIdActivity(activitySelected.getIdActivity());
+					if(mCurrentActivity != null){
+						detail.setIdActivity(mCurrentActivity.getIdActivity());
 					}
 					detail.setIdAction(service.ID);
 					detail.setType(ActivitiesDAO.TYPE_SERVICE);
@@ -257,12 +269,12 @@ public class ManageActivityActivity extends FragmentActivity implements
 			}
 		}
 		
-		if (selectedActions != null){
-			for (ApplicationVo application : selectedActions){
+		if (mCurrentApplications != null){
+			for (ApplicationVo application : mCurrentApplications){
 				if (application != null){
 					ActivityDetailVo detail = new ActivityDetailVo();
-					if(activitySelected != null){
-						detail.setIdActivity(activitySelected.getIdActivity());
+					if(mCurrentActivity != null){
+						detail.setIdActivity(mCurrentActivity.getIdActivity());
 					}
 					detail.setType(ActivitiesDAO.TYPE_ACTION);
 					detail.setIcon(application.getIcon());
@@ -276,9 +288,13 @@ public class ManageActivityActivity extends FragmentActivity implements
 		return result;
 	}
 	
+	/**
+	 * if any service || app was updated save new information
+	 * this is done discarting (deletting) existing information and saving current state.
+	 */
 	public void saveLists(List<ActivityDetailVo> listDetails, long activityId){
 		try {
-			// REMOVE INFORMATION 
+			// Delete Actions (applications)  
 			List<ActivityDetailVo> lDetails = activitiesDetailsDao
 						.getAllActivityDetailsByActivity(String.valueOf(activityId));
 			if (lDetails != null){
@@ -288,23 +304,31 @@ public class ManageActivityActivity extends FragmentActivity implements
 					}
 				}
 			}
-			
+			// Delete * from ActivityDetails 
 			activitiesDetailsDao
 					.removeActivityDetailsByActivity(safeLongToInt(activityId));
 			
 			for (ActivityDetailVo detailItem : listDetails) {
+				// if app save action in actions table. 
 				detailItem.setIdActivity(safeLongToInt(activityId));
 				if (detailItem.getType() == ActivitiesDAO.TYPE_ACTION) {
 					detailItem.getApplication().getCurrentAction()
 							.setType(ActivityDetailsDAO.DETAIL_TYPE_ACTIVITY);
+					detailItem.getApplication().getCurrentAction().setIdAction(0);
 					long idAction = actionsDao.addUpdateAction(detailItem
 							.getApplication().getCurrentAction());
 					detailItem.setIdAction(safeLongToInt(idAction));
 				}
+				// add item regardless app or serviece. 
 				activitiesDetailsDao.addUpdateActivityDetail(detailItem);
 			}
 		} catch (Exception e) {
-			// TODO exception handle...
+			Toast.makeText(getApplicationContext(),
+					"An exception has occured saving the information",
+					Toast.LENGTH_SHORT).show();
+			e.printStackTrace();
+			Log.d(AppManager.LOG_EXCEPTIONS, "Exception: " + this.getClass()
+					+ " method: saveLists");
 		}
 	}
 	
@@ -315,24 +339,29 @@ public class ManageActivityActivity extends FragmentActivity implements
 				callSelectApplication(result);
 			}
 			if (resultCode == RESULT_CANCELED) {
-				/*TODO no application selected!!*/  
+				Toast.makeText(getApplicationContext(),
+						"No Application selected", Toast.LENGTH_SHORT).show();
 			}
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see com.il.appshortcut.android.fragments.SelectServicesFragment.SelectServicesListener#refreshList(java.util.List)
+	 * this method is called from child to refresh the current Service list
+	 */
 	@Override
 	public void refreshList(List<ServiceVo> list) {
-		selectedServices = list;
+		mCurrentSelectedServices = list;
 	}
 
 	@Override
 	public void removeService(ActivityDetailVo detail) {
 		detailsUpdated = true;
 		int i = 0;
-		for (ServiceVo item : selectedServices) {
+		for (ServiceVo item : mCurrentSelectedServices) {
 			if (detail.getService() != null
 					&& item.equals(detail.getService())) {
-				selectedServices.remove(i);
+				mCurrentSelectedServices.remove(i);
 				break;
 			}
 			i++;
@@ -343,10 +372,10 @@ public class ManageActivityActivity extends FragmentActivity implements
 	public void removeAction(ActivityDetailVo detail) {
 		detailsUpdated = true;
 		int i = 0;
-		for (ApplicationVo item : selectedActions) {
+		for (ApplicationVo item : mCurrentApplications) {
 			if (detail.getApplication() != null
 					&& item.equals(detail.getApplication())) {
-				selectedActions.remove(i);
+				mCurrentApplications.remove(i);
 				break;
 			}
 			i++;
@@ -355,35 +384,71 @@ public class ManageActivityActivity extends FragmentActivity implements
 
 	@Override
 	public List<ServiceVo> getParentList() {
-		return selectedServices;
+		return mCurrentSelectedServices;
 	}
 	
-	public void assignPattern(View view){
-		if (activitySelected != null){
-			ApplicationSelectPatternFragment newFragment = new ApplicationSelectPatternFragment();
-			newFragment.setmCurrentInformation(convertActivity2SelectPatternInfoView(activitySelected, getResources()));
-			getSupportFragmentManager().beginTransaction()
-					.replace(R.id.fragment_container_activity, newFragment)
-					.commit();
-		}else{
-			//TODO Handle expception.
+	/**
+	 * assign selected pattern to the activity
+	 */
+	public void assignPattern(){
+		if (mCurrentActivity != null){
+			mCurrentActivity.setPattern(selectedPattern);
 		}
+		detailsUpdated = true;
+		formFragment.setmCurrentActivity(mCurrentActivity);
+		getSupportFragmentManager().beginTransaction()
+				.replace(R.id.fragment_container_activity, formFragment)
+				.commit();
 	}
 
 	@Override
 	public void onSomething(String something) {
-		// TODO Auto-generated method stub
+		// Method not used, used on interface:  com.il.appshortcut.android.fragments.ApplicationSelectPatternFragment.ApplicationSelectPatternFragmentListener
 	}
-
 	@Override
 	public void fireApplication(String currentSelection) {
-		// Not used
+		// Method not used: used on interface: com.il.appshortcut.android.views.LuncherPatternView.LuncherPatternListener
 	}
 
 	@Override
 	public void registerSelection(String currentSelection) {
 		this.selectedPattern = currentSelection;
-		
+	}
+	
+	/**
+	 * logic to assign pattern
+	 */
+	public void assignPattern(View view) {
+		if (selectedPattern != null) {
+			AppshortcutDAO dao = new AppshortcutDAO();
+			try{
+				Log.d(AppManager.LOG_MANAGE_APPLICATIONS, "saving applicatoin...");
+				if(dao.isPatternAssigned(selectedPattern, getApplicationContext())){
+					Toast.makeText(getApplicationContext(),
+							"Pattern assigned Show confirmation ",
+							Toast.LENGTH_SHORT).show();
+					
+					new AlertDialog.Builder(this)
+							.setIcon(android.R.drawable.ic_dialog_alert)
+							.setTitle("Confirmation")
+							.setMessage("Bla bla bla.... ")
+							.setPositiveButton("Confirm",
+									new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											assignPattern();
+										}
+									}).setNegativeButton("Cancel", null).show();
+
+				} else {
+					assignPattern();
+				}
+			}catch(Exception e){
+				Toast.makeText(getApplicationContext(), "Error Saving Information", Toast.LENGTH_SHORT).show();
+			}
+		}
 	}
 
 	@Override
@@ -391,14 +456,20 @@ public class ManageActivityActivity extends FragmentActivity implements
 		selectedIcon = icon;  
 	}
 	
+	/**
+	 * show Dialog for selecting icon.
+	 */
 	public void selectImage(View view){
 		ActivitySelectIconDialogFragment fa = new ActivitySelectIconDialogFragment();
 		fa.show(getSupportFragmentManager(), "Select Icon...");
 	}
 
+	/* 
+	 * assign icon for the activity
+	 */
 	@Override
 	public void onDialogPositiveClick(DialogFragment dialog, ActivityIconVo activityIcon) {
-		Toast.makeText(getApplicationContext(), "Selected: " + activityIcon.getIdIcon(), Toast.LENGTH_SHORT).show();
+		selectedIcon = activityIcon;
 		if (formFragment != null){
 			formFragment.updateIcon(activityIcon);
 		}
@@ -406,7 +477,21 @@ public class ManageActivityActivity extends FragmentActivity implements
 
 	@Override
 	public void onDialogNegativeClick(DialogFragment dialog) {
-		// TODO Auto-generated method stub
-		
+		// not used.. if cancel on select icon is pressed nothing to do
+	}
+	
+	public void openPatternPanel(View view){
+		if (mCurrentActivity != null){
+			castCurrentActivityObject();
+			ApplicationSelectPatternFragment newFragment = new ApplicationSelectPatternFragment();
+			newFragment.setmCurrentInformation(convertActivity2SelectPatternInfoView(mCurrentActivity, getResources()));
+			getSupportFragmentManager().beginTransaction()
+					.replace(R.id.fragment_container_activity, newFragment)
+					.commit();
+		}else{
+			Toast.makeText(getApplicationContext(),
+					"Error Activity not assigned plase try again",
+					Toast.LENGTH_SHORT).show();
+		}
 	}
 }

@@ -13,6 +13,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.il.appshortcut.sqlite.ActivityDetailsOpenHelper;
 import com.il.appshortcut.views.ActivityDetailVo;
+import com.il.appshortcut.views.AllAppsList;
 
 public class ActivityDetailsDAO {
 	private SQLiteDatabase database;
@@ -110,6 +111,19 @@ public class ActivityDetailsDAO {
 				new String[] { activityId }, null, null, null, null);
 		if (cursor != null) {
 			list = convertCursor2ListActivityDetails(cursor);
+		}
+		this.close();
+		return list;
+	}
+	
+	public List<ActivityDetailVo> getAllActivityDetailsByActivity(String activityId, AllAppsList allAppsList, Context context) {
+		List<ActivityDetailVo> list = null;
+		this.open();
+		Cursor cursor = database.query(ActivityDetailsOpenHelper.TABLE_NAME,
+				allColumns, ActivityDetailsOpenHelper.FIELD_ID_ACTIVITY + "=?",
+				new String[] { activityId }, null, null, null, null);
+		if (cursor != null) {
+			list = convertCursor2ListActivityDetails(cursor, allAppsList, context);
 		}
 		this.close();
 		return list;

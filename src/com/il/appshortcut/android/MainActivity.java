@@ -18,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,11 +27,19 @@ import android.widget.Toast;
 import com.il.appshortcut.R;
 import com.il.appshortcut.actions.ActionsFactory;
 import com.il.appshortcut.android.views.LuncherPatternView;
+import com.il.appshortcut.android.views.Utilities;
 import com.il.appshortcut.config.AppManager;
 import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.dao.ActionsDAO;
+import com.il.appshortcut.dao.ActivitiesDAO;
+import com.il.appshortcut.dao.ActivityDetailsDAO;
 import com.il.appshortcut.dao.AppshortcutDAO;
+import com.il.appshortcut.helpers.ServicesHelper;
+import com.il.appshortcut.services.ServiceVo;
 import com.il.appshortcut.views.ActionVo;
+import com.il.appshortcut.views.ActivityDetailListVo;
+import com.il.appshortcut.views.ActivityDetailVo;
+import com.il.appshortcut.views.ActivityVo;
 import com.il.appshortcut.views.AllAppsList;
 import com.il.appshortcut.views.ApplicationVo;
 
@@ -121,9 +130,39 @@ public class MainActivity extends Activity implements
 					Intent i = getPatternIntent(action, getPackageManager());
 					if (i != null){
 						startActivity(i);
-					}else{ Toast.makeText(getApplicationContext(), "Exception.. so bad right? ", Toast.LENGTH_SHORT).show(); }
+					}else{ Toast.makeText(getApplicationContext(), "mh.. application could not be ran ", Toast.LENGTH_SHORT).show(); }
 				}
 				if (typePattern == AppshortcutDAO.TYPE_ACTIVITY){
+					Toast.makeText(getApplicationContext(), "Its an activity", Toast.LENGTH_SHORT).show();
+					ActivitiesDAO activitiesDao = new ActivitiesDAO(getApplicationContext());
+					ActivityVo activity = activitiesDao.getActivityByPattern(currentSelection);
+					if (activity != null){
+						
+						ActivityDetailsDAO activitiesDetailsDao = new ActivityDetailsDAO(getApplicationContext());
+						ActivityDetailListVo mActivityDetailListVo =  new ActivityDetailListVo();
+						
+						mActivityDetailListVo.data = activitiesDetailsDao
+								.getAllActivityDetailsByActivity(
+										String.valueOf(activity.getIdActivity()),
+										allAppsList,
+										getApplicationContext());
+						
+						activity.setActivityDetailListVo(mActivityDetailListVo);
+						ServicesHelper servicesHelper = new ServicesHelper(getApplicationContext());
+						for (ActivityDetailVo item : mActivityDetailListVo.data) {
+							if (item.getType() == ActivitiesDAO.TYPE_ACTION) {
+								Intent i = getPatternIntent(item.getApplication().getCurrentAction(), getPackageManager());
+								if (i != null){
+									startActivity(i);
+								}else{ Toast.makeText(getApplicationContext(), "mh.. application could not be ran", Toast.LENGTH_SHORT).show(); }
+							} else {
+								ServiceVo service = servicesHelper.getServiceById(item
+										.getIdAction());
+								service.run(getApplicationContext());
+								Log.d(AppManager.LOG_DEBUGGIN, "service:" + service.getName());
+							}
+						}
+					}
 				}
 			}else{
 				Toast.makeText(getApplicationContext(), "Pattern not assigned", Toast.LENGTH_SHORT).show();
@@ -175,6 +214,7 @@ public class MainActivity extends Activity implements
 					ApplicationInfo applicationInfo = info.activityInfo.applicationInfo;
 					ApplicationVo item = new ApplicationVo(info.loadLabel(manager).toString());
 					item.setIcon(info.loadIcon(manager));
+					item.setIcon(Utilities.createIconThumbnail(item.getIcon(), getApplicationContext()));
 					item.setComponentName(new ComponentName(info.activityInfo.packageName, info.activityInfo.name));
 					item.setApplicationInfo(applicationInfo);
 					item.setApplicationPackage(applicationInfo.packageName);

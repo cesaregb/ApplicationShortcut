@@ -12,7 +12,6 @@ import android.widget.LinearLayout;
 
 import com.il.appshortcut.R;
 import com.il.appshortcut.android.views.ApplicationListItemView;
-import com.il.appshortcut.android.views.Utilities;
 import com.il.appshortcut.views.ApplicationVo;
 
 /**
@@ -48,10 +47,6 @@ public class ApplicationListItemAdapter extends ArrayAdapter<ApplicationVo> {
 		} else {
 			view = (LinearLayout) convertView;
 		}
-		if (item.getIcon() != null) {
-			item.setIcon(Utilities.createIconThumbnail(item.getIcon(), getContext()));
-		}
-
 		ApplicationListItemView applicationView = (ApplicationListItemView) view
 				.findViewById(R.id.row);
 		applicationView.setText(applicationName);

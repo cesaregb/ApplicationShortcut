@@ -158,7 +158,7 @@ public final class R {
         public static final int manage_acivities_list=0x7f0a0002;
         public static final int manage_activity=0x7f0a0003;
         public static final int manage_application=0x7f0a0004;
-        public static final int manage_application_context=0x7f0a0005;
+        public static final int manage_common_list_context=0x7f0a0005;
         public static final int manage_patterns=0x7f0a0006;
         public static final int proxy=0x7f0a0007;
     }

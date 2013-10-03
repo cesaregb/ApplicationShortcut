@@ -6,6 +6,7 @@ import java.util.List;
 import com.il.appshortcut.views.ApplicationVo;
 
 public class AppManager {
+	public static String LOG_DEBUGGIN = "LOG_DEBUGGIN";
 	public static String LOG_WIDGET = "LOG_WIDGET";
 	public static String LOG_APPLICATION_INFO_FRAGMENT = "LOG_APPLICATION_INFO_FRAGMENT";
 	public static String LOG_EXCEPTIONS = "LOG_EXCEPTIONS";

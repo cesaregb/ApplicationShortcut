@@ -16,7 +16,6 @@ import android.widget.ListView;
 import com.il.appshortcut.R;
 import com.il.appshortcut.android.adapters.ActivityActionItemAdapter;
 import com.il.appshortcut.android.listeners.SwipeDismissListViewTouchListener;
-import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.dao.ActivitiesDAO;
 import com.il.appshortcut.helpers.ActivityIconHelper;
 import com.il.appshortcut.views.ActivityDetailVo;
@@ -26,7 +25,6 @@ import com.il.appshortcut.views.ActivityVo;
 public class ActivityFormFragment extends Fragment {
 	
 	ActivityFormListener mCallback;
-	private List<ActivityDetailVo> activitiesDetails;
 	
 	public interface ActivityFormListener{
 		public void removeService(ActivityDetailVo detail);
@@ -35,7 +33,7 @@ public class ActivityFormFragment extends Fragment {
 	}
 	
 	public final static String ARG_POSITION = "position";
-	private ActivityVo mCurrentactivity;
+	private ActivityVo mCurrentActivity;
 	
 	private ArrayList<ActivityDetailVo> acticityApplicationActionsItems  = new ArrayList<ActivityDetailVo>();;
 	private ActivityActionItemAdapter applicationActionsItemsArrayAdapter;
@@ -124,9 +122,6 @@ public class ActivityFormFragment extends Fragment {
 		
 		listServices.setOnTouchListener(touchServicesListener);
 		listServices.setOnScrollListener(touchServicesListener.makeScrollListener());
-		
-		AppShortcutApplication appState = (AppShortcutApplication) view.getContext().getApplicationContext();
-		mCurrentactivity = appState.getCurrentActivity();
 		return view;
 	}
 	
@@ -141,31 +136,34 @@ public class ActivityFormFragment extends Fragment {
 	}
 
 	public void updateArticleView() {
-		if (mCurrentactivity != null) {
+		if (mCurrentActivity != null) {
 			EditText editTextName = (EditText) getActivity().findViewById(
 					R.id.activityName);
 			if (editTextName != null) {
-				editTextName.setText(mCurrentactivity.getName());
+				editTextName.setText(mCurrentActivity.getName());
 			}
+			editTextName.setSelected(false);
 			EditText editTextDescription = (EditText) getActivity()
 					.findViewById(R.id.acticityDescription);
 			if (editTextDescription != null) {
-				editTextDescription.setText(mCurrentactivity.getDescription());
+				editTextDescription.setText(mCurrentActivity.getDescription());
 			}
 
-			if (mCurrentactivity.getIdIcon() > 0) {
+			if (mCurrentActivity.getIdIcon() > 0) {
 				activityIcon.setImageResource(ActivityIconHelper
-						.getDrawable(mCurrentactivity.getIdIcon()));
+						.getDrawable(mCurrentActivity.getIdIcon()));
 			}
 		}
 		
-		if (activitiesDetails != null && activitiesDetails.size() > 0) {
+		if (mCurrentActivity.getActivityDetailListVo() != null 
+				&& mCurrentActivity.getActivityDetailListVo().data != null 
+				&& mCurrentActivity.getActivityDetailListVo().size() > 0) {
 			acticityApplicationServicesItems.clear();
 			acticityApplicationActionsItems.clear();
 			List<ActivityDetailVo> actions = new ArrayList<ActivityDetailVo>();
 			List<ActivityDetailVo> services = new ArrayList<ActivityDetailVo>();
 
-			for (ActivityDetailVo detail : activitiesDetails) {
+			for (ActivityDetailVo detail : mCurrentActivity.getActivityDetailListVo().data) {
 				if (detail.getType() == ActivitiesDAO.TYPE_ACTION) {
 					actions.add(detail);
 				} else {
@@ -190,14 +188,6 @@ public class ActivityFormFragment extends Fragment {
 		applicationServicesItemsArrayAdapter.notifyDataSetChanged();
 	}
 
-	public List<ActivityDetailVo> getActivitiesDetails() {
-		return activitiesDetails;
-	}
-
-	public void setActivitiesDetails(List<ActivityDetailVo> activitiesDetails) {
-		this.activitiesDetails = activitiesDetails;
-	}
-	
 	@Override
 	public void onResume() {
 		super.onResume();
@@ -209,5 +199,14 @@ public class ActivityFormFragment extends Fragment {
 		super.onActivityCreated(savedInstanceState);
 //		registerForContextMenu(getListView());
 	}
+
+	public ActivityVo getmCurrentActivity() {
+		return mCurrentActivity;
+	}
+
+	public void setmCurrentActivity(ActivityVo mCurrentActivity) {
+		this.mCurrentActivity = mCurrentActivity;
+	}
+
 
 }

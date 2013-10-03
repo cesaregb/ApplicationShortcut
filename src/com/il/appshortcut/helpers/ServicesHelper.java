@@ -20,7 +20,7 @@ public class ServicesHelper {
 	public ServicesHelper(Context context){
 		serviceList = new ArrayList<ServiceVo>();
 		
-		Drawable icon = context.getResources().getDrawable(R.drawable.cuadrito);
+		Drawable icon = context.getResources().getDrawable(R.drawable.navigation_accept);
 		
 		AirplaneModeService airplaneModeService = new AirplaneModeService();
 		airplaneModeService.setName("airplaneModeService");

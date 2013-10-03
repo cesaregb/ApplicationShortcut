@@ -79,7 +79,6 @@ public class ManageActionListActivity extends FragmentActivity implements
 		AppShortcutApplication appState = (AppShortcutApplication) getApplicationContext();
 		appState.setTypeSelectAppReturn(activityActionParam);
 		
-		
 		mGridPagerAdapter = new GridPagerAdapter(getSupportFragmentManager());
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mGridPagerAdapter);
@@ -345,5 +344,4 @@ public class ManageActionListActivity extends FragmentActivity implements
 		list = appState.getCurrentDBActions();
 		new LoadApplication().execute();
 	}
-
 }

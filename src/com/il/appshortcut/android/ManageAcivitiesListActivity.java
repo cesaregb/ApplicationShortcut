@@ -12,8 +12,11 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
+import android.view.ActionMode;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.il.appshortcut.R;
@@ -21,15 +24,18 @@ import com.il.appshortcut.android.adapters.ActivityItemAdapter;
 import com.il.appshortcut.android.fragments.ActivityListFragment;
 import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.dao.ActivitiesDAO;
+import com.il.appshortcut.dao.AppshortcutDAO;
 import com.il.appshortcut.views.ActivityVo;
 
 public class ManageAcivitiesListActivity extends FragmentActivity implements
-		ActivityItemAdapter.ActivityListListener {
+		ActivityItemAdapter.ActivityListListener, 
+		ActivityListFragment.ActivityListFragmentListener {
 
 	private ArrayList<ActivityVo> activityItems;
 	private ActivityItemAdapter aa;
 	private List<ActivityVo> listActivities;
 	ActivitiesDAO activitiesDao;
+	ActivityListFragment listFragment;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +45,9 @@ public class ManageAcivitiesListActivity extends FragmentActivity implements
 		ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
 		actionBar.setDisplayShowTitleEnabled(false);
-		
 		FragmentManager fm =  getSupportFragmentManager();
-		
-		ActivityListFragment listFragment = (ActivityListFragment) fm
-				.findFragmentById(R.id.ActivityFragment);
+		listFragment = (ActivityListFragment) fm.findFragmentById(R.id.ActivityFragment);
+		listFragment.setmCallback(this);
 		
 		activityItems = new ArrayList<ActivityVo>();
 		int resID = R.layout.comp_activities_list_item;
@@ -102,6 +106,8 @@ public class ManageAcivitiesListActivity extends FragmentActivity implements
 				onNewItemAdded(item);
 			}
 		}else{
+			activityItems.clear();
+			aa.notifyDataSetChanged();
 			Toast.makeText(getApplicationContext(), "No activities where found", Toast.LENGTH_SHORT).show();
 		}
 	}
@@ -150,7 +156,6 @@ public class ManageAcivitiesListActivity extends FragmentActivity implements
 		new LoadActivities().execute();
 	}
 
-	@Override
 	public void itemSelected(ActivityVo activity) {
 		AppShortcutApplication appState = ((AppShortcutApplication)getApplicationContext());
 		appState.setCurrentActivity(activity);
@@ -158,4 +163,81 @@ public class ManageAcivitiesListActivity extends FragmentActivity implements
 		startActivity(i);
 	}
 
+	protected Object mActionMode;
+	private ActivityVo mActivityLongOver;
+	
+	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+
+	    @Override
+	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+	        MenuInflater inflater = mode.getMenuInflater();
+	        inflater.inflate(R.menu.manage_common_list_context, menu);
+	        return true;
+	    }
+
+	    @Override
+	    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+	        return false; // Return false if nothing is done
+	    }
+
+	    @Override
+	    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+	        switch (item.getItemId()) {
+	            case R.id.action_deselect:
+	                removeSelectedLongOverItem();
+	                mode.finish(); // Action picked, so close the CAB
+	                return true;
+	            default:
+	                return false;
+	        }
+	    }
+
+	    @Override
+	    public void onDestroyActionMode(ActionMode mode) {
+	    	mActivityLongOver = null;
+	        mActionMode = null;
+	    }
+	};
+
+	
+	public boolean longPressApplicationActionItem(ActivityVo item, View eventView) {
+		return false;
+	}
+	
+	public void removeSelectedLongOverItem(){
+		if (mActivityLongOver != null){
+			try{
+				AppshortcutDAO dao = new AppshortcutDAO();
+				dao.removePattern(mActivityLongOver.getPattern(),
+						getApplicationContext());
+				activitiesDao.removeActionByActivity(mActivityLongOver);
+				new LoadActivities().execute();
+			}catch(Exception e){
+				Toast.makeText(getApplicationContext(),
+						"error deleting activity", Toast.LENGTH_SHORT).show();
+			}
+		}
+	}
+
+	@Override
+	public boolean onItemLongClickListener(Object object, int position, View eventView) {
+		ActivityVo activity = (ActivityVo)object;
+		if (mActionMode == null && activity.getIdActivity() > 0) {
+			mActivityLongOver = activity;
+			mActionMode = ManageAcivitiesListActivity.this
+					.startActionMode(mActionModeCallback);
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	@Override
+	public boolean onItemClickListener(Object object, int position,
+			View eventView) {
+		ActivityVo activity = (ActivityVo)object;
+		itemSelected(activity);
+		return false;
+	}
+	
 }

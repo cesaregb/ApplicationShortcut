@@ -12,6 +12,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
     <application
         android:name="com.il.appshortcut.config.AppShortcutApplication"
@@ -78,6 +80,7 @@
         </activity>
         <activity
             android:name="com.il.appshortcut.android.ManageActivityActivity"
+            android:windowSoftInputMode="stateHidden|adjustResize"
             android:label="@string/title_activity_manage_activity" >
         </activity>
     </application>

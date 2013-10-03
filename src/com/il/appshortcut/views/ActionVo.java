@@ -10,6 +10,7 @@ public class ActionVo {
 	private boolean assigned;
 	private int type;
 	private String className;
+	private ApplicationVo applicationView;
 	
 	public ActionVo(){ }
 	
@@ -85,6 +86,14 @@ public class ActionVo {
 	
 	public boolean isSaved(){
 		return (this != null && this.getIdAction() > 0);
+	}
+
+	public ApplicationVo getApplicationView() {
+		return applicationView;
+	}
+
+	public void setApplicationView(ApplicationVo applicationView) {
+		this.applicationView = applicationView;
 	}
 	
 }

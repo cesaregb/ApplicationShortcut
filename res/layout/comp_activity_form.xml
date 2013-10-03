@@ -2,8 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" 
+    android:descendantFocusability="beforeDescendants"
+	android:focusableInTouchMode="true"
     android:orientation="vertical">
-
+    
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,21 +19,22 @@
             android:layout_width="90dp"
             android:layout_height="90dp"
             android:onClick="selectImage"
-            android:text="Select Image" />
+            android:text="Select Image" >
+             <requestFocus />
+        </Button>
     </LinearLayout>
     
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
-
         <TextView
             android:id="@+id/activityName_txt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Name" />
-
         <EditText
             android:id="@+id/activityName"
+            android:nextFocusUp="@id/activityName" android:nextFocusLeft="@id/activityName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -105,7 +108,7 @@
                 style="@style/button"
                 android:layout_width="90dp"
                 android:layout_height="90dp"
-                android:onClick="addApplication"
+                android:onClick="openAddApplication"
                 android:text="Add" />
             
         </LinearLayout>
@@ -128,7 +131,7 @@
                 style="@style/button"
                 android:layout_width="90dp"
                 android:layout_height="90dp"
-                android:onClick="addService"
+                android:onClick="openAddService"
                 android:text="Add" />
         </LinearLayout>
 
@@ -159,14 +162,8 @@
             style="@style/button"
             android:layout_width="90dp"
             android:layout_height="90dp"
-            android:onClick="assignPattern"
+            android:onClick="openPatternPanel"
             android:text="Assign Pattern" >
         </Button>
-        
     </LinearLayout>
-    
-    
-    
-
-	
 </LinearLayout>
