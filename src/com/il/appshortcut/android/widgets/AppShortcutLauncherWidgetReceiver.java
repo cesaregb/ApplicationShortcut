@@ -5,6 +5,10 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -12,9 +16,15 @@ import android.widget.Toast;
 import com.il.appshortcut.R;
 import com.il.appshortcut.config.AppManager;
 import com.il.appshortcut.dao.ActionsDAO;
+import com.il.appshortcut.dao.ActivitiesDAO;
+import com.il.appshortcut.dao.ActivityDetailsDAO;
 import com.il.appshortcut.dao.AppshortcutDAO;
+import com.il.appshortcut.helpers.ActivityIconHelper;
 import com.il.appshortcut.views.ActionVo;
-import com.il.appshortcut.views.ApplicationVo;
+import com.il.appshortcut.views.ActivityDetailListVo;
+import com.il.appshortcut.views.ActivityVo;
+import com.il.appshortcut.views.EventIconVo;
+import com.il.appshortcut.views.EventWrapper;
 
 public class AppShortcutLauncherWidgetReceiver extends BroadcastReceiver {
 	public static int clickCount = 0;
@@ -23,7 +33,6 @@ public class AppShortcutLauncherWidgetReceiver extends BroadcastReceiver {
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
-
 		boolean updateWidget = false;
 		String currentAction = intent.getAction();
 		try{
@@ -55,45 +64,70 @@ public class AppShortcutLauncherWidgetReceiver extends BroadcastReceiver {
 				Log.d(AppManager.LOG_WIDGET, "Clear Selection");
 				WidgetUtils.clearSharedPref(context);
 				isMatchFound = false;
-				AppManager.getInstance().getListApplications().clear();
+				AppManager.getInstance().getListEvents().clear();
 				updateWidget = true;
+				
 			}
-			
 		}catch(Exception e){/*TODO add action */}
 		
 		if (updateWidget) {
+			EventWrapper eventWrapper = new EventWrapper();
+			EventIconVo eventIconVo = new EventIconVo();
+			eventWrapper.setEventIconVo(eventIconVo);
 			try {
 				KeyguardManager mKeyguardManager = (KeyguardManager) context
 							.getSystemService(Context.KEYGUARD_SERVICE);
 				
-				String applicationName = null;
 				AppshortcutDAO dao = new AppshortcutDAO();
 				ActionsDAO actionsDao = new ActionsDAO(context);
-				int typePattern = dao.getTypePatternAssigned(currentSelection,
-						context);
+				int typePattern = dao.getTypePatternAssigned(currentSelection, context);
 				if (typePattern > 0) {
-					//TODO assign more information as icon and stuff!!! 
 					if (typePattern == AppshortcutDAO.TYPE_ACTION) {
 						ActionVo action = actionsDao
 								.getActionByPattern(currentSelection);
-						applicationName = action.getActionName();
-						
+						ApplicationInfo app = context.getPackageManager()
+								.getApplicationInfo(action.getParentPackage(),
+										0);        
+				        Drawable icon = context.getPackageManager().getApplicationIcon(app);
+				        String name = context.getPackageManager().getApplicationLabel(app).toString();
+				        eventWrapper.getEventIconVo().setName(name);
+				        eventWrapper.getEventIconVo().setDrawable(icon);
+				        eventWrapper.setObject(action);
+				        eventWrapper.setType(AppshortcutDAO.TYPE_ACTION);
 					}
 					if (typePattern == AppshortcutDAO.TYPE_ACTIVITY) {
+						ActivitiesDAO activitiesDao = new ActivitiesDAO(context);
+						ActivityVo activity = activitiesDao
+								.getActivityByPattern(currentSelection);
+						if (activity != null) {
+							ActivityDetailsDAO activitiesDetailsDao = new ActivityDetailsDAO(
+									context);
+							ActivityDetailListVo mActivityDetailListVo = new ActivityDetailListVo();
+							mActivityDetailListVo.data = activitiesDetailsDao
+									.getAllActivityDetailsByActivity(String
+											.valueOf(activity.getIdActivity()),
+											context);
+
+							activity.setActivityDetailListVo(mActivityDetailListVo);
+
+							eventWrapper.getEventIconVo().setName(activity.getName());
+							Drawable icon = context.getResources().getDrawable(ActivityIconHelper.getDrawableResource(activity.getIdIcon()));
+							eventWrapper.getEventIconVo().setDrawable(icon);
+							eventWrapper.setObject(activity);
+							eventWrapper.setType(AppshortcutDAO.TYPE_ACTIVITY);
+						}
 					}
 				}
 				
-				
-				if (applicationName != null){
+				if (eventWrapper.getType() > 0){
 					isMatchFound = true;
-					ApplicationVo application = new ApplicationVo(applicationName);
-					application.setPatter(currentSelection);
-					AppManager.getInstance().getListApplications().add(application);
+					AppManager.getInstance().addEvent(eventWrapper);
+//					AppManager.getInstance().getListEvents().add(eventWrapper);
 				}
-				
 				if (mKeyguardManager.isKeyguardLocked()) { } else { }
 				
 				updateWidgetPictureAndButtonListener(context);
+				
 			} catch (Exception e) {
 				//TODO Add String...
 				e.printStackTrace();
@@ -103,7 +137,7 @@ public class AppShortcutLauncherWidgetReceiver extends BroadcastReceiver {
 			}
 		}
 	}
-
+	
 	private void updateWidgetPictureAndButtonListener(Context context) {
 		RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
 				R.layout.widget_app_shortcut_launcher);
@@ -132,34 +166,79 @@ public class AppShortcutLauncherWidgetReceiver extends BroadcastReceiver {
 		
 		if( isMatchFound ){
 			currentSelection = (currentSelection != null)?currentSelection:"";
-			Log.d(AppManager.LOG_WIDGET, "applicatoin List Size: " + AppManager.getInstance().getListApplications().size());
+			Log.d(AppManager.LOG_WIDGET, "applicatoin List Size: " + AppManager.getInstance().getListEvents().size());
 			int i = 0;
-			for (ApplicationVo app : AppManager.getInstance().getListApplications()){
+			for (EventWrapper event : AppManager.getInstance().getListEvents()){
 				if (i == 0){
+//					remoteViews.setImageViewResource(R.id.option1, R.drawable.content_new);
+					int iconResource = R.drawable.ic_launcher;
+					Log.d(AppManager.LOG_DEBUGGIN, "resource as: " + iconResource);
+					Drawable icon = context.getResources().getDrawable(R.drawable.ic_launcher);
+					try{
+						icon = event.getEventIconVo().getDrawable();
+					}catch (Exception e){
+						icon = context.getResources().getDrawable(R.drawable.ic_launcher);
+					}
+					Bitmap bitmap = ((BitmapDrawable)icon).getBitmap();
+					remoteViews.setImageViewBitmap(R.id.option1, bitmap);
 					remoteViews.setOnClickPendingIntent(R.id.option1,
 							AppShortcutLauncherWidgetProvider
-							.buildLunchApplicationBtnPendingIntent(context, app.getPatter()));
+							.buildLunchEventBtnPendingIntent(context, event.getPatter()));
 				}
 				if (i == 1){
+					int iconResource = R.drawable.ic_launcher;
+					Log.d(AppManager.LOG_DEBUGGIN, "resource as: " + iconResource);
+					Drawable icon = context.getResources().getDrawable(R.drawable.ic_launcher);
+					try{
+						icon = event.getEventIconVo().getDrawable();
+					}catch (Exception e){
+						icon = context.getResources().getDrawable(R.drawable.ic_launcher);
+					}
+					Bitmap bitmap = ((BitmapDrawable)icon).getBitmap();
+					remoteViews.setImageViewBitmap(R.id.option2, bitmap);
 					remoteViews.setOnClickPendingIntent(R.id.option2,
 							AppShortcutLauncherWidgetProvider
-							.buildLunchApplicationBtnPendingIntent(context, app.getPatter()));
+							.buildLunchEventBtnPendingIntent(context, event.getPatter()));
+					
+					
+//					remoteViews.setInt(R.id.option1, "setImageResource", R.drawable.content_new);
+//					remoteViews.setOnClickPendingIntent(R.id.option2,
+//							AppShortcutLauncherWidgetProvider
+//							.buildLunchEventBtnPendingIntent(context, event.getPatter()));
 				}
 				if (i == 2){
+					int iconResource = R.drawable.ic_launcher;
+					Log.d(AppManager.LOG_DEBUGGIN, "resource as: " + iconResource);
+					Drawable icon = context.getResources().getDrawable(R.drawable.ic_launcher);
+					try{
+						icon = event.getEventIconVo().getDrawable();
+					}catch (Exception e){
+						icon = context.getResources().getDrawable(R.drawable.ic_launcher);
+					}
+					Bitmap bitmap = ((BitmapDrawable)icon).getBitmap();
+					remoteViews.setImageViewBitmap(R.id.option3, bitmap);
 					remoteViews.setOnClickPendingIntent(R.id.option3,
 							AppShortcutLauncherWidgetProvider
-							.buildLunchApplicationBtnPendingIntent(context, app.getPatter()));
+							.buildLunchEventBtnPendingIntent(context, event.getPatter()));
+					
+//					remoteViews.setInt(R.id.option1, "setImageResource", R.drawable.content_new);
+//					remoteViews.setOnClickPendingIntent(R.id.option3,
+//							AppShortcutLauncherWidgetProvider
+//							.buildLunchEventBtnPendingIntent(context, event.getPatter()));
 				}
 				
-				Log.d(AppManager.LOG_WIDGET, i + "; Application: " + app.getName() + " ++ " + app.getPatter());
+				Log.d(AppManager.LOG_WIDGET, i + "; Application: " + event.getType() + " ++ " + event.getPatter());
 				i++;
 			}
 		}else{
 			Intent i = new Intent();
 			PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
-			remoteViews.setOnClickPendingIntent(R.id.option1,pi);
-			remoteViews.setOnClickPendingIntent(R.id.option2,pi);
-			remoteViews.setOnClickPendingIntent(R.id.option3,pi);
+			remoteViews.setOnClickPendingIntent(R.id.option1, pi);
+			remoteViews.setOnClickPendingIntent(R.id.option2, pi);
+			remoteViews.setOnClickPendingIntent(R.id.option3, pi);
+			remoteViews.setImageViewResource(R.id.option1, R.drawable.action_search);
+			remoteViews.setImageViewResource(R.id.option2, R.drawable.action_search);
+			remoteViews.setImageViewResource(R.id.option3, R.drawable.action_search);
 		}
 
 		AppShortcutLauncherWidgetProvider.pushWidgetUpdate(

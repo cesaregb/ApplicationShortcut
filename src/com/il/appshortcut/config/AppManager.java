@@ -3,7 +3,7 @@ package com.il.appshortcut.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.il.appshortcut.views.ApplicationVo;
+import com.il.appshortcut.views.EventWrapper;
 
 public class AppManager {
 	public static String LOG_DEBUGGIN = "LOG_DEBUGGIN";
@@ -25,7 +25,9 @@ public class AppManager {
 	public static int ACTIVITY_ACTION_FROM_MAIN = 0;
 	public static int ACTIVITY_ACTION_FROM_ACTIVITIES = 1;
 	
-	private List<ApplicationVo> listApplications;
+	public static String WIDGET_PROXY_SELECTION = "WIDGET_PROXY_SELECTION";
+
+	private List<EventWrapper> listEvents;
 	
 	private AppManager() { }
 
@@ -36,15 +38,29 @@ public class AppManager {
 		return _instance;
 	}
 
-	public List<ApplicationVo> getListApplications() {
-		if (listApplications == null){
-			listApplications = new ArrayList<ApplicationVo>();
+	public List<EventWrapper> getListEvents() {
+		if (listEvents == null){
+			listEvents = new ArrayList<EventWrapper>();
 		}
-		return listApplications;
+		return listEvents;
+	}
+	
+	public void addEvent(EventWrapper event) {
+		if (_instance != null){
+			listEvents = (listEvents != null)?listEvents: new ArrayList<EventWrapper>();
+			if (listEvents.size() >= 3){
+				listEvents.set(0, listEvents.get(1));
+				listEvents.set(1, listEvents.get(2));
+				listEvents.set(2, event);
+			}else{
+				listEvents.add(event);
+			}
+		}
 	}
 
-	public void setListApplications(List<ApplicationVo> listApplications) {
-		this.listApplications = listApplications;
+	public void setListEvents(List<EventWrapper> listEvents) {
+		this.listEvents = listEvents;
 	}
+
 
 }

@@ -115,6 +115,7 @@ public class ActivitiesConverter {
 		}
 		return result;
 	}
+	
 	public static List<ActivityDetailVo> convertCursor2ListActivityDetails(Cursor cursor, AllAppsList allAppsList, Context context){
 		List<ActivityDetailVo> result = null;
 		if (cursor.moveToFirst()) {
@@ -152,6 +153,53 @@ public class ActivitiesConverter {
 							item.setApplication(application);
 							break;
 						}
+					}
+				}else{
+					ServiceVo service = servicesHelper.getServiceById(item
+							.getIdAction());
+					item.setService(service);
+				}
+			} while (cursor.moveToNext());
+		}
+		return result;
+	}
+	
+	public static List<ActivityDetailVo> convertCursor2ListActivityDetails(Cursor cursor, Context context){
+		List<ActivityDetailVo> result = null;
+		if (cursor.moveToFirst()) {
+			result = new ArrayList<ActivityDetailVo>();
+			ServicesHelper servicesHelper = new ServicesHelper(context);
+			ActionsDAO actionsDao = new ActionsDAO(context);
+			do {
+				ActivityDetailVo item = new ActivityDetailVo();
+				item.setIdActivityDetail(cursor.getInt(cursor.getColumnIndex(ActivityDetailsOpenHelper.FIELD_ID)));
+				item.setIdActivity(cursor.getInt(cursor.getColumnIndex(ActivityDetailsOpenHelper.FIELD_ID_ACTIVITY)));
+				int typeApp = cursor.getInt(cursor.getColumnIndex(ActivityDetailsOpenHelper.FIELD_TYPE));
+				item.setType(typeApp);
+				item.setOrder(cursor.getInt(cursor.getColumnIndex(ActivityDetailsOpenHelper.FIELD_ORDER)));
+				item.setTop(cursor.getInt(cursor.getColumnIndex(ActivityDetailsOpenHelper.FIELD_TOP)));
+				item.setIdAction(cursor.getInt(cursor.getColumnIndex(ActivityDetailsOpenHelper.FIELD_ID_ACTION)));
+				result.add(item);
+				if (typeApp == ActivitiesDAO.TYPE_ACTION){
+					try{
+						ActionVo action = actionsDao.getActionById(item
+								.getIdAction());
+						ApplicationVo application = new ApplicationVo(action.getActionName());
+						application.setCurrentAction(action);
+						item.setApplication(application);
+//						try {
+//					        ApplicationInfo app = this.getPackageManager().getApplicationInfo("com.example.name", 0);        
+//
+//					        Drawable icon = packageManager.getApplicationIcon(app);
+//					        String name = packageManager.getApplicationLabel(app);
+//					        return icon;
+//					    } catch (NameNotFoundException e) {
+//					        Toast toast = Toast.makeText(this, "error in getting icon", Toast.LENGTH_SHORT);
+//					        toast.show();
+//					        e.printStackTrace();
+//					    }
+					}catch(Exception e){
+						//TODO handle exception 
 					}
 				}else{
 					ServiceVo service = servicesHelper.getServiceById(item

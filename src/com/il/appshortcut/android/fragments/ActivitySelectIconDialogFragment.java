@@ -21,18 +21,18 @@ import android.widget.ImageView;
 
 import com.il.appshortcut.R;
 import com.il.appshortcut.helpers.ActivityIconHelper;
-import com.il.appshortcut.views.ActivityIconVo;
+import com.il.appshortcut.views.EventIconVo;
 
 public class ActivitySelectIconDialogFragment extends DialogFragment {
 	public int lastSelected = -1;
 	ActivitySelectIconDialogImageAdapter gridAdapter;
-	List<ActivityIconVo> myObjects;
+	List<EventIconVo> myObjects;
 	
 
 	ActivitySelectIconDialogListener mCallback;
 	
 	public interface ActivitySelectIconDialogListener {
-		public void onDialogPositiveClick(DialogFragment dialog, ActivityIconVo activityIcon);
+		public void onDialogPositiveClick(DialogFragment dialog, EventIconVo activityIcon);
 		public void onDialogNegativeClick(DialogFragment dialog);
 	}
 
@@ -104,7 +104,7 @@ public class ActivitySelectIconDialogFragment extends DialogFragment {
 		}   
 		public View getView(int position, View convertView, ViewGroup   
 				parent) {
-			ActivityIconVo icon = myObjects.get(position);
+			EventIconVo icon = myObjects.get(position);
 			ImageView imageView;   
 			if (convertView == null) {  
 				imageView = new ImageView(mContext);   

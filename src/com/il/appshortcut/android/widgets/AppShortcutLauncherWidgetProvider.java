@@ -6,10 +6,13 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.il.appshortcut.R;
+import com.il.appshortcut.android.ProxyActivity;
+import com.il.appshortcut.config.AppManager;
 import com.il.appshortcut.dao.ActionsDAO;
 import com.il.appshortcut.dao.AppshortcutDAO;
 import com.il.appshortcut.views.ActionVo;
@@ -41,9 +44,7 @@ public class AppShortcutLauncherWidgetProvider extends AppWidgetProvider {
 					buildClearButtonPendingIntent(context));
 			
 			views.setTextViewText(R.id.selected_patter_widget, getDesc(context));
-			
 			appWidgetManager.updateAppWidget(appWidgetId, views);
-			
 		}
 	}
 
@@ -86,13 +87,14 @@ public class AppShortcutLauncherWidgetProvider extends AppWidgetProvider {
 				PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 	
-	public static PendingIntent buildLunchApplicationBtnPendingIntent(Context context, String currentSelection) {
+	public static PendingIntent buildLunchEventBtnPendingIntent(Context context, String currentSelection) {
 		Intent i = null;
 		try{
 			AppshortcutDAO dao = new AppshortcutDAO();
 			ActionsDAO actionsDao = new ActionsDAO(context);
 			int typePattern = dao.getTypePatternAssigned(currentSelection,
 					context);
+			
 			if (typePattern > 0) {
 				if (typePattern == AppshortcutDAO.TYPE_ACTION) {
 					ActionVo action = actionsDao
@@ -102,6 +104,11 @@ public class AppShortcutLauncherWidgetProvider extends AppWidgetProvider {
 									context.getPackageManager());
 				}
 				if (typePattern == AppshortcutDAO.TYPE_ACTIVITY) {
+					Log.d(AppManager.LOG_DEBUGGIN, "typePattern:" + typePattern + " inot the intent creation...");
+					i = new Intent(context, ProxyActivity.class);
+					i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+					i.putExtra(AppManager.WIDGET_PROXY_SELECTION, currentSelection);
 				}
 			}
 		} catch (Exception e){}

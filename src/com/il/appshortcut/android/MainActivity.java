@@ -1,11 +1,11 @@
 package com.il.appshortcut.android;
 
-import static com.il.appshortcut.helpers.ActionHelper.getPatternIntent;
-
 import java.util.Collections;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
@@ -31,18 +31,10 @@ import com.il.appshortcut.android.views.Utilities;
 import com.il.appshortcut.config.AppManager;
 import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.dao.ActionsDAO;
-import com.il.appshortcut.dao.ActivitiesDAO;
-import com.il.appshortcut.dao.ActivityDetailsDAO;
 import com.il.appshortcut.dao.AppshortcutDAO;
-import com.il.appshortcut.helpers.ServicesHelper;
-import com.il.appshortcut.services.ServiceVo;
-import com.il.appshortcut.views.ActionVo;
-import com.il.appshortcut.views.ActivityDetailListVo;
-import com.il.appshortcut.views.ActivityDetailVo;
-import com.il.appshortcut.views.ActivityVo;
+import com.il.appshortcut.helpers.RunnableHelper;
 import com.il.appshortcut.views.AllAppsList;
 import com.il.appshortcut.views.ApplicationVo;
-
 
 public class MainActivity extends Activity implements
 		LuncherPatternView.LuncherPatternListener {
@@ -50,6 +42,7 @@ public class MainActivity extends Activity implements
 	LuncherPatternView luncherWidget;
 	AppshortcutDAO dao = new AppshortcutDAO();
 	ActionsDAO actionsDao;
+	
 	
 	private AllAppsList allAppsList;
 	int activityActionParam = AppManager.ACTIVITY_ACTION_FROM_MAIN;
@@ -121,59 +114,24 @@ public class MainActivity extends Activity implements
 	
 	@Override
 	public void fireApplication(String currentSelection) {
-		try {
-			int typePattern = dao.getTypePatternAssigned(currentSelection, getApplicationContext());
-			if (typePattern > 0){
-				Toast.makeText(getApplicationContext(), "it is assigned", Toast.LENGTH_SHORT).show();
-				if (typePattern == AppshortcutDAO.TYPE_ACTION){
-					ActionVo action = actionsDao.getActionByPattern(currentSelection);
-					Intent i = getPatternIntent(action, getPackageManager());
-					if (i != null){
-						startActivity(i);
-					}else{ Toast.makeText(getApplicationContext(), "mh.. application could not be ran ", Toast.LENGTH_SHORT).show(); }
-				}
-				if (typePattern == AppshortcutDAO.TYPE_ACTIVITY){
-					Toast.makeText(getApplicationContext(), "Its an activity", Toast.LENGTH_SHORT).show();
-					ActivitiesDAO activitiesDao = new ActivitiesDAO(getApplicationContext());
-					ActivityVo activity = activitiesDao.getActivityByPattern(currentSelection);
-					if (activity != null){
-						
-						ActivityDetailsDAO activitiesDetailsDao = new ActivityDetailsDAO(getApplicationContext());
-						ActivityDetailListVo mActivityDetailListVo =  new ActivityDetailListVo();
-						
-						mActivityDetailListVo.data = activitiesDetailsDao
-								.getAllActivityDetailsByActivity(
-										String.valueOf(activity.getIdActivity()),
-										allAppsList,
-										getApplicationContext());
-						
-						activity.setActivityDetailListVo(mActivityDetailListVo);
-						ServicesHelper servicesHelper = new ServicesHelper(getApplicationContext());
-						for (ActivityDetailVo item : mActivityDetailListVo.data) {
-							if (item.getType() == ActivitiesDAO.TYPE_ACTION) {
-								Intent i = getPatternIntent(item.getApplication().getCurrentAction(), getPackageManager());
-								if (i != null){
-									startActivity(i);
-								}else{ Toast.makeText(getApplicationContext(), "mh.. application could not be ran", Toast.LENGTH_SHORT).show(); }
-							} else {
-								ServiceVo service = servicesHelper.getServiceById(item
-										.getIdAction());
-								service.run(getApplicationContext());
-								Log.d(AppManager.LOG_DEBUGGIN, "service:" + service.getName());
-							}
-						}
-					}
-				}
-			}else{
-				Toast.makeText(getApplicationContext(), "Pattern not assigned", Toast.LENGTH_SHORT).show();
-			}
-			
-		} catch (Exception e) {
-			Toast.makeText(getApplicationContext(),
-					"Exception.. so bad right? ", Toast.LENGTH_SHORT).show();
-		}
+		RunnableHelper runnableHelper = new RunnableHelper(getApplicationContext());
+		runnableHelper.setAllAppsList(allAppsList);
+		runnableHelper.setActionsDao(actionsDao);
+		List<Intent> lIntent = runnableHelper.getIntentList(currentSelection, getApplicationContext());
+		new RunnableHelper(getApplication(), lIntent).execute();
 	}
 
+	public void showProcessRuning(){
+		ActivityManager manager = (ActivityManager) this
+				.getSystemService(ACTIVITY_SERVICE);
+		List<RunningAppProcessInfo> processes = manager
+				.getRunningAppProcesses();
+
+		for (RunningAppProcessInfo process : processes) {
+			Log.d(AppManager.LOG_DEBUGGIN, "process Name: " + process.processName);
+		}
+	}
+	
 	@Override
 	public void registerSelection(String currentSelection) {
 		// Not Used
@@ -234,11 +192,10 @@ public class MainActivity extends Activity implements
 			addApplicationsToContext();
 			progressDialog.dismiss();
 		}
+		
 	}
-	
 	public void addApplicationsToContext(){
 		AppShortcutApplication appState = (AppShortcutApplication) getApplicationContext();
 		appState.setAllAppsList(allAppsList);
 	}
-
 }

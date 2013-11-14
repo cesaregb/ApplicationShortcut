@@ -35,7 +35,7 @@ import com.il.appshortcut.helpers.ServicesHelper;
 import com.il.appshortcut.services.ServiceVo;
 import com.il.appshortcut.views.ActivityDetailListVo;
 import com.il.appshortcut.views.ActivityDetailVo;
-import com.il.appshortcut.views.ActivityIconVo;
+import com.il.appshortcut.views.EventIconVo;
 import com.il.appshortcut.views.ActivityVo;
 import com.il.appshortcut.views.ApplicationVo;
 
@@ -59,7 +59,7 @@ public class ManageActivityActivity extends FragmentActivity implements
 	private int topOrderApplications = 0;
 	ServicesHelper servicesHelper;
 	private String selectedPattern = "";
-	private ActivityIconVo selectedIcon;
+	private EventIconVo selectedIcon;
 	protected ActivityFormFragment formFragment;
 	SelectServicesFragment selectServicesFragment;
 	private boolean detailsUpdated = false;
@@ -452,7 +452,7 @@ public class ManageActivityActivity extends FragmentActivity implements
 	}
 
 	@Override
-	public void selectIcon(ActivityIconVo icon) {
+	public void selectIcon(EventIconVo icon) {
 		selectedIcon = icon;  
 	}
 	
@@ -468,7 +468,7 @@ public class ManageActivityActivity extends FragmentActivity implements
 	 * assign icon for the activity
 	 */
 	@Override
-	public void onDialogPositiveClick(DialogFragment dialog, ActivityIconVo activityIcon) {
+	public void onDialogPositiveClick(DialogFragment dialog, EventIconVo activityIcon) {
 		selectedIcon = activityIcon;
 		if (formFragment != null){
 			formFragment.updateIcon(activityIcon);

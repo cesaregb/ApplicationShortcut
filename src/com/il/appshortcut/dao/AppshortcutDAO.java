@@ -3,12 +3,14 @@ package com.il.appshortcut.dao;
 import java.util.List;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 
 import com.il.appshortcut.android.widgets.WidgetUtils;
 import com.il.appshortcut.config.AppManager;
 import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.exception.AppShortcutException;
+import com.il.appshortcut.views.ApplicationVo;
 
 public class AppshortcutDAO {
 	
@@ -100,5 +102,13 @@ public class AppshortcutDAO {
 			ActivitiesDAO activityDao = new ActivitiesDAO(context);
 			activityDao.removeActionByPattern(pattern);
 		}
+	}
+	
+	public ApplicationVo convertIntent2Applicatoin(Intent intent){
+		ApplicationVo result = null;
+		if (intent != null){
+			
+		}
+		return result;
 	}
 }

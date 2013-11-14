@@ -19,7 +19,7 @@ import com.il.appshortcut.android.listeners.SwipeDismissListViewTouchListener;
 import com.il.appshortcut.dao.ActivitiesDAO;
 import com.il.appshortcut.helpers.ActivityIconHelper;
 import com.il.appshortcut.views.ActivityDetailVo;
-import com.il.appshortcut.views.ActivityIconVo;
+import com.il.appshortcut.views.EventIconVo;
 import com.il.appshortcut.views.ActivityVo;
 
 public class ActivityFormFragment extends Fragment {
@@ -29,7 +29,7 @@ public class ActivityFormFragment extends Fragment {
 	public interface ActivityFormListener{
 		public void removeService(ActivityDetailVo detail);
 		public void removeAction(ActivityDetailVo detail);
-		public void selectIcon(ActivityIconVo idDrawable);
+		public void selectIcon(EventIconVo idDrawable);
 	}
 	
 	public final static String ARG_POSITION = "position";
@@ -125,7 +125,7 @@ public class ActivityFormFragment extends Fragment {
 		return view;
 	}
 	
-	public void updateIcon(ActivityIconVo icon){
+	public void updateIcon(EventIconVo icon){
 		activityIcon.setImageResource(icon.getIdResource());
 	}
 	
@@ -151,7 +151,7 @@ public class ActivityFormFragment extends Fragment {
 
 			if (mCurrentActivity.getIdIcon() > 0) {
 				activityIcon.setImageResource(ActivityIconHelper
-						.getDrawable(mCurrentActivity.getIdIcon()));
+						.getDrawableResource(mCurrentActivity.getIdIcon()));
 			}
 		}
 		

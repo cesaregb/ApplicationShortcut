@@ -128,4 +128,17 @@ public class ActivityDetailsDAO {
 		this.close();
 		return list;
 	}
+	
+	public List<ActivityDetailVo> getAllActivityDetailsByActivity(String activityId, Context context) {
+		List<ActivityDetailVo> list = null;
+		this.open();
+		Cursor cursor = database.query(ActivityDetailsOpenHelper.TABLE_NAME,
+				allColumns, ActivityDetailsOpenHelper.FIELD_ID_ACTIVITY + "=?",
+				new String[] { activityId }, null, null, null, null);
+		if (cursor != null) {
+			list = convertCursor2ListActivityDetails(cursor, context);
+		}
+		this.close();
+		return list;
+	}
 }
