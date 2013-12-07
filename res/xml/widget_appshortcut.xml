@@ -1,8 +1,9 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:initialLayout="@layout/widget_app_shortcut_launcher"
-    android:minHeight="180dp"
-    android:minWidth="180dp"
+    android:initialLayout="@layout/widget_app_shortcut"
+    android:minHeight="40dp"
+    android:minWidth="40dp"
     android:resizeMode="horizontal|vertical"
+    android:configure= "com.il.appshortcut.android.SelectEventWidgetActivity"
     android:widgetCategory="home_screen|keyguard" >
 	
 </appwidget-provider>

@@ -21,9 +21,8 @@ import com.il.appshortcut.views.ActionVo;
  *
  */
 
-public class ApplicationActionItemAdapter extends ArrayAdapter<ActionVo>{
-	int resource; 
-	
+public class ApplicationActionItemAdapter extends ArrayAdapter<ActionVo> {
+	int resource;
 	
 	public ApplicationActionItemAdapter(Context context, int textViewResourceId) {
 		super(context, textViewResourceId);

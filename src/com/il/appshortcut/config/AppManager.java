@@ -29,6 +29,8 @@ public class AppManager {
 
 	private List<EventWrapper> listEvents;
 	
+	private EventWrapper shortcutEventWraper;
+	
 	private AppManager() { }
 
 	public static AppManager getInstance() {
@@ -60,6 +62,14 @@ public class AppManager {
 
 	public void setListEvents(List<EventWrapper> listEvents) {
 		this.listEvents = listEvents;
+	}
+
+	public EventWrapper getShortcutEventWraper() {
+		return shortcutEventWraper;
+	}
+
+	public void setShortcutEventWraper(EventWrapper shortcutEventWraper) {
+		this.shortcutEventWraper = shortcutEventWraper;
 	}
 
 

@@ -1,0 +1,2 @@
+Bugs
+The first image on activities is not being saved. 

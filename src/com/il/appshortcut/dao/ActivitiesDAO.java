@@ -12,7 +12,6 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.il.appshortcut.sqlite.ActionsOpenHelper;
 import com.il.appshortcut.sqlite.ActivityOpenHelper;
 import com.il.appshortcut.views.ActionVo;
 import com.il.appshortcut.views.ActivityVo;

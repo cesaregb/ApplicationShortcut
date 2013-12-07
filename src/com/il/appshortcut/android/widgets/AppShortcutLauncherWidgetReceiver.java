@@ -20,6 +20,7 @@ import com.il.appshortcut.dao.ActivitiesDAO;
 import com.il.appshortcut.dao.ActivityDetailsDAO;
 import com.il.appshortcut.dao.AppshortcutDAO;
 import com.il.appshortcut.helpers.ActivityIconHelper;
+import com.il.appshortcut.helpers.WidgetHelper;
 import com.il.appshortcut.views.ActionVo;
 import com.il.appshortcut.views.ActivityDetailListVo;
 import com.il.appshortcut.views.ActivityVo;
@@ -182,8 +183,8 @@ public class AppShortcutLauncherWidgetReceiver extends BroadcastReceiver {
 					Bitmap bitmap = ((BitmapDrawable)icon).getBitmap();
 					remoteViews.setImageViewBitmap(R.id.option1, bitmap);
 					remoteViews.setOnClickPendingIntent(R.id.option1,
-							AppShortcutLauncherWidgetProvider
-							.buildLunchEventBtnPendingIntent(context, event.getPatter()));
+							WidgetHelper.buildLunchEventBtnPendingIntent(
+									context, event.getPatter()));
 				}
 				if (i == 1){
 					int iconResource = R.drawable.ic_launcher;
@@ -197,8 +198,8 @@ public class AppShortcutLauncherWidgetReceiver extends BroadcastReceiver {
 					Bitmap bitmap = ((BitmapDrawable)icon).getBitmap();
 					remoteViews.setImageViewBitmap(R.id.option2, bitmap);
 					remoteViews.setOnClickPendingIntent(R.id.option2,
-							AppShortcutLauncherWidgetProvider
-							.buildLunchEventBtnPendingIntent(context, event.getPatter()));
+							WidgetHelper.buildLunchEventBtnPendingIntent(
+									context, event.getPatter()));
 					
 					
 //					remoteViews.setInt(R.id.option1, "setImageResource", R.drawable.content_new);
@@ -218,13 +219,9 @@ public class AppShortcutLauncherWidgetReceiver extends BroadcastReceiver {
 					Bitmap bitmap = ((BitmapDrawable)icon).getBitmap();
 					remoteViews.setImageViewBitmap(R.id.option3, bitmap);
 					remoteViews.setOnClickPendingIntent(R.id.option3,
-							AppShortcutLauncherWidgetProvider
-							.buildLunchEventBtnPendingIntent(context, event.getPatter()));
+							WidgetHelper.buildLunchEventBtnPendingIntent(
+									context, event.getPatter()));
 					
-//					remoteViews.setInt(R.id.option1, "setImageResource", R.drawable.content_new);
-//					remoteViews.setOnClickPendingIntent(R.id.option3,
-//							AppShortcutLauncherWidgetProvider
-//							.buildLunchEventBtnPendingIntent(context, event.getPatter()));
 				}
 				
 				Log.d(AppManager.LOG_WIDGET, i + "; Application: " + event.getType() + " ++ " + event.getPatter());

@@ -11,7 +11,9 @@ public class WidgetUtils {
 	public final static String WIDGET_RIGHT_ACTION = "com.il.appshortcut.intent.action.RIGTH";
 	public final static String WIDGET_DOWN_ACTION 	= "com.il.appshortcut.intent.action.DOWN";
 	
-	public final static String WIDGET_CLEAR_ACTION 	= "com.il.appshortcut.intent.action.CLEAR";
+	public final static String WIDGET_CLEAR_ACTION = "com.il.appshortcut.intent.action.CLEAR";
+	
+	public final static String WIDGET_DOWN_LAUCH = "com.il.appshortcut.intent.action.LAUNCH";
 	
 	public final static String WIDGET_LEFT_VALUE = "1";
 	public final static String WIDGET_UP_VALUE = "2";

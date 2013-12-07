@@ -43,7 +43,6 @@ public class MainActivity extends Activity implements
 	AppshortcutDAO dao = new AppshortcutDAO();
 	ActionsDAO actionsDao;
 	
-	
 	private AllAppsList allAppsList;
 	int activityActionParam = AppManager.ACTIVITY_ACTION_FROM_MAIN;
 	
@@ -51,13 +50,10 @@ public class MainActivity extends Activity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
 		luncherWidget = (LuncherPatternView) findViewById(R.id.luncher_widget);
 		actionsDao = new ActionsDAO(getApplicationContext());
-		
 		new LoadApplication().execute();
 	}
-
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {

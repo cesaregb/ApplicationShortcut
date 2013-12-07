@@ -38,5 +38,7 @@
     <string name="addItemHint">New To Do Item</string>
     <string name="addItemContentDescription">New To Do Item</string>
     <string name="title_activity_manage_activity">ManageActivityActivity</string>
+    <string name="title_activity_select_event_widget">SelectEventWidgetActivity</string>
+    <string name="title_activity_configure_widget_sc">ConfigureWidgetActivity</string>
 
 </resources>

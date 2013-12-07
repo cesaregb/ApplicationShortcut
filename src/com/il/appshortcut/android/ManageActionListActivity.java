@@ -293,11 +293,8 @@ public class ManageActionListActivity extends FragmentActivity implements
 				for (ApplicationVo item : listApplications) {
 					try {
 						for (ActionVo action : list) { //iterate db values
-							
 							if (item.getApplicationPackage().equalsIgnoreCase(action.getParentPackage())) {
-								
 								item.setAssigned(true);
-
 								if (item.getCommonActions() != null 
 										&& item.getCommonActions().getActions() != null) {
 									int i = 0;
