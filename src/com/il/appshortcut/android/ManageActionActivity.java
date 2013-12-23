@@ -1,5 +1,6 @@
 package com.il.appshortcut.android;
 
+import static com.il.appshortcut.converter.ActionsConverter.convertApplication2SelectPatternInfoView;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -23,13 +24,9 @@ import com.il.appshortcut.android.fragments.ApplicationSelectPatternFragment;
 import com.il.appshortcut.android.views.LuncherPatternView;
 import com.il.appshortcut.config.AppManager;
 import com.il.appshortcut.config.AppShortcutApplication;
-import com.il.appshortcut.dao.ActionsDAO;
 import com.il.appshortcut.dao.AppshortcutDAO;
-import com.il.appshortcut.helpers.ApplicationHelper;
 import com.il.appshortcut.views.ActionVo;
 import com.il.appshortcut.views.ApplicationVo;
-
-import static com.il.appshortcut.converter.ActionsConverter.convertApplication2SelectPatternInfoView;
 
 public class ManageActionActivity extends FragmentActivity
 		implements
@@ -87,9 +84,7 @@ public class ManageActionActivity extends FragmentActivity
 
 	@Override
 	public void onApplicationActionItem(ActionVo item) {
-		
 		if (mActionMode != null) {((ActionMode) mActionMode).finish();}
-		
 		AppShortcutApplication appState = ((AppShortcutApplication)getApplicationContext());
 		ApplicationVo appSelected = appState.getAppSelected();
 		int getTypeResponse = appState.getTypeSelectAppReturn();
@@ -106,9 +101,7 @@ public class ManageActionActivity extends FragmentActivity
 
 		if (getTypeResponse == AppManager.ACTIVITY_ACTION_FROM_MAIN) {
 			ApplicationSelectPatternFragment newFragment = new ApplicationSelectPatternFragment();
-			
 			newFragment.setmCurrentInformation(convertApplication2SelectPatternInfoView(appSelected, getApplicationContext()));
-			
 			FragmentTransaction transaction = getSupportFragmentManager()
 					.beginTransaction();
 			transaction
@@ -136,31 +129,16 @@ public class ManageActionActivity extends FragmentActivity
 			}
 		}
 	}
-	
-	@Override
-	public void onSomething(String something) {
-	}
-
-	@Override
-	public void fireApplication(String currentSelection) {
-		// Not used
-	}
 
 	@Override
 	public void registerSelection(String currentSelection) {
 		this.selectedPattern = currentSelection;
 	}
 
-	/**
-	 * @param view
-	 *            Click save info on the select pattern fragment Save
-	 *            information for a pattern...
-	 */
 	public void assignPattern(View view) {
 		if (selectedPattern != null) {
 			AppshortcutDAO dao = new AppshortcutDAO();
 			try{
-				Log.d(AppManager.LOG_MANAGE_APPLICATIONS, "saving applicatoin...");
 				if(dao.isPatternAssigned(selectedPattern, getApplicationContext())){
 					Toast.makeText(getApplicationContext(),
 							"Pattern assigned Show confirmation ",
@@ -195,40 +173,27 @@ public class ManageActionActivity extends FragmentActivity
 	
 	public void saveAction(){
 		try{
-			ApplicationVo appSelected = ((AppShortcutApplication)getApplicationContext()).getAppSelected();
 			AppshortcutDAO dao = new AppshortcutDAO();
-			ActionsDAO actionsDao = new ActionsDAO(getApplicationContext());
-			dao.savePattern(selectedPattern, getApplicationContext(), AppshortcutDAO.TYPE_ACTION);
-			appSelected.getCurrentAction().setPattern(selectedPattern);
-			appSelected.getCurrentAction().setAssigned(true);
-			appSelected.getCurrentAction().setIdAction(
-					ApplicationHelper.safeLongToInt(actionsDao
-							.addUpdateAction(appSelected.getCurrentAction())));
-			dao.refreshDataDb(getApplicationContext());
+			dao.saveAction(selectedPattern, getApplicationContext());
 		}catch(Exception e){
 			//TODO exception handle... 
 		}
 	}
 
 	public void removeSelectedItem(){
+		Log.d(AppManager.LOG_DEBUGGIN, "removeSelectedItem: ");
 		if (mActionLongOver.isSaved()){
 			try{
-				ApplicationVo appSelected = ((AppShortcutApplication)getApplicationContext()).getAppSelected();
-				appSelected.getCurrentAction().setAssigned(false);
-				appSelected.getCurrentAction().setIdAction(0);
 				AppshortcutDAO dao = new AppshortcutDAO();
-				ActionsDAO actionsDao = new ActionsDAO(getApplicationContext());
-				dao.removePattern(mActionLongOver.getPattern(),
-						getApplicationContext());
-				actionsDao.removeActionById(String.valueOf(mActionLongOver
-						.getIdAction()));
-				dao.refreshDataDb(getApplicationContext());
+				dao.removeAction(mActionLongOver, getApplicationContext());
+				
 				ApplicationInfoFragment newFragment = new ApplicationInfoFragment();
 				getSupportFragmentManager()
 						.beginTransaction()
 						.replace(R.id.fragment_container_application,
 								newFragment).commit();
 			}catch(Exception e){
+				Toast.makeText(getApplicationContext(), "Error deleting application", Toast.LENGTH_SHORT).show();
 				//TODO handle exception 
 			}
 		}
@@ -278,4 +243,10 @@ public class ManageActionActivity extends FragmentActivity
 			return false;
 		}
 	}
+	
+	@Override
+	public void onSomething(String something) { }
+
+	@Override
+	public void fireApplication(String currentSelection) { }
 }

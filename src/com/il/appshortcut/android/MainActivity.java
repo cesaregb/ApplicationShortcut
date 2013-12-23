@@ -42,6 +42,7 @@ public class MainActivity extends Activity implements
 	LuncherPatternView luncherWidget;
 	AppshortcutDAO dao = new AppshortcutDAO();
 	ActionsDAO actionsDao;
+	private static final int RESULT_SETTINGS = 1;
 	
 	private AllAppsList allAppsList;
 	int activityActionParam = AppManager.ACTIVITY_ACTION_FROM_MAIN;
@@ -68,7 +69,7 @@ public class MainActivity extends Activity implements
 				NavUtils.navigateUpTo(this, upIntent);
 			}
 			break;
-		case R.id.action_clear:
+		case 0:
 			SharedPreferences sharedPref = getApplicationContext()
 			.getSharedPreferences(AppManager.ID_PRE_FFILE,
 					Context.MODE_PRIVATE);
@@ -78,6 +79,18 @@ public class MainActivity extends Activity implements
 			actionsDao.clearDatabase();
 			
 			Toast.makeText(getApplicationContext(), "The patters had been deleted", Toast.LENGTH_SHORT).show();
+			break;
+		case R.id.action_settings:
+			Toast.makeText(getApplicationContext(), "Show settings", Toast.LENGTH_SHORT).show();
+			Intent i = new Intent(this, SettingsActivity.class);
+            startActivityForResult(i, RESULT_SETTINGS);
+			break;
+		case R.id.action_rate_us:
+			
+			Toast.makeText(getApplicationContext(), "Show rate us", Toast.LENGTH_SHORT).show();
+			break;
+		case R.id.action_about_us:
+			Toast.makeText(getApplicationContext(), "Show information about us", Toast.LENGTH_SHORT).show();
 			break;
 		}
 		return super.onOptionsItemSelected(item);
@@ -194,4 +207,10 @@ public class MainActivity extends Activity implements
 		AppShortcutApplication appState = (AppShortcutApplication) getApplicationContext();
 		appState.setAllAppsList(allAppsList);
 	}
+	
+	public void openViewActiveSelections(View view){
+		Intent intent = new Intent(MainActivity.this, ViewAllSelectionsActivity.class);
+		startActivity(intent);
+	}
+	
 }

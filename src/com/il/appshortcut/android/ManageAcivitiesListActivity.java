@@ -208,9 +208,8 @@ public class ManageAcivitiesListActivity extends FragmentActivity implements
 		if (mActivityLongOver != null){
 			try{
 				AppshortcutDAO dao = new AppshortcutDAO();
-				dao.removePattern(mActivityLongOver.getPattern(),
-						getApplicationContext());
-				activitiesDao.removeActionByActivity(mActivityLongOver);
+				dao.removeActivity(mActivityLongOver, getApplicationContext(),
+						mActivityLongOver.getPattern());
 				new LoadActivities().execute();
 			}catch(Exception e){
 				Toast.makeText(getApplicationContext(),

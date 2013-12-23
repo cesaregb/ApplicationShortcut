@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -35,6 +36,15 @@
             android:layout_height="90dp"
             android:onClick="openManageActions"
             android:text="@string/managePatterns" >
+        </Button>
+        
+        <Button
+            android:id="@+id/view_active_selections"
+            style="@style/button"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:onClick="openViewActiveSelections"
+            android:text="@string/viewActiveSelections" >
         </Button>
         
     </LinearLayout>

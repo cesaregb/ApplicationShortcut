@@ -93,7 +93,23 @@ public class ActivitiesDAO {
 		return result;
 	}
 	
-	public ActionVo removeActionByPattern(String pattern) {
+	public ActivityVo getActivityById(int id) {
+		ActivityVo result = null;
+		this.open();
+		if (id > 0) {
+			Cursor cursor = database.query(ActivityOpenHelper.TABLE_NAME,
+					allColumns, ActivityOpenHelper.FIELD_ID + "=?",
+					new String[] { String.valueOf(id) },
+					null, null, null, null);
+			if (cursor != null) { 
+				result = convertCursor2Activity(cursor); 
+			}
+		}
+		this.close();
+		return result;
+	}
+	
+	public ActionVo removeActivityByPattern(String pattern) {
 		this.open();
 		ActionVo result = null;
 		if (pattern != null) {
@@ -104,7 +120,7 @@ public class ActivitiesDAO {
 		return result;
 	}
 	
-	public ActionVo removeActionByActivity(ActivityVo activity) {
+	public ActionVo removeActivityByActivity(ActivityVo activity) {
 		this.open();
 		ActionVo result = null;
 		if (activity != null && activity.getIdActivity() > 0) {
@@ -113,6 +129,12 @@ public class ActivitiesDAO {
 		}
 		this.close();
 		return result;
+	}
+	
+	public void removeAll() {
+		this.open();
+		database.delete(ActivityOpenHelper.TABLE_NAME, null, null);
+		this.close();
 	}
 	
 }

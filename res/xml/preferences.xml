@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <PreferenceCategory
+        android:key="pref_key_storage_settings"
+        android:title="@string/settings_information" >
+
+        <Preference
+            android:key="pref_key_delete_all_info"
+            android:summary="@string/settings_desc_clear_all"
+            android:title="@string/settings_clear_all" />
+        <Preference
+            android:key="pref_key_delete_applications"
+            android:summary="@string/settings_desc_clear_applications"
+            android:title="@string/settings_clear_applications" />
+        <Preference
+            android:key="pref_key_delete_activities"
+            android:summary="@string/settings_desc_clear_activities"
+            android:title="@string/settings_clear_activities" />
+        
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -74,7 +74,7 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_appshortcut_launcher" />
         </receiver>
-		<!-- PAD WIDGET -->
+        <!-- PAD WIDGET -->
         <!-- SHORTCUT WIDGET -->
         <receiver android:name="com.il.appshortcut.android.widgets.AppShortcutWidgetProvider" >
             <intent-filter>
@@ -85,8 +85,8 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_appshortcut" />
         </receiver>
-		<!-- SHORTCUT WIDGET -->
-		
+        <!-- SHORTCUT WIDGET -->
+
         <activity
             android:name="com.il.appshortcut.android.ManageAcivitiesListActivity"
             android:label="@string/title_activity_manage_acivities_list" >
@@ -96,20 +96,24 @@
             android:label="@string/title_activity_manage_activity"
             android:windowSoftInputMode="stateHidden|adjustResize" >
         </activity>
-        
+        <activity
+            android:name="com.il.appshortcut.android.SettingsActivity"
+            android:label="Settings" >
+        </activity>
         <activity
             android:name="com.il.appshortcut.android.ProxyActivity"
             android:label="@string/title_activity_proxy" >
         </activity>
-        
         <activity
             android:name="com.il.appshortcut.android.SelectEventWidgetActivity"
             android:label="@string/title_activity_select_event_widget" >
-            
             <intent-filter>
-		        <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
-		    </intent-filter>
-            
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.il.appshortcut.android.ViewAllSelectionsActivity"
+            android:label="@string/title_activity_view_all_selections" >
         </activity>
     </application>
 

@@ -1,7 +1,6 @@
 package com.il.appshortcut.android;
 
 import static com.il.appshortcut.converter.ActivitiesConverter.convertActivity2SelectPatternInfoView;
-import static com.il.appshortcut.helpers.ApplicationHelper.safeLongToInt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +34,9 @@ import com.il.appshortcut.helpers.ServicesHelper;
 import com.il.appshortcut.services.ServiceVo;
 import com.il.appshortcut.views.ActivityDetailListVo;
 import com.il.appshortcut.views.ActivityDetailVo;
-import com.il.appshortcut.views.EventIconVo;
 import com.il.appshortcut.views.ActivityVo;
 import com.il.appshortcut.views.ApplicationVo;
+import com.il.appshortcut.views.EventIconVo;
 
 public class ManageActivityActivity extends FragmentActivity implements
 		ActivityFormFragment.ActivityFormListener,
@@ -160,19 +159,13 @@ public class ManageActivityActivity extends FragmentActivity implements
 			if (mCurrentActivity == null) {
 				mCurrentActivity = new ActivityVo();
 			}
-			castCurrentActivityObject();
-			ActivitiesDAO activitiDao = new ActivitiesDAO(getApplicationContext());
-			if (selectedPattern != null && selectedPattern != "") {
-				mCurrentActivity.setPattern(selectedPattern);
-				AppshortcutDAO dao = new AppshortcutDAO();
-				dao.savePattern(selectedPattern, getApplicationContext(),
-						AppshortcutDAO.TYPE_ACTIVITY);
-			}
 			
-			long idActivity = activitiDao.addUpdateActivity(mCurrentActivity);
-			if (detailsUpdated) {
-				saveLists(mergeLists(), idActivity);
-			}
+			castCurrentActivityObject();
+			AppshortcutDAO dao = new AppshortcutDAO();
+			
+			dao.saveActivity(getApplicationContext(), selectedPattern,
+					mCurrentActivity, detailsUpdated, mergeLists());
+			
 		}catch (Exception e){
 			Toast.makeText(getApplicationContext(), "Error saving activity.",
 					Toast.LENGTH_SHORT).show();
@@ -288,49 +281,6 @@ public class ManageActivityActivity extends FragmentActivity implements
 		return result;
 	}
 	
-	/**
-	 * if any service || app was updated save new information
-	 * this is done discarting (deletting) existing information and saving current state.
-	 */
-	public void saveLists(List<ActivityDetailVo> listDetails, long activityId){
-		try {
-			// Delete Actions (applications)  
-			List<ActivityDetailVo> lDetails = activitiesDetailsDao
-						.getAllActivityDetailsByActivity(String.valueOf(activityId));
-			if (lDetails != null){
-				for (ActivityDetailVo detailItem : lDetails ){
-					if (detailItem.getType() == ActivitiesDAO.TYPE_ACTION){
-						actionsDao.removeActionById(String.valueOf(detailItem.getIdAction()));
-					}
-				}
-			}
-			// Delete * from ActivityDetails 
-			activitiesDetailsDao
-					.removeActivityDetailsByActivity(safeLongToInt(activityId));
-			
-			for (ActivityDetailVo detailItem : listDetails) {
-				// if app save action in actions table. 
-				detailItem.setIdActivity(safeLongToInt(activityId));
-				if (detailItem.getType() == ActivitiesDAO.TYPE_ACTION) {
-					detailItem.getApplication().getCurrentAction()
-							.setType(ActivityDetailsDAO.DETAIL_TYPE_ACTIVITY);
-					detailItem.getApplication().getCurrentAction().setIdAction(0);
-					long idAction = actionsDao.addUpdateAction(detailItem
-							.getApplication().getCurrentAction());
-					detailItem.setIdAction(safeLongToInt(idAction));
-				}
-				// add item regardless app or serviece. 
-				activitiesDetailsDao.addUpdateActivityDetail(detailItem);
-			}
-		} catch (Exception e) {
-			Toast.makeText(getApplicationContext(),
-					"An exception has occured saving the information",
-					Toast.LENGTH_SHORT).show();
-			e.printStackTrace();
-			Log.d(AppManager.LOG_EXCEPTIONS, "Exception: " + this.getClass()
-					+ " method: saveLists");
-		}
-	}
 	
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == 1) {
@@ -402,13 +352,10 @@ public class ManageActivityActivity extends FragmentActivity implements
 	}
 
 	@Override
-	public void onSomething(String something) {
-		// Method not used, used on interface:  com.il.appshortcut.android.fragments.ApplicationSelectPatternFragment.ApplicationSelectPatternFragmentListener
-	}
+	public void onSomething(String something) { }
+	
 	@Override
-	public void fireApplication(String currentSelection) {
-		// Method not used: used on interface: com.il.appshortcut.android.views.LuncherPatternView.LuncherPatternListener
-	}
+	public void fireApplication(String currentSelection) { }
 
 	@Override
 	public void registerSelection(String currentSelection) {

@@ -15,7 +15,7 @@ public class FacebookActions extends CommonActions {
 		ActionVo action = new ActionVo();
 		action.setActionName("New Message");
 		action.setAssigned(false);
-		action.setActionPackage(ACTION_NEW_MESSAGE);
+		action.setActionPackage(packageName);
 		action.setActionDescription("Create new facebook message");
 		action.setPattern("");
 		action.setClassName(className);

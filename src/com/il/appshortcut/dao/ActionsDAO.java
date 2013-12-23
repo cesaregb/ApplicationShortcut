@@ -80,6 +80,7 @@ public class ActionsDAO {
 		this.close();
 		return result;
 	}
+	
 	public ActionVo removeActionById(String id) {
 		this.open();
 		ActionVo result = null;
@@ -89,6 +90,18 @@ public class ActionsDAO {
 		}
 		this.close();
 		return result;
+	}
+	
+	public void removeAll() {
+		this.open();
+		database.delete(ActionsOpenHelper.TABLE_NAME, null, null);
+		this.close();
+	}
+	public void removeAllByType(int type) {
+		this.open();
+		database.delete(ActionsOpenHelper.TABLE_NAME,
+				ActionsOpenHelper.FIELD_TYPE + "=?", new String[] { String.valueOf(type) });
+		this.close();
 	}
 	
 	public List<ActionVo> getAllActions() {

@@ -12,11 +12,8 @@ import com.il.appshortcut.views.ActionVo;
 public class CommonActions {
 
 //com.joelapenna.foursquared foursquare
-//com.twitter.android twitter
-//com.google.android.youtube
 //com.google.android.apps.maps
 //com.google.android.gm - gmail
-//com.instagram.android
 	
 	public static final String ACTION_OPEN = "open";
 	
@@ -40,9 +37,6 @@ public class CommonActions {
 		action.setClassName(className);
 		actions.add(action);
 	}
-	
-	
-	
 	public CommonActions(String appPackage, PackageManager pm){
 		this.appPackage = appPackage;
 		this.pm = pm;

@@ -129,6 +129,7 @@ public class ManageActionListActivity extends FragmentActivity implements
 		if (isOrderSelected) {
 			refrestTabs();
 		}
+		
 		if (tmpList.isEmpty()) {
 			Toast.makeText(getApplicationContext(), "No application found.",
 					Toast.LENGTH_SHORT).show();

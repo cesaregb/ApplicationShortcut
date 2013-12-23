@@ -3,62 +3,55 @@ package com.il.appshortcut.android;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.ActionBar;
 import android.app.Activity;
-import android.app.PendingIntent;
-import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.il.appshortcut.R;
+import com.il.appshortcut.actions.ActionsFactory;
 import com.il.appshortcut.android.adapters.EventItemAdapter;
+import com.il.appshortcut.android.views.Utilities;
 import com.il.appshortcut.config.AppManager;
+import com.il.appshortcut.config.AppShortcutApplication;
 import com.il.appshortcut.dao.ActionsDAO;
 import com.il.appshortcut.dao.ActivitiesDAO;
 import com.il.appshortcut.dao.AppshortcutDAO;
 import com.il.appshortcut.helpers.ActivityIconHelper;
-import com.il.appshortcut.helpers.WidgetHelper;
 import com.il.appshortcut.views.ActionVo;
 import com.il.appshortcut.views.ActivityVo;
+import com.il.appshortcut.views.ApplicationVo;
 import com.il.appshortcut.views.EventIconVo;
 import com.il.appshortcut.views.EventWrapper;
 
-public class SelectEventWidgetActivity extends Activity {
-	int mAppWidgetId;
+public class ViewAllSelectionsActivity extends Activity {
 	
 	private ArrayList<EventWrapper> eventItems = new ArrayList<EventWrapper>();
 	private EventItemAdapter aa;
 	ListView listView = null;
 	AppshortcutDAO appshortcutDao;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_select_event_widget);
-		setResult(RESULT_CANCELED);
-		Intent intent = getIntent();
-		Bundle extras = intent.getExtras();
-		if (extras != null) {
-		    mAppWidgetId = extras.getInt(
-		            AppWidgetManager.EXTRA_APPWIDGET_ID, 
-		            AppWidgetManager.INVALID_APPWIDGET_ID);
-		}
+		setContentView(R.layout.activity_view_all_selections);
 		
-		if (mAppWidgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
-			finish();
-		}
-	     
-		listView = (ListView) findViewById( R.id.list_widget_possible_actions);
+		ActionBar actionBar = getActionBar();
+		actionBar.setDisplayHomeAsUpEnabled(true);
+		actionBar.setDisplayShowTitleEnabled(false);
+		
+		listView = (ListView) findViewById( R.id.list_possible_actions);
 		
 		int resID = R.layout.comp_action_list_item;
 		aa = new EventItemAdapter(getApplicationContext(), resID, eventItems);
@@ -68,51 +61,56 @@ public class SelectEventWidgetActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				EventWrapper event = (EventWrapper) listView
-						.getItemAtPosition(position);
-				configureWithEvent(event);
+				EventWrapper event = (EventWrapper) listView.getItemAtPosition(position);
+				
+				fireEvent(event);
 			}
 		});
 		appshortcutDao = new AppshortcutDAO();
 		refreshList();
+		
 	}
-
-	public void configureWithEvent(EventWrapper event){
-		AppManager.getInstance().setShortcutEventWraper(event);
-		AppWidgetManager appWidgetManager = AppWidgetManager
-				.getInstance(getApplicationContext());
-		RemoteViews views = new RemoteViews(getApplicationContext()
-				.getPackageName(), R.layout.widget_app_shortcut);
+	
+	public void fireEvent(EventWrapper event){
+		Log.d(AppManager.LOG_DEBUGGIN, "into fireEvent: " + event.getType());
 		
-		//set the pendingIntent 
-		PendingIntent pendingIntent = WidgetHelper
-				.buildLunchEventBtnPendingIntent(getApplicationContext(), event.getPatter());
-		views.setOnClickPendingIntent(R.id.option_launch, pendingIntent);
-		
-		//set the icon 
-		Drawable icon = getApplicationContext().getResources().getDrawable(R.drawable.ic_launcher);
-		try{
-			icon = event.getEventIconVo().getDrawable();
-		}catch (Exception e){
-			icon = getApplicationContext().getResources().getDrawable(R.drawable.ic_launcher);
-		}
-		Bitmap bitmap = ((BitmapDrawable)icon).getBitmap();
-		views.setImageViewBitmap(R.id.option_launch, bitmap);
-		int idEvent = 0;
 		if(AppshortcutDAO.TYPE_ACTIVITY == event.getType()){
-			idEvent = ((ActivityVo) event.getObject()).getIdActivity();
+			AppShortcutApplication appState = ((AppShortcutApplication)getApplicationContext());
+			appState.setCurrentActivity(((ActivityVo) event.getObject()));
+			
+			Intent i = new Intent(ViewAllSelectionsActivity.this, ManageActivityActivity.class);
+			startActivity(i);
 		}else if(AppshortcutDAO.TYPE_ACTION == event.getType()){
-			idEvent = ((ActionVo) event.getObject()).getIdAction();
+			
+			try{
+				AppShortcutApplication appState = (AppShortcutApplication) getApplicationContext();
+				ActionVo action = ((ActionVo) event.getObject());
+				
+				ApplicationInfo info = getApplicationContext().getPackageManager()
+						.getApplicationInfo(action.getParentPackage(),
+								0);
+				PackageManager manager = getPackageManager();
+				ApplicationVo item = new ApplicationVo(info.loadLabel(manager).toString());
+				item.setIcon(info.loadIcon(manager));
+				item.setIcon(Utilities.createIconThumbnail(item.getIcon(), getApplicationContext()));
+				item.setComponentName(new ComponentName(info.packageName, action.getClassName()));
+				item.setApplicationInfo(info);
+				item.setApplicationPackage(info.packageName);
+				item.setAssigned(true);
+				item.setCommonActions(ActionsFactory.create(item));
+				
+				appState.setAppSelected(item);
+				
+				Intent intent = new Intent(ViewAllSelectionsActivity.this,
+						ManageActionActivity.class);
+				startActivity(intent);
+				
+			}catch(Exception e){
+				Toast.makeText(getApplicationContext(), "Error opening Applicatoin", Toast.LENGTH_SHORT).show();
+				//TODO handle exception
+			}
+			
 		}
-		
-		appshortcutDao.saveWidgetId(getApplicationContext(), String.valueOf(mAppWidgetId), event.getType() + AppshortcutDAO.SHARED_PREFERENCE_DELIMITER + idEvent);
-		
-		appWidgetManager.updateAppWidget(mAppWidgetId, views);
-		
-		Intent resultValue = new Intent();
-		resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-		setResult(RESULT_OK, resultValue);
-		finish();
 	}
 	
 	public void refreshList(){
@@ -166,18 +164,11 @@ public class SelectEventWidgetActivity extends Activity {
 		}
 		aa.notifyDataSetChanged();
 	}
-	
-	
-	public Intent getIntentByWidgetId(String widgetId){
-		Intent result = null;
-		return result; 
-	}
-	
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.select_event_widget, menu);
+		getMenuInflater().inflate(R.menu.view_all_selections, menu);
 		return true;
 	}
 

@@ -5,6 +5,8 @@ import android.content.pm.PackageManager;
 
 import com.il.appshortcut.actions.CommonActions;
 import com.il.appshortcut.actions.FacebookActions;
+import com.il.appshortcut.actions.TwitterActions;
+import com.il.appshortcut.actions.WhatsappActions;
 import com.il.appshortcut.views.ActionVo;
 
 public class ActionHelper {
@@ -20,6 +22,26 @@ public class ActionHelper {
 					.equalsIgnoreCase(FacebookActions.ACTION_NEW_MESSAGE)) {
 				actions = new FacebookActions(action.getParentPackage(), action.getClassName());
 				resultIntent = ((FacebookActions) actions).getNewMessageIntent();
+			} else {
+				actions = new CommonActions(action.getActionPackage(), pm);
+				resultIntent = actions.getOpenApplicationIntent(action.getClassName());
+			}
+		}else if (action.getParentPackage().equalsIgnoreCase(TwitterActions.TWITTER_PACKAGE)) {
+				if (action.getActionPackage()
+						.equalsIgnoreCase(TwitterActions.ACTION_NEW_TWITT)) {
+					
+					actions = new TwitterActions(action.getParentPackage(), action.getClassName());
+					resultIntent = ((TwitterActions) actions).getNewTwittIntent();
+				} else {
+					actions = new CommonActions(action.getActionPackage(), pm);
+					resultIntent = actions.getOpenApplicationIntent(action.getClassName());
+				}
+		}else if (action.getParentPackage().equalsIgnoreCase(WhatsappActions.WHATSAPP_PACKAGE)) {
+			if (action.getActionPackage()
+					.equalsIgnoreCase(WhatsappActions.ACTION_NEW_MESSAGE)) {
+				
+				actions = new WhatsappActions(action.getParentPackage(), action.getClassName());
+				resultIntent = ((WhatsappActions) actions).getNewMessageIntent();
 			} else {
 				actions = new CommonActions(action.getActionPackage(), pm);
 				resultIntent = actions.getOpenApplicationIntent(action.getClassName());

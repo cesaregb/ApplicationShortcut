@@ -92,6 +92,12 @@ public class ActivityDetailsDAO {
 		return result;
 	}
 	
+	public void removeAll() {
+		this.open();
+		database.delete(ActivityDetailsOpenHelper.TABLE_NAME, null, null);
+		this.close();
+	}
+	
 	public List<ActivityDetailVo> getAllActivityDetail() {
 		List<ActivityDetailVo> list = null;
 		this.open();

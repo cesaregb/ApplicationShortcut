@@ -9,6 +9,10 @@ public class ActionsFactory {
 		CommonActions ca = null;
 		if (app.getApplicationPackage().equalsIgnoreCase(FacebookActions.FACEBOOK_PACKAGE)){
 			ca = new FacebookActions(app.getApplicationPackage(), app.getComponentName().getClassName());
+		}else if(app.getApplicationPackage().equalsIgnoreCase(TwitterActions.TWITTER_PACKAGE)){ 
+			ca = new TwitterActions(app.getApplicationPackage(), app.getComponentName().getClassName());
+		}else if(app.getApplicationPackage().equalsIgnoreCase(WhatsappActions.WHATSAPP_PACKAGE)){ 
+			ca = new WhatsappActions(app.getApplicationPackage(), app.getComponentName().getClassName());
 		}else{
 			ca = new CommonActions(app.getApplicationPackage(), app.getComponentName().getClassName());
 		}
