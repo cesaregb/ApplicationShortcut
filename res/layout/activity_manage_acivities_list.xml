@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/ActivityFragment"
-        android:name="com.il.appshortcut.android.fragments.ActivityListFragment"
+        android:name="com.il.easyclick.android.fragments.ActivityListFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

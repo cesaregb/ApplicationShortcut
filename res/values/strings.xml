@@ -2,7 +2,7 @@
 <resources>
 
     <!-- app settings -->
-    <string name="app_name">AppShortcut</string>
+    <string name="app_name">Easy Click</string>
 
     <!-- common used -->
     <string name="action_settings">Settings</string>
@@ -21,9 +21,9 @@
     <string name="title_activity_manage_application">Manage Application</string>
 
     <!-- specific -->
-    <string name="viewActiveSelections">View Active Selections</string>
-    <string name="managePatterns">Manage Patterns</string>
-    <string name="manageActivities">Manage Activities</string>
+    <string name="viewActiveSelections">Active</string>
+    <string name="manageApplications">Applications</string>
+    <string name="manageActivities">Activities</string>
     <string name="desc_backround">Background image</string>
     <string name="desc_temporal">Background image</string>
     <string name="assigned">Assigned</string>

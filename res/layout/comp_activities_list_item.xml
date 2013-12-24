@@ -14,7 +14,7 @@
         android:scrollbars="vertical"
         android:textColor="#F000" />
 
-    <com.il.appshortcut.android.views.ActivityListItemView
+    <com.il.easyclick.android.views.ActivityListItemView
         android:id="@+id/activityRowDescription"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
