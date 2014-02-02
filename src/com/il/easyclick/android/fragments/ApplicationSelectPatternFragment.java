@@ -34,7 +34,7 @@ public class ApplicationSelectPatternFragment extends Fragment {
 							+ " must implement ApplicationSelectPatternFragmentListener");
 		}
 	}
-
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {

@@ -14,6 +14,7 @@ public class ActivityListFragment extends ListFragment {
 		public boolean onItemLongClickListener(Object object, int position, View eventView);
 		public boolean onItemClickListener(Object object, int position, View eventView);
 	}
+	private View prev = null;
 	
 	@Override
 	public void onActivityCreated(Bundle savedState) {
@@ -22,6 +23,12 @@ public class ActivityListFragment extends ListFragment {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> parent,
 					View eventView, int position, long id) {
+				eventView.setSelected(true);
+				
+				if (prev != null){
+					prev.setSelected(false);
+				}
+				prev = eventView;
 				return mCallback.onItemLongClickListener(getListView()
 						.getItemAtPosition(position), position, eventView);
 			}
@@ -42,5 +49,13 @@ public class ActivityListFragment extends ListFragment {
 
 	public void setmCallback(ActivityListFragmentListener mCallback) {
 		this.mCallback = mCallback;
+	}
+
+	public View getPrev() {
+		return prev;
+	}
+
+	public void setPrev(View prev) {
+		this.prev = prev;
 	}
 }

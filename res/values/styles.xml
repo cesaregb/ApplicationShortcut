@@ -3,21 +3,7 @@
     <style name="AppBaseTheme" parent="android:Theme.Holo">
     </style><!-- Application theme. -->
     
-    <style name="AppTheme" parent="AppBaseTheme">
-        <item name="android:actionBarItemBackground">@drawable/selectable_background_easyclick</item>
-        <item name="android:popupMenuStyle">@style/PopupMenu.Easyclick</item>
-        <item name="android:dropDownListViewStyle">@style/DropDownListView.Easyclick</item>
-        <item name="android:actionBarTabStyle">@style/ActionBarTabStyle.Easyclick</item>
-        <item name="android:actionDropDownStyle">@style/DropDownNav.Easyclick</item>
-        <item name="android:actionBarStyle">@style/ActionBar.Solid.Easyclick</item>
-        <item name="android:actionModeBackground">@drawable/cab_background_top_easyclick</item>
-        <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_easyclick</item>
-        <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Easyclick</item>
-    </style>
-    
-    
-    
-     <style name="activities" parent="AppTheme">
+    <style name="activities" parent="EasyClickTheme">
         <item name="android:background">#122320</item>
     </style>
     
@@ -95,5 +81,9 @@
         <item name="android:minHeight">16dip</item>
         <item name="android:maxHeight">16dip</item>
     </style>
+    
+    <style name="ListView.EasyClick" parent="@android:style/Widget.ListView">
+	    <item name="android:listSelector">@drawable/list_selector</item>
+	</style>
 
 </resources>

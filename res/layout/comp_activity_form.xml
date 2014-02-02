@@ -1,169 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" 
+    
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" 
+    android:padding="5dip"
+    style="@style/activities"
     android:descendantFocusability="beforeDescendants"
 	android:focusableInTouchMode="true"
     android:orientation="vertical">
     
-    <LinearLayout
-        android:layout_width="match_parent"
+    <ImageButton
+        android:id="@+id/activityIcon"
+        style="@style/button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="left"
+        android:onClick="openSelectImage"
+        android:src="@drawable/easy_click_logo" >
+
+        <requestFocus />
+    </ImageButton>
+    
+    <ImageButton
+        android:id="@+id/assignPattern"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
-        <ImageView
-            android:id="@+id/activityIcon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <Button
-            style="@style/button"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:onClick="selectImage"
-            android:text="Select Image" >
-             <requestFocus />
-        </Button>
-    </LinearLayout>
+        android:gravity="center"
+        android:layout_alignParentRight="true"
+        android:onClick="openPatternPanel"
+        android:src="@drawable/pad_icon"  >
+    </ImageButton>
     
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:padding="5dip"
+        android:id="@+id/nameContainer"
+        android:layout_below="@+id/activityIcon"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
         <TextView
-            android:id="@+id/activityName_txt"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="0.25"
             android:text="Name" />
         <EditText
             android:id="@+id/activityName"
-            android:nextFocusUp="@id/activityName" android:nextFocusLeft="@id/activityName"
-            android:layout_width="wrap_content"
+            android:nextFocusUp="@id/activityName" 
+            android:nextFocusLeft="@id/activityName"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:ems="10" >
-            <requestFocus />
-        </EditText>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
-
-        <TextView
-            android:id="@+id/acticityDescription_txt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Description" />
-
-        <EditText
-            android:id="@+id/acticityDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textMultiLine" />
-
+            android:layout_weight="0.75"
+            android:ems="10" />
     </LinearLayout>
     
-     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical" >
-
-        <HorizontalScrollView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content" >
-
-            <LinearLayout
-                android:id="@+id/_linearLayout"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" >
-            </LinearLayout>
-            
-        </HorizontalScrollView>
-        
-	</LinearLayout>
-	
     <LinearLayout
-        android:layout_width="match_parent"
+        android:padding="5dip"
+        android:id="@+id/descriptionContainer"
+        android:layout_below="@+id/nameContainer"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
-
-        <LinearLayout
+        <TextView
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_width="100dp"
-            android:orientation="vertical" >
-			<TextView
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:text="Applications" />
-			
-            <ListView
-                android:id="@+id/list_activity_actions"
-                android:layout_width="90dp"
-                android:layout_height="wrap_content"
-                android:background="@color/background_color" />
-
-            <Button
-                style="@style/button"
-                android:layout_width="90dp"
-                android:layout_height="90dp"
-                android:onClick="openAddApplication"
-                android:text="Add" />
-            
-        </LinearLayout>
-        <LinearLayout
-            android:layout_height="wrap_content"
-            android:layout_width="100dp"
-            android:orientation="vertical" >
-			<TextView
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:text="Services" />
-			
-           <ListView
-	            android:id="@+id/list_activity_services"
-	            android:layout_width="90dp"
-	            android:layout_height="wrap_content"
-	            android:background="@color/background_color" />
-
-            <Button
-                style="@style/button"
-                android:layout_width="90dp"
-                android:layout_height="90dp"
-                android:onClick="openAddService"
-                android:text="Add" />
-        </LinearLayout>
-
+            android:layout_weight="0.25"
+            android:text="Description" />
         
+        <EditText
+            android:id="@+id/acticityDescription"
+            android:nextFocusUp="@id/activityName" 
+            android:nextFocusLeft="@id/activityName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.75"
+            android:ems="10" />
     </LinearLayout>
     
     <LinearLayout
+        android:padding="12dip"
+        android:id="@+id/listsActivityDetailsContainer"
+   	    android:layout_below="@+id/descriptionContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+	    <LinearLayout
+	        android:padding="12dip"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal" >
+	        <TextView
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="Activity Details" />
+	        <ImageButton
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:gravity="center"
+		        android:onClick="openAddActivityDetail"
+		        android:src="@drawable/content_new" />
+	    </LinearLayout>
+	    
+        <ListView
+            android:id="@+id/list_activity_actions"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+	
+    </LinearLayout>
+    
+    <LinearLayout
+		android:id="@+id/actionButtons"
+   	    android:layout_below="@+id/listsActivityDetailsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="12dip" >
 
         <Button
             style="@style/button"
             android:layout_width="90dp"
-            android:layout_height="90dp"
+            android:layout_marginRight="10dip"
+            android:layout_height="wrap_content"
             android:text="Cancel" />
 
         <Button
             android:id="@+id/manage"
             style="@style/button"
             android:layout_width="90dp"
-            android:layout_height="90dp"
+            android:layout_height="match_parent"
             android:onClick="callSaveActivity"
             android:text="Save" >
         </Button>
-        
-        <Button
-            android:id="@+id/assignPattern"
-            style="@style/button"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:onClick="openPatternPanel"
-            android:text="Assign Pattern" >
-        </Button>
     </LinearLayout>
-</LinearLayout>
+    
+</RelativeLayout>

@@ -8,14 +8,6 @@ import com.il.easyclick.views.EventWrapper;
 public class AppManager {
 	public static String LOG_DEBUGGIN = "LOG_DEBUGGIN";
 	public static String LOG_WIDGET = "LOG_WIDGET";
-	public static String LOG_APPLICATION_INFO_FRAGMENT = "LOG_APPLICATION_INFO_FRAGMENT";
-	public static String LOG_EXCEPTIONS = "LOG_EXCEPTIONS";
-	public static String LOG_SQL = "LOG_SQL";
-	public static String LOG_ACTIONS = "LOG_ACTIONS";
-	public static String LOG_ACTIVITIES = "LOG_ACTIVITIES";
-	
-	public static String LOG_MANAGE_APPLICATIONS= "LOG_MANAGE_APPLICATIONS";
-	
 	
 	private static AppManager _instance;
 	public static String CLEAR_STRING = "";

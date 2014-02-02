@@ -118,6 +118,7 @@ public class ActivitiesConverter {
 	
 	public static List<ActivityDetailVo> convertCursor2ListActivityDetails(Cursor cursor, AllAppsList allAppsList, Context context){
 		List<ActivityDetailVo> result = null;
+		
 		if (cursor.moveToFirst()) {
 			result = new ArrayList<ActivityDetailVo>();
 			ServicesHelper servicesHelper = new ServicesHelper(context);
@@ -131,7 +132,7 @@ public class ActivitiesConverter {
 				item.setOrder(cursor.getInt(cursor.getColumnIndex(ActivityDetailsOpenHelper.FIELD_ORDER)));
 				item.setTop(cursor.getInt(cursor.getColumnIndex(ActivityDetailsOpenHelper.FIELD_TOP)));
 				item.setIdAction(cursor.getInt(cursor.getColumnIndex(ActivityDetailsOpenHelper.FIELD_ID_ACTION)));
-				result.add(item);
+				
 				if (typeApp == ActivitiesDAO.TYPE_ACTION){
 					ActionVo action = actionsDao.getActionById(item
 							.getIdAction());
@@ -158,7 +159,9 @@ public class ActivitiesConverter {
 					ServiceVo service = servicesHelper.getServiceById(item
 							.getIdAction());
 					item.setService(service);
+					item.setIcon(service.getIcon());
 				}
+				result.add(item);
 			} while (cursor.moveToNext());
 		}
 		return result;

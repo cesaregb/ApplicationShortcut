@@ -20,41 +20,44 @@ public class ServicesHelper {
 	public ServicesHelper(Context context){
 		serviceList = new ArrayList<ServiceVo>();
 		
-		Drawable icon = context.getResources().getDrawable(R.drawable.navigation_accept);
-		
+		Drawable iconAirplane = context.getResources().getDrawable(R.drawable.airplane_on);
 		AirplaneModeService airplaneModeService = new AirplaneModeService();
-		airplaneModeService.setName("airplaneModeService");
-		airplaneModeService.setDescription("airplaneModeService");
+		airplaneModeService.setName("Airplane Service");
+		airplaneModeService.setDescription("Airplane Service");
 		airplaneModeService.setSelected(false);
-		airplaneModeService.setIcon(icon);
+		airplaneModeService.setIcon(iconAirplane);
 		serviceList.add(airplaneModeService);
 		
+		Drawable iconWifi = context.getResources().getDrawable(R.drawable.wifi);
 		WifiService wifi = new WifiService();
-		wifi.setName("wifi");
-		wifi.setDescription("wifi");
+		wifi.setName("Wifi Service");
+		wifi.setDescription("Wifi Service");
 		wifi.setSelected(false);
-		wifi.setIcon(icon);
+		wifi.setIcon(iconWifi);
 		serviceList.add(wifi);
 		
+		Drawable iconBluetooth = context.getResources().getDrawable(R.drawable.bluetooth);
 		BluetoothService bluetoothService = new BluetoothService();
-		bluetoothService.setName("bluetoothService");
-		bluetoothService.setDescription("bluetoothService");
+		bluetoothService.setName("Bluetooth Service");
+		bluetoothService.setDescription("Bluetooth Service");
 		bluetoothService.setSelected(false);
-		bluetoothService.setIcon(icon);
+		bluetoothService.setIcon(iconBluetooth);
 		serviceList.add(bluetoothService);
 		
+		Drawable iconGps = context.getResources().getDrawable(R.drawable.gps);
 		GPSService gpsService = new GPSService();
-		gpsService.setName("gpsService");
-		gpsService.setDescription("gpsService");
+		gpsService.setName("GPS Service");
+		gpsService.setDescription("GPS Service");
 		gpsService.setSelected(false);
-		gpsService.setIcon(icon);
+		gpsService.setIcon(iconGps);
 		serviceList.add(gpsService);
 		
+		Drawable iconSoundOff = context.getResources().getDrawable(R.drawable.sound_off);
 		SoundOffService soundOffService = new SoundOffService();
-		soundOffService.setName("soundOffService");
-		soundOffService.setDescription("soundOffService");
+		soundOffService.setName("Sound off");
+		soundOffService.setDescription("Sound off");
 		soundOffService.setSelected(false);
-		soundOffService.setIcon(icon);
+		soundOffService.setIcon(iconSoundOff);
 		serviceList.add(soundOffService);
 		
 	}
@@ -66,9 +69,7 @@ public class ServicesHelper {
 	public List<ServiceVo> getServiceList(List<ServiceVo> list) {
 		if (list != null 
 				&& list.size() > 0){
-			
 			for (ServiceVo item : list){
-				
 				for (int i = 0; i < serviceList.size(); i++){
 					if (serviceList.get(i).equals(item)){
 						serviceList.get(i).setSelected(true);

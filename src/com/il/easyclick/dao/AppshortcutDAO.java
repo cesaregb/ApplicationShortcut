@@ -203,8 +203,7 @@ public class AppshortcutDAO {
 	
 	/*Activities  */
 	public void saveActivity(Context context, String selectedPattern,
-			ActivityVo mCurrentActivity, boolean detailsUpdated,
-			List<ActivityDetailVo> activityList) throws Exception{
+			ActivityVo mCurrentActivity, boolean detailsUpdated) throws Exception{
 		
 		ActivitiesDAO activitiDao = new ActivitiesDAO(context);
 		if (selectedPattern != null && selectedPattern != "") {
@@ -214,14 +213,16 @@ public class AppshortcutDAO {
 					AppshortcutDAO.TYPE_ACTIVITY);
 		}
 		
+		List<ActivityDetailVo> activityList =  mCurrentActivity.getActivityDetailListVo().data;
 		long idActivity = activitiDao.addUpdateActivity(mCurrentActivity);
-		if (detailsUpdated) {
+		if (detailsUpdated && activityList != null) {
 			saveActivityLists(activityList, idActivity, context);
 		}
 	}
 	
 	
-	public void saveActivityLists(List<ActivityDetailVo> listDetails, long activityId, Context context){
+	public void saveActivityLists(List<ActivityDetailVo> listDetails,
+			long activityId, Context context) {
 		// Delete Actions (applications)  
 		ActivityDetailsDAO activitiesDetailsDao =  new ActivityDetailsDAO(context);
 		ActionsDAO actionsDao = new ActionsDAO(context);
@@ -244,6 +245,9 @@ public class AppshortcutDAO {
 		for (ActivityDetailVo detailItem : listDetails) {
 			// if app save action in actions table. 
 			detailItem.setIdActivity(safeLongToInt(activityId));
+			//when updating applicatoin still we removed all the information so reset the id
+			detailItem.setIdActivityDetail(0);
+			
 			if (detailItem.getType() == ActivitiesDAO.TYPE_ACTION) {
 				detailItem.getApplication().getCurrentAction()
 						.setType(ActivityDetailsDAO.DETAIL_TYPE_ACTIVITY);

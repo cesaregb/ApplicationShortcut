@@ -28,7 +28,6 @@ public class ActivitySelectIconDialogFragment extends DialogFragment {
 	ActivitySelectIconDialogImageAdapter gridAdapter;
 	List<EventIconVo> myObjects;
 	
-
 	ActivitySelectIconDialogListener mCallback;
 	
 	public interface ActivitySelectIconDialogListener {
@@ -67,13 +66,15 @@ public class ActivitySelectIconDialogFragment extends DialogFragment {
                 gridAdapter.notifyDataSetChanged();
             }
         });
-		
+
 		builder.setView(layout)
-				.setTitle(R.string.filter)
+				.setTitle(R.string.title_select_activity_icon)
 				.setPositiveButton(R.string.apply,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								mCallback.onDialogPositiveClick(ActivitySelectIconDialogFragment.this, myObjects.get(lastSelected));
+								mCallback.onDialogPositiveClick(
+										ActivitySelectIconDialogFragment.this,
+										myObjects.get(lastSelected));
 								myObjects.get(lastSelected).setSelected(false);
 								lastSelected = -1;
 							}
@@ -81,48 +82,52 @@ public class ActivitySelectIconDialogFragment extends DialogFragment {
 				.setNegativeButton(R.string.cancel,
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								mCallback.onDialogNegativeClick(ActivitySelectIconDialogFragment.this);
+								mCallback
+										.onDialogNegativeClick(ActivitySelectIconDialogFragment.this);
 							}
-						})
-		;
+						});
 		return builder.create();
 	}
 	
-	class ActivitySelectIconDialogImageAdapter extends BaseAdapter {   
-		private Context mContext;   
-		public ActivitySelectIconDialogImageAdapter(Context c) {   
-			mContext = c;   
-		}   
-		public int getCount() {   
-			return myObjects.size();   
-		}   
-		public Object getItem(int position) {   
-			return null;   
-		}   
-		public long getItemId(int position) {   
-			return 0;   
-		}   
-		public View getView(int position, View convertView, ViewGroup   
-				parent) {
+	class ActivitySelectIconDialogImageAdapter extends BaseAdapter {
+		private Context mContext;
+
+		public ActivitySelectIconDialogImageAdapter(Context c) {
+			mContext = c;
+		}
+
+		public int getCount() {
+			return myObjects.size();
+		}
+
+		public Object getItem(int position) {
+			return null;
+		}
+
+		public long getItemId(int position) {
+			return 0;
+		}
+
+		public View getView(int position, View convertView, ViewGroup parent) {
 			EventIconVo icon = myObjects.get(position);
-			ImageView imageView;   
-			if (convertView == null) {  
-				imageView = new ImageView(mContext);   
-				imageView.setLayoutParams(new GridView.LayoutParams(85, 85));   
-				imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);   
-				imageView.setPadding(8, 8, 8, 8);   
-			} else {   
-				imageView = (ImageView) convertView;   
+			ImageView imageView;
+			if (convertView == null) {
+				imageView = new ImageView(mContext);
+				imageView.setLayoutParams(new GridView.LayoutParams(85, 85));
+				imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+				imageView.setPadding(5, 5, 5, 5);
+			} else {
+				imageView = (ImageView) convertView;
 			}
-			
+
 			if (icon.isSelected()) {
 				imageView.setBackgroundColor(Color.LTGRAY);
-            }else{
-            	imageView.setBackgroundColor(Color.WHITE);
-            }
+			} else {
+				imageView.setBackgroundColor(Color.WHITE);
+			}
 			imageView.setImageResource(icon.getIdResource());
-			return imageView;   
-		}   
-	}   
+			return imageView;
+		}
+	}
 	
 }

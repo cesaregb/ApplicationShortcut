@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.NavUtils;
 import android.support.v4.app.TaskStackBuilder;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -97,8 +96,6 @@ public class ManageActionActivity extends FragmentActivity
 		appSelected.setCurrentAction(item);
 		appState.setAppSelected(appSelected);
 		
-		Log.d(AppManager.LOG_MANAGE_APPLICATIONS, "Application seleted.");
-
 		if (getTypeResponse == AppManager.ACTIVITY_ACTION_FROM_MAIN) {
 			ApplicationSelectPatternFragment newFragment = new ApplicationSelectPatternFragment();
 			newFragment.setmCurrentInformation(convertApplication2SelectPatternInfoView(appSelected, getApplicationContext()));
@@ -181,12 +178,10 @@ public class ManageActionActivity extends FragmentActivity
 	}
 
 	public void removeSelectedItem(){
-		Log.d(AppManager.LOG_DEBUGGIN, "removeSelectedItem: ");
 		if (mActionLongOver.isSaved()){
 			try{
 				AppshortcutDAO dao = new AppshortcutDAO();
 				dao.removeAction(mActionLongOver, getApplicationContext());
-				
 				ApplicationInfoFragment newFragment = new ApplicationInfoFragment();
 				getSupportFragmentManager()
 						.beginTransaction()
@@ -200,7 +195,6 @@ public class ManageActionActivity extends FragmentActivity
 	}
 	
 	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
-
 	    @Override
 	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
 	        MenuInflater inflater = mode.getMenuInflater();

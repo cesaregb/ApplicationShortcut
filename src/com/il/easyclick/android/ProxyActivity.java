@@ -27,7 +27,7 @@ public class ProxyActivity extends Activity {
 				new RunnableHelper(getApplication(), lIntent).execute();
 			}
 		}catch(Exception e){
-			Log.d(AppManager.LOG_EXCEPTIONS, "Exception on running... ");
+			Log.d(AppManager.LOG_DEBUGGIN, "Exception on running... ");
 			//TODO handle exception...
 		}
 	}

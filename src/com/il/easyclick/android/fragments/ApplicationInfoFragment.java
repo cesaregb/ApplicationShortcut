@@ -101,6 +101,7 @@ public class ApplicationInfoFragment extends Fragment {
 				.getApplicationContext();
 		
 		mCurrentApplication = (ApplicationVo) appState.getAppSelected();
+		
 		updateApplicationView();
 	}
 
@@ -111,13 +112,17 @@ public class ApplicationInfoFragment extends Fragment {
 	public void updateApplicationView() {
 		applicationActionItems.clear();
 		if (mCurrentApplication.getCommonActions() != null 
-				&& mCurrentApplication.getCommonActions().getActions() != null) {
+				&& mCurrentApplication.getCommonActions()
+						.getActions() != null) {
+			
 			applicationActionItems.addAll(mCurrentApplication.getCommonActions().getActions());
 		}
+		
 		aa.notifyDataSetChanged();
-
+		// set text
 		TextView article = (TextView) getActivity().findViewById(R.id.app_name);
 		article.setText(mCurrentApplication.getName());
+		// set icon
 		ImageView image = (ImageView) getActivity().findViewById(
 				R.id.icon_app_selected);
 		ApplicationInfo appInfo = mCurrentApplication.getApplicationInfo();

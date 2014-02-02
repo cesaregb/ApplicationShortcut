@@ -3,9 +3,19 @@
 <!-- Generated with http://android-holo-colors.com -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="easyClick" parent="AppTheme">
+     <style name="EasyClickTheme" parent="AppBaseTheme">
+        <item name="android:actionBarItemBackground">@drawable/selectable_background_easyclick</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu.Easyclick</item>
+        <item name="android:dropDownListViewStyle">@style/DropDownListView.Easyclick</item>
+        <item name="android:actionBarTabStyle">@style/ActionBarTabStyle.Easyclick</item>
+        <item name="android:actionDropDownStyle">@style/DropDownNav.Easyclick</item>
+        <item name="android:actionBarStyle">@style/ActionBar.Solid.Easyclick</item>
+        <item name="android:actionModeBackground">@drawable/cab_background_top_easyclick</item>
+        <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_easyclick</item>
+        <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Easyclick</item>
         <item name="android:editTextStyle">@style/EditTexteasyClick</item>
+        <item name="android:textColor">#BADC14</item>
         <item name="android:progressBarStyleHorizontal">@style/ProgressBareasyClick</item>
     </style>
-
+    
 </resources>

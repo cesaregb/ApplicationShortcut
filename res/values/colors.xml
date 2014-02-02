@@ -5,10 +5,6 @@
     <color name="marker_color">#AFFF</color>
     <color name="text_color">#AFFF</color>
     
-    <color name="notepad_paper">#EEF8E0A0</color>
-    <color name="notepad_lines">#FF0000FF</color>
-    <color name="notepad_margin">#90FF0000</color>
-    <color name="notepad_text">#AA0000FF</color>
 
     <!-- From android -->
     <color name="window_background">#FF191919</color>
@@ -20,4 +16,10 @@
     <color name="gesture_color">#ff0563c1</color>
     <color name="uncertain_gesture_color">#ff848484</color>
 
+    <!-- List Colors -->
+    <color name="lists_background_color">#FFFFFF</color>
+    <color name="lists_selected_background_color">#666666</color>
+    <color name="lists_lines">#ECEC6B</color>
+    <color name="lists_margin">#ECEC6B</color>
+    <color name="lists_text">#BADC14</color>
 </resources>

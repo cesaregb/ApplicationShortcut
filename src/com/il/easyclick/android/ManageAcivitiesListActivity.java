@@ -41,22 +41,24 @@ public class ManageAcivitiesListActivity extends FragmentActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_manage_acivities_list);
-		
+
 		ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);
-		actionBar.setDisplayShowTitleEnabled(false);
-		FragmentManager fm =  getSupportFragmentManager();
-		listFragment = (ActivityListFragment) fm.findFragmentById(R.id.ActivityFragment);
+		actionBar.setDisplayShowTitleEnabled(true);
+
+		FragmentManager fm = getSupportFragmentManager();
+		listFragment = (ActivityListFragment) fm
+				.findFragmentById(R.id.ActivityFragment);
 		listFragment.setmCallback(this);
-		
+
 		activityItems = new ArrayList<ActivityVo>();
 		int resID = R.layout.comp_activities_list_item;
 		aa = new ActivityItemAdapter(this, resID, activityItems);
 		aa.setCallback(this);
 		listFragment.setListAdapter(aa);
-		
+
 		listActivities = new ArrayList<ActivityVo>();
-		activitiesDao =  new ActivitiesDAO(getApplicationContext());
+		activitiesDao = new ActivitiesDAO(getApplicationContext());
 	}
 
 	
@@ -91,11 +93,11 @@ public class ManageAcivitiesListActivity extends FragmentActivity implements
 		return super.onOptionsItemSelected(item);
 	}
 	
-	
-	public void loadNewActivityFragment(){
-		EasyClickApplication appState = ((EasyClickApplication)getApplicationContext());
+	public void loadNewActivityFragment() {
+		EasyClickApplication appState = ((EasyClickApplication) getApplicationContext());
 		appState.setCurrentActivity(null);
-		Intent i = new Intent(ManageAcivitiesListActivity.this, ManageActivityActivity.class);
+		Intent i = new Intent(ManageAcivitiesListActivity.this,
+				ManageActivityActivity.class);
 		startActivity(i);
 	}
 	
@@ -111,7 +113,6 @@ public class ManageAcivitiesListActivity extends FragmentActivity implements
 			Toast.makeText(getApplicationContext(), "No activities where found", Toast.LENGTH_SHORT).show();
 		}
 	}
-
 	
 	/**
 	 * @author cesaregb progress dialog loads application list
@@ -157,6 +158,11 @@ public class ManageAcivitiesListActivity extends FragmentActivity implements
 	}
 
 	public void itemSelected(ActivityVo activity) {
+		//remove menu
+		if (mActionMode != null) {((ActionMode) mActionMode).finish();}
+		aa.notifyDataSetChanged();
+		listFragment.setPrev(null);
+		
 		EasyClickApplication appState = ((EasyClickApplication)getApplicationContext());
 		appState.setCurrentActivity(activity);
 		Intent i = new Intent(ManageAcivitiesListActivity.this, ManageActivityActivity.class);
@@ -196,6 +202,8 @@ public class ManageAcivitiesListActivity extends FragmentActivity implements
 	    public void onDestroyActionMode(ActionMode mode) {
 	    	mActivityLongOver = null;
 	        mActionMode = null;
+	        aa.notifyDataSetChanged();
+	        listFragment.setPrev(null);
 	    }
 	};
 

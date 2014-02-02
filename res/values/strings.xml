@@ -16,11 +16,10 @@
     <string name="confirm">Confirm</string>
     <string name="apply">Apply</string>
 
-    <!-- activities captions -->
+    <string name="title_select_activity_icon">Select Activity Icon</string>
+    <string name="title_select_services">Select Services</string>
     <string name="title_activity_manage_patterns">Manage Patterns</string>
     <string name="title_activity_manage_application">Manage Application</string>
-
-    <!-- specific -->
     <string name="viewActiveSelections">Active</string>
     <string name="manageApplications">Applications</string>
     <string name="manageActivities">Activities</string>
@@ -28,24 +27,15 @@
     <string name="desc_temporal">Background image</string>
     <string name="assigned">Assigned</string>
     <string name="not_assigned">Not Assigned</string>
-
-    <string-array name="filter_options_string_array">
-        <item>All</item>
-        <item>Assigned</item>
-        <item>Not Assigned</item>
-    </string-array>
-
     <string name="dummy_section_text">Section %1d is just a dummy section.</string>
-    <string name="title_activity_proxy">ProxyActivity</string>
+    <string name="title_activity_proxy">Proxy Activity</string>
     <string name="hello_world">Hello world!</string>
-    <string name="title_activity_manage_acivities_list">ManageAcivitiesListActivity</string>
+    <string name="title_activity_manage_acivities_list">Activity List</string>
     <string name="addItemHint">New To Do Item</string>
     <string name="addItemContentDescription">New To Do Item</string>
-    <string name="title_activity_manage_activity">ManageActivityActivity</string>
-    <string name="title_activity_select_event_widget">SelectEventWidgetActivity</string>
-    <string name="title_activity_configure_widget_sc">ConfigureWidgetActivity</string>
-
-    <!-- Settings -->
+    <string name="title_activity_manage_activity">Activity</string>
+    <string name="title_activity_select_event_widget">Select Widget\' Event</string>
+    <string name="title_activity_configure_widget_sc">Configure Widget</string>
     <string name="settings_information">Information</string>
     <string name="settings_clear_all">Clear all selectoins</string>
     <string name="settings_desc_clear_all">Clear all selectoins</string>
@@ -53,6 +43,19 @@
     <string name="settings_desc_clear_applications">Clear Applications</string>
     <string name="settings_clear_activities">Clear Activities</string>
     <string name="settings_desc_clear_activities">Clear Activities</string>
-    <string name="title_activity_view_all_selections">ViewAllSelectionsActivity</string>
+    <string name="title_activity_view_all_selections">View All Active</string>
+    <string name="type_activity_detail">Detail Type</string>
+
+    <string-array name="filter_options_string_array">
+        <item>All</item>
+        <item>Assigned</item>
+        <item>Not Assigned</item>
+    </string-array>
+    
+    <string-array name="dialog_options_activity_type">
+        <item>Application</item>
+        <item>Service</item>
+    </string-array>
+
 
 </resources>
